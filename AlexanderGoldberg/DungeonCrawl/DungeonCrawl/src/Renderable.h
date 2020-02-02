@@ -14,7 +14,7 @@ private:
 	//SDL
 	SDL_Texture* m_texture = nullptr;
 	SDL_Rect m_destination = SDL_Rect();
-
+	SDL_Renderer* m_rendererRef = nullptr;
 	
 	//rotation
 	float m_currentAngle = 0;
@@ -24,6 +24,7 @@ protected:
 	std::string m_name = "NO NAME SET";
 	void updateDestination();
 	void updateScale();
+	void changeImage(std::string _imagePath, Uint32 _transparentColor = -999);
 public:
 	Renderable();
 	virtual ~Renderable();
@@ -31,6 +32,8 @@ public:
 	virtual void Render(SDL_Renderer* renderer);
 	void SetPosition(float x, float y);
 	void SetPosition(Vector2& pos);
+	Vector2 GetPosition();
+	SDL_Rect GetDestination();
 	void SetSize(Vector2& _scale);
 	void SetSize(float _x, float _y);
 	Vector2 GetCurrentSize();

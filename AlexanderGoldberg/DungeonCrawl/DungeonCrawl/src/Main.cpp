@@ -10,39 +10,12 @@
 #include <iostream>
 #include "SDL_mixer.h"
 #include "World.h"
+#include "BinaryTree.h"
 
 void CleanUpSDL(SDL_Window* _window, SDL_Renderer* _renderer);
 
 
-World generateTiles(Scene* _scene, int _tileCountH, int _tileCountV, int _screenWidth, int _screenHeight) {
-	Vector2 targetSize = Vector2(_screenWidth / _tileCountH, _screenHeight / _tileCountV);
-	World myWorld = World(_tileCountH, _tileCountV);
-	for (size_t i = 0; i < _tileCountV; i++)
-	{
-		for (size_t j = 0; j < _tileCountH; j++)
-		{
-			
-			std::string name = "Tile (" + std::to_string(j) + ", " + std::to_string(i) + ")";
-			Tile* t = new Tile();
-			if (j % 3 == 0)
-			{
-				t->Init("img/block_tile.bmp", name, myWorld.GetTileCount(), j, i, Vector2(j * targetSize.X, i * targetSize.Y), _scene->GetRenderer());
-				t->SetPassable(false);
-			}
-			else
-			{
-				t->Init("img/blank_tile.bmp", name, myWorld.GetTileCount(), j, i, Vector2(j * targetSize.X, i * targetSize.Y), _scene->GetRenderer());
-			}
-				
-			t->SetSize(targetSize);
-			myWorld.AddTile(t);
-			
-			_scene->AddRenderable(t);
-		}
-	}
-	return myWorld;
-	
-}
+ 
 
 void mainLoop()
 {
@@ -56,19 +29,17 @@ void mainLoop()
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
 
 	int width = SDL_GetWindowSurface(window)->w;
-	float height = SDL_GetWindowSurface(window)->h;
+	int height = SDL_GetWindowSurface(window)->h;
 
 
 	DeltaTime deltaTime = DeltaTime();
 
 	std::unique_ptr<Scene> scene(new Scene(renderer));//create scene
-	World myWorld = generateTiles(scene.get(), 20, 15, width, height);
+	World myWorld = World(20, 15);
+	myWorld.GenerateTiles(scene.get(), width, height);
 
 	Timer timer = Timer(3.0f);
-	for (int i = 0; i < 20; i++)
-	{
-		printf("Check from starting point %d in direction is %s\n", i, (myWorld.IsViableDirectionToMoveIn(i, World::TileDirection::LEFT) ? "true" : "false"));
-	}
+
 	while (play)
 	{
 		float dt = deltaTime.GetCurrentDeltaTime();

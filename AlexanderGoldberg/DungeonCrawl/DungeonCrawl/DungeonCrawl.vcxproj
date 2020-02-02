@@ -150,10 +150,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\BinaryTree.cpp" />
+    <ClCompile Include="src\AStarSearch.cpp" />
+    <ClCompile Include="src\BSP.cpp" />
     <ClCompile Include="src\DeltaTime.cpp" />
     <ClCompile Include="src\IInputHandler.cpp" />
     <ClCompile Include="src\InputManager.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\Node.cpp" />
     <ClCompile Include="src\Quit.cpp" />
     <ClCompile Include="src\Renderable.cpp" />
     <ClCompile Include="src\Scene.cpp" />
@@ -162,8 +166,11 @@
     <ClCompile Include="src\Tile.cpp" />
     <ClCompile Include="src\Thing.cpp" />
     <ClCompile Include="src\World.cpp" />
+    <ClCompile Include="src\TreeNode.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\BSP.h" />
+    <ClInclude Include="src\BinaryTree.h" />
     <ClInclude Include="SDL\include\begin_code.h" />
     <ClInclude Include="SDL\include\close_code.h" />
     <ClInclude Include="SDL\include\SDL.h" />
@@ -247,13 +254,16 @@
     <ClInclude Include="SDL\include\SDL_version.h" />
     <ClInclude Include="SDL\include\SDL_video.h" />
     <ClInclude Include="SDL\include\SDL_vulkan.h" />
+    <ClInclude Include="src\AStarSearch.h" />
     <ClInclude Include="src\DeltaTime.h" />
     <ClInclude Include="src\IInputHandler.h" />
     <ClInclude Include="src\InputManager.h" />
+    <ClInclude Include="src\Node.h" />
     <ClInclude Include="src\Quit.h" />
     <ClInclude Include="src\Renderable.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Timer.h" />
+    <ClInclude Include="src\TreeNode.h" />
     <ClInclude Include="src\Vector2.h" />
     <ClInclude Include="src\Tile.h" />
     <ClInclude Include="src\Thing.h" />

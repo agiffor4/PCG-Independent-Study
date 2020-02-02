@@ -24,7 +24,7 @@ void Scene::AddRenderable(const std::string _path, const std::string _name, Vect
 {
 	m_renderables.push_back(std::unique_ptr<Renderable>(new Renderable()));
 	m_renderables[m_renderables.size() - 1]->Init(_path, _name, m_rendererRef);
-	m_renderables[m_renderables.size() - 1]->SetPosition(_position.X, _position.Y);
+	m_renderables[m_renderables.size() - 1]->SetPosition((float)_position.X, (float)_position.Y);
 }
 /*
 int Scene::AddSound(AudioFileA& _sound, bool _playOnCreate)

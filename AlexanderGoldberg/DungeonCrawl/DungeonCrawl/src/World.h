@@ -5,6 +5,8 @@
 #include <string>
 #include "Vector2.h"
 class Tile;
+class Scene;
+class Vector2;
 class World
 {
 protected:
@@ -17,10 +19,20 @@ public:
 	{
 		UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT
 	};
-	World(int _width, int _height);
+	World(int _hTileCount, int _vTileCount);
 	~World();
 	bool IsViableDirectionToMoveIn(int _currentTileIndex, TileDirection _direction);
+	Tile* GetAdjacentTile(int _currentTileIndex, TileDirection _direction);
+	Tile* GetTileAtIndex(int _index);
+	Tile* GetTileAtPosition(int _x, int _y);
+	Tile* GetTile(Tile& _tile);
+	Vector2 GetMapDimentions();
+	std::vector<Tile*> GetNeighbors(Tile* _tileToFindNeighborsFor);
+	std::vector<Tile*> GetNeighbors(int _tileToFindNeighborsFor);
+	std::vector<Tile*> GetTiles();
 	void AddTile(Tile* _renderable);
-	int GetTileCount();
+	int GetTileCount();	
+	void GenerateTiles(Scene* _scene, int _screenWidth, int _screenHeight);
+
 };
 

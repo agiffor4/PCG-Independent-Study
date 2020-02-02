@@ -15,6 +15,7 @@ void Renderable::Init(const std::string _path, const std::string _name, SDL_Rend
 	SDL_Surface* surface = SDL_LoadBMP(_path.c_str());
 	if (surface != nullptr)
 	{
+		m_rendererRef = _renderer;
 		SDL_SetColorKey(surface, SDL_TRUE, (_transparentColor == -999 ? SDL_MapRGB(surface->format, 0, 255, 0) : _transparentColor));
 		m_shouldRender = true;
 		m_texture = SDL_CreateTextureFromSurface(_renderer, surface);
@@ -22,7 +23,7 @@ void Renderable::Init(const std::string _path, const std::string _name, SDL_Rend
 		m_destination.h = surface->h;
 		m_scaleDefault.X = surface->w;
 		m_scaleDefault.Y = surface->h;
-		SDL_CreateTextureFromSurface(_renderer, surface);
+		//SDL_CreateTextureFromSurface(_renderer, surface);
 		
 	}
 	else
@@ -44,6 +45,8 @@ void Renderable::SetPosition(Vector2& _pos) {
 	
 }
 
+Vector2 Renderable::GetPosition() { return m_position;}
+SDL_Rect Renderable::GetDestination() { return m_destination; }
 
 void Renderable::SetSize(Vector2& _scale) {
 
@@ -73,6 +76,28 @@ void Renderable::updateScale()
 {
 	m_destination.w = m_scale.X;
 	m_destination.h = m_scale.Y;
+}
+void Renderable::changeImage(std::string _imagePath, Uint32 _transparentColor)
+{
+	SDL_Surface* surface = SDL_LoadBMP(_imagePath.c_str());
+	if (surface != nullptr)
+	{
+		SDL_DestroyTexture(m_texture);
+		m_texture = nullptr;
+		SDL_SetColorKey(surface, SDL_TRUE, (_transparentColor == -999 ? SDL_MapRGB(surface->format, 0, 255, 0) : _transparentColor));
+		m_texture = SDL_CreateTextureFromSurface(m_rendererRef, surface);
+		m_destination.w = surface->w;
+		m_destination.h = surface->h;
+		m_scaleDefault.X = surface->w;
+		m_scaleDefault.Y = surface->h;
+		SetSize(m_scale);
+
+	}
+	else
+	{
+		printf("Unable to load file at \"%s\"\n", _imagePath.c_str());
+	}
+	SDL_FreeSurface(surface);
 }
 
 void Renderable::Render(SDL_Renderer* renderer)

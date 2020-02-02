@@ -11,13 +11,17 @@ private:
 	SDL_Event e = SDL_Event();
 	void onKeyDown(SDL_Keycode _key);
 	void onKeyUp(SDL_Keycode _key);
+	void onMouseDown(SDL_MouseButtonEvent _mouse);
+	void onMouseUp(SDL_MouseButtonEvent _mouse);
 
-	std::vector<IInputHandler*> m_subscribers[2];
+	std::vector<IInputHandler*> m_subscribers[4];
 	
 public:
 	enum class KeyPressType {
 		UP,
 		DOWN,
+		MOUSEUP,
+		MOUSEDOWN
 
 	};
 	InputManager();
