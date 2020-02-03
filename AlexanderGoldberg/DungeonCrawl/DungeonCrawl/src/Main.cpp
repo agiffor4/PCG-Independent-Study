@@ -32,7 +32,7 @@ void mainLoop()
 	int width = SDL_GetWindowSurface(window)->w;
 	int height = SDL_GetWindowSurface(window)->h;
 	BSP bsp = BSP(32, 32);
-	bsp.BeginSplit(3);
+	bsp.BeginSplit(4);
 	int foo = 0;
 	DeltaTime deltaTime = DeltaTime();
 

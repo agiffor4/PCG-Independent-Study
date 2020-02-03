@@ -83,6 +83,22 @@ void BSP::split()
 	}
 
 }
+void print(std::vector<int>& _toPrint, int _width) {
+	//print
+	printf("\n\n");
+	for (size_t i = 0; i < _toPrint.size(); i++)
+	{
+		std::string message = _toPrint[i] < 10 ? "0" + std::to_string(_toPrint[i]) : std::to_string(_toPrint[i]);
+		
+		printf("%s", message.c_str());
+		if (i % _width == _width - 1)
+		{
+			printf("\n");
+		}
+
+	}
+	printf("\n\n");
+}
 
 void BSP::printLeafResults() {
 	int sizeOfTree = m_tree.size();
@@ -91,40 +107,31 @@ void BSP::printLeafResults() {
 	//(m_width * y) + x
 	for (size_t i = 0; i < m_height * m_width; i++)
 	{
-		mapToPrint.push_back(-1);
+		mapToPrint.push_back(0);
 	}
 	
+	print(mapToPrint, m_width);
+
 	for (size_t i = 0; i < leaves.size(); i++)
 	{
 		BSPNode::RectA rect = leaves[i]->GetRect();
-		int x1 = rect.x1;
-		int y1 = 32 - rect.y1;
+		int x1 = rect.x1;		
+		int y1 = m_height - rect.y1;
 		int x2 = rect.x2;
-		int y2 = 32 - rect.y2;
+		int y2 = m_height - rect.y2;
 		for (size_t y = y2; y < y1; y++)
 		{
 			for (size_t x = x1; x < x2; x++)
 			{
-				mapToPrint[(m_width * y) + x] = leaves[i]->GetSelfIndex() + 1;
+				mapToPrint[(m_width * y) + x] = (leaves[i]->GetSelfIndex() + 1);
 			}
 		}
 		
 
 	}
 
-
-	//print
-	printf("\n\n");
-	for (size_t i = 0; i < mapToPrint.size(); i++)
-	{
-		printf("%s", std::to_string(mapToPrint[i]).c_str());
-		if (i % m_width == m_width -1)
-		{
-			printf("\n");
-		}
-		
-	}
-	printf("\n\n");
+	print(mapToPrint, m_width);
+	
 }
 
 BSPNode* BSP::GetFirstLeaf() {
