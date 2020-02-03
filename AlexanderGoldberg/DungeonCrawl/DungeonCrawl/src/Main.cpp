@@ -10,7 +10,7 @@
 #include <iostream>
 #include "SDL_mixer.h"
 #include "World.h"
-#include "BinaryTree.h"
+#include "BSP.h"
 
 void CleanUpSDL(SDL_Window* _window, SDL_Renderer* _renderer);
 
@@ -19,6 +19,7 @@ void CleanUpSDL(SDL_Window* _window, SDL_Renderer* _renderer);
 
 void mainLoop()
 {
+	srand(1024);// time(NULL));
 	//quit functionality
 	bool play = true;
 	Quit quit = Quit(&play);
@@ -30,8 +31,9 @@ void mainLoop()
 
 	int width = SDL_GetWindowSurface(window)->w;
 	int height = SDL_GetWindowSurface(window)->h;
-
-
+	BSP bsp = BSP(32, 32);
+	bsp.BeginSplit(3);
+	int foo = 0;
 	DeltaTime deltaTime = DeltaTime();
 
 	std::unique_ptr<Scene> scene(new Scene(renderer));//create scene

@@ -150,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\BSPNode.cpp" />
     <ClCompile Include="src\BinaryTree.cpp" />
     <ClCompile Include="src\AStarSearch.cpp" />
     <ClCompile Include="src\BSP.cpp" />
@@ -169,6 +170,7 @@
     <ClCompile Include="src\TreeNode.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\BSPNode.h" />
     <ClInclude Include="src\BSP.h" />
     <ClInclude Include="src\BinaryTree.h" />
     <ClInclude Include="SDL\include\begin_code.h" />
