@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 class BSPNode;
+class World;
 class BSP
 {
 public:
@@ -19,6 +20,7 @@ private:
 	std::vector<BSPNode*> m_tree;
 	std::vector<DTS> m_previousRotations;
 	void split();
+	void print(std::vector<int>& _toPrint, int _width);	
 	void printLeafResults();
 public:
 	BSP(int _gridWidth, int _gridHeight);
@@ -28,7 +30,9 @@ public:
 	int GetFirstLeafIndex();
 	std::vector<BSPNode*> GetLeaves();
 	BSPNode* GetRandomLeaf();
+	std::vector<std::vector<int>> GetPartions(World* _world);
 	int Size();
+
 	
 };
 

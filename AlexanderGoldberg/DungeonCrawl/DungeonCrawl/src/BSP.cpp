@@ -1,6 +1,8 @@
 #include "BSP.h"
 #include "BSPNode.h"
 #include <string>
+#include"World.h"
+#include "Tile.h"
 BSP::BSP(int _gridWidth, int _gridHeight)
 {
 	m_width = _gridWidth;
@@ -83,7 +85,7 @@ void BSP::split()
 	}
 
 }
-void print(std::vector<int>& _toPrint, int _width) {
+void BSP::print(std::vector<int>& _toPrint, int _width) {
 	//print
 	printf("\n\n");
 	for (size_t i = 0; i < _toPrint.size(); i++)
@@ -99,9 +101,33 @@ void print(std::vector<int>& _toPrint, int _width) {
 	}
 	printf("\n\n");
 }
+std::vector<std::vector<int>> BSP::GetPartions(World* _world) {
+	std::vector<std::vector<int>> partions = std::vector<std::vector<int>>();
+	std::vector<BSPNode*> leaves = GetLeaves();
+	for (size_t i = 0; i < leaves.size(); i++)
+	{
+		partions.push_back(std::vector<int>());
+	}
+	for (size_t i = 0; i < leaves.size(); i++)
+	{
+		BSPNode::RectA rect = leaves[i]->GetRect();
+		int x1 = rect.x1;
+		int y1 = m_height - rect.y1;
+		int x2 = rect.x2;
+		int y2 = m_height - rect.y2;
+		for (size_t y = y2; y < y1; y++)
+		{
+			for (size_t x = x1; x < x2; x++)
+			{
+				partions[i].push_back(_world->GetTileAtPosition(x, y)->GetPositionInVector());
+			}
+		}
+	}
+	return partions;
+
+}
 
 void BSP::printLeafResults() {
-	int sizeOfTree = m_tree.size();
 	std::vector<BSPNode*> leaves = GetLeaves();
 	std::vector<int> mapToPrint = std::vector<int>();
 	//(m_width * y) + x
@@ -126,8 +152,6 @@ void BSP::printLeafResults() {
 				mapToPrint[(m_width * y) + x] = (leaves[i]->GetSelfIndex() + 1);
 			}
 		}
-		
-
 	}
 
 	print(mapToPrint, m_width);

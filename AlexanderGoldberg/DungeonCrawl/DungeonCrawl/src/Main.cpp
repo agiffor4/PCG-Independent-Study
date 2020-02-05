@@ -30,16 +30,16 @@ void mainLoop()
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
 
 	int width = SDL_GetWindowSurface(window)->w;
-	int height = SDL_GetWindowSurface(window)->h;
-	BSP bsp = BSP(32, 32);
-	bsp.BeginSplit(4);
-	int foo = 0;
+	int height = SDL_GetWindowSurface(window)->h;	
+
 	DeltaTime deltaTime = DeltaTime();
 
 	std::unique_ptr<Scene> scene(new Scene(renderer));//create scene
 	World myWorld = World(20, 15);
 	myWorld.GenerateTiles(scene.get(), width, height);
-
+	BSP bsp = BSP(20, 15);
+	bsp.BeginSplit(4);
+	bsp.GetPartions(&myWorld);
 	Timer timer = Timer(3.0f);
 
 	while (play)
