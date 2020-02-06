@@ -24,7 +24,7 @@ void BSP::BeginSplit(int _timesToSplit) {
 	m_tree.push_back(new BSPNode(0, 0, m_width, m_height, -1, 0));
 	split();
 	printf("For a target number of splits %d the total size is %d and leaf count is %d\n", m_targetNumOfSplits, m_tree.size(), GetLeaves().size());
-	m_previousRotations.erase(m_previousRotations.begin(), m_previousRotations.end());
+	m_previousRotations.erase(m_previousRotations.begin(), m_previousRotations.end());		
 	printLeafResults();
 }
 
@@ -42,7 +42,7 @@ void BSP::split()
 			bool isNextIndexEven = (m_tree.size() + 1) % 2 == 0;
 			int nextSize = m_tree.size() + 1;
 			int parentIndex = (isNextIndexEven) ? nextSize / 2 : (nextSize-1) / 2;
-			BSPNode::RectA parent = m_tree[parentIndex -1]->GetRect();
+			RectA parent = m_tree[parentIndex -1]->GetRect();
 			if (m_previousRotations.size() > 2)
 			{
 				if (m_previousRotations[m_previousRotations.size() -1] == direction &&
@@ -58,8 +58,8 @@ void BSP::split()
 			m_previousRotations.push_back(direction);
 			
 
-			BSPNode::RectA rect1 = BSPNode::RectA();
-			BSPNode::RectA rect2 = BSPNode::RectA();
+			RectA rect1 = RectA();
+			RectA rect2 = RectA();
 
 			if (direction == DTS::VERTICAL)
 			{
@@ -134,6 +134,39 @@ void BSP::StartOver()
 	WipeTree();
 	BeginSplit(m_targetNumOfSplits);
 }
+
+std::vector<RectA> BSP::GenerateRooms() {
+	std::vector<BSPNode*> leaves = GetLeaves();
+	std::vector<RectA> roomRegions;
+	for (size_t i = 0; i < leaves.size(); i++)
+	{
+		RectA currentPartion = leaves[i]->GetRect();
+		RectA generatedRoom = RectA();
+		int x1 = 0;
+		int y1 = 0;
+		int x2 = 0;
+		int y2 = 0;
+		float a1 = 0;
+		float a2 = currentPartion.Area() * 0.5f;
+		bool minSize = false;
+		do
+		{
+			
+			x1 = currentPartion.x1 + rand() % (currentPartion.x2 - currentPartion.x1 + 1);
+			y1 = currentPartion.y1 + rand() % (currentPartion.y2 - currentPartion.y1 + 1);
+			x2 = x1 + rand() % (currentPartion.x2 - x1 + 1);
+			y2 = y1 + rand() % (currentPartion.y2 - y1 + 1);;
+			generatedRoom.Set(x1, y1, x2, y2);
+			a1 = generatedRoom.Area();
+			minSize = generatedRoom.CheckIfMeetsOrExceedsMin(3, 3);
+		} while (a1 <  a2 && !minSize); 
+		//room must use at least half the partion and be at least a 3x3 sized room
+		roomRegions.push_back(generatedRoom);
+		
+	}
+	return roomRegions;
+}
+
 void BSP::print(std::vector<int>& _toPrint, int _width) {
 	//print
 	printf("\n\n");
@@ -159,7 +192,7 @@ std::vector<std::vector<int>> BSP::GetPartions(World* _world) {
 	}
 	for (size_t i = 0; i < leaves.size(); i++)
 	{
-		BSPNode::RectA rect = leaves[i]->GetRect();
+		RectA rect = leaves[i]->GetRect();
 		int x1 = rect.x1;
 		int y1 = m_height - rect.y1;
 		int x2 = rect.x2;
@@ -189,7 +222,7 @@ void BSP::printLeafResults() {
 
 	for (size_t i = 0; i < leaves.size(); i++)
 	{
-		BSPNode::RectA rect = leaves[i]->GetRect();
+		RectA rect = leaves[i]->GetRect();
 		int x1 = rect.x1;		
 		int y1 = m_height - rect.y1;
 		int x2 = rect.x2;
@@ -204,7 +237,27 @@ void BSP::printLeafResults() {
 	}
 
 	print(mapToPrint, m_width);
+
+	std::vector<RectA> rooms = GenerateRooms();
 	
+
+	for (size_t i = 0; i < rooms.size(); i++)
+	{
+		RectA rect = rooms[i];
+		int x1 = rect.x1;
+		int y1 = m_height - rect.y1;
+		int x2 = rect.x2;
+		int y2 = m_height - rect.y2;
+		for (size_t y = y2; y < y1; y++)
+		{
+			for (size_t x = x1; x < x2; x++)
+			{
+				mapToPrint[(m_width * y) + x] = 0;
+			}
+		}
+	}
+
+	print(mapToPrint, m_width);
 }
 
 BSPNode* BSP::GetFirstLeaf() {

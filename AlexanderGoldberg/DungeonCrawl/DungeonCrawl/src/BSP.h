@@ -1,7 +1,9 @@
 #pragma once
 #include <vector>
+#include "RectA.h"
 class BSPNode;
 class World;
+struct RectA;
 class BSP
 {
 public:
@@ -22,6 +24,7 @@ private:
 	void split();
 	void WipeTree();
 	void StartOver();
+	std::vector<RectA> GenerateRooms();
 	void print(std::vector<int>& _toPrint, int _width);	
 	void printLeafResults();
 public:

@@ -9,7 +9,7 @@ BSPNode::BSPNode(int x1, int y1, int x2, int y2, int _parentIndex, int _selfInde
 	m_parentIndex = _parentIndex;
 	m_selfIndex = _selfIndex;
 }
-BSPNode::BSPNode(BSPNode::RectA _rect, int _parentIndex, int _selfIndex)
+BSPNode::BSPNode(RectA _rect, int _parentIndex, int _selfIndex)
 {
 	m_myRect.x1 = _rect.x1;
 	m_myRect.y1 = _rect.y1;
@@ -24,7 +24,7 @@ BSPNode::~BSPNode()
 {
 }
 
-BSPNode::RectA BSPNode::GetRect()
+RectA BSPNode::GetRect()
 {
 	return m_myRect;
 }
