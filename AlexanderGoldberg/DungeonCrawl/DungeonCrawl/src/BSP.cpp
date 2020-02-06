@@ -64,20 +64,52 @@ void BSP::split()
 			m_previousRotations.push_back(direction);
 			if (direction == DTS::VERTICAL)
 			{
-				int width = parent.x2 - parent.x1;
-				int splitPoint = (parent.x1 + (int)(width * 0.25f)) + rand() % (width - (int)(width * 0.25f) + 1);
-				m_tree.push_back(new BSPNode(parent.x1, parent.y1, splitPoint, parent.y2, parentIndex - 1, m_tree.size() -1));
-				m_tree.push_back(new BSPNode(splitPoint, parent.y1, parent.x2, parent.y2, parentIndex - 1, m_tree.size() -1));
+				int width = parent.x2 - parent.x1;				
+				BSPNode::RectA rect1 = BSPNode::RectA();
+				BSPNode::RectA rect2 = BSPNode::RectA();
+				int timesRound = 99;
+				do
+				{
+					int splitPoint = (parent.x1 + (int)(width * 0.25f)) + rand() % (width - (int)(width * 0.25f) + 1);
+					rect1.Set(parent.x1, parent.y1, splitPoint, parent.y2);
+					rect2.Set(splitPoint, parent.y1, parent.x2, parent.y2);
+					if (timesRound-- < 0)
+					{
+						printf("Unable to break out of do while loop for ensuring minimum room size. Splitting parent at index %d\n", parentIndex);
+						break;
+					}
+				} while (!rect1.CheckIfMeetsOrExceedsMin(3, 3) || !rect2.CheckIfMeetsOrExceedsMin(3, 3));
+
+				m_tree.push_back(new BSPNode(rect1, parentIndex - 1, m_tree.size() -1));
+				m_tree.push_back(new BSPNode(rect2, parentIndex - 1, m_tree.size() -1));
 
 
 
 			}
 			if (direction == DTS::HORIZONTAL)
 			{
-				int width = parent.y2 - parent.y1;
-				int splitPoint = (parent.y1 + (int)(width * 0.25f))+ std::rand() % (width - (int)(width * 0.25f) + 1);
-				m_tree.push_back(new BSPNode(parent.x1, parent.y1, parent.x2, splitPoint, parentIndex - 1, m_tree.size() -1));
-				m_tree.push_back(new BSPNode(parent.x1, splitPoint, parent.x2, parent.y2, parentIndex - 1, m_tree.size() -1));
+				int height = parent.y2 - parent.y1;
+				
+				
+				BSPNode::RectA rect1 = BSPNode::RectA();
+				BSPNode::RectA rect2 = BSPNode::RectA();
+				int timesRound = 99;
+				do
+				{
+					int splitPoint = (parent.y1 + (int)(height * 0.25f)) + std::rand() % (height - (int)(height * 0.25f) + 1);
+					
+					rect1.Set(parent.x1, parent.y1, parent.x2, splitPoint);
+					rect2.Set(parent.x1, splitPoint, parent.x2, parent.y2);
+
+					if (timesRound-- < 0)
+					{
+						printf("Unable to break out of do while loop for ensuring minimum room size. Splitting parent at index %d\n", parentIndex);
+						break;
+					}
+				} while (!rect1.CheckIfMeetsOrExceedsMin(3, 3) || !rect2.CheckIfMeetsOrExceedsMin(3, 3));
+
+				m_tree.push_back(new BSPNode(rect1, parentIndex - 1, m_tree.size() -1));
+				m_tree.push_back(new BSPNode(rect2, parentIndex - 1, m_tree.size() -1));
 
 			}
 		}
