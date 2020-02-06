@@ -20,6 +20,8 @@ private:
 	std::vector<BSPNode*> m_tree;
 	std::vector<DTS> m_previousRotations;
 	void split();
+	void WipeTree();
+	void StartOver();
 	void print(std::vector<int>& _toPrint, int _width);	
 	void printLeafResults();
 public:

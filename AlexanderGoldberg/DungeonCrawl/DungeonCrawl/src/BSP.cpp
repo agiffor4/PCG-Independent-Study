@@ -12,22 +12,15 @@ BSP::BSP(int _gridWidth, int _gridHeight)
 
 BSP::~BSP()
 {
-
-	for (size_t i = 0; i < m_tree.size(); i++)
-	{
-		if (m_tree[i] != nullptr)
-		{
-			delete(m_tree[i]);
-			m_tree[i] = nullptr;
-		}
-	}
-	m_tree.erase(m_tree.begin(), m_tree.end());
+	WipeTree();
+	
 }
 
 
 void BSP::BeginSplit(int _timesToSplit) {
 	
 	m_targetNumOfSplits = _timesToSplit;
+	m_numberOfSplits = 0;
 	m_tree.push_back(new BSPNode(0, 0, m_width, m_height, -1, 0));
 	split();
 	printf("For a target number of splits %d the total size is %d and leaf count is %d\n", m_targetNumOfSplits, m_tree.size(), GetLeaves().size());
@@ -39,6 +32,7 @@ void BSP::split()
 {
 	
 	m_numberOfSplits++;
+	bool success = true;
 	if (m_numberOfSplits < m_targetNumOfSplits)
 	{
 		size_t size = m_tree.size();
@@ -62,11 +56,14 @@ void BSP::split()
 				
 			}
 			m_previousRotations.push_back(direction);
+			
+
+			BSPNode::RectA rect1 = BSPNode::RectA();
+			BSPNode::RectA rect2 = BSPNode::RectA();
+
 			if (direction == DTS::VERTICAL)
 			{
-				int width = parent.x2 - parent.x1;				
-				BSPNode::RectA rect1 = BSPNode::RectA();
-				BSPNode::RectA rect2 = BSPNode::RectA();
+				int width = parent.x2 - parent.x1;	
 				int timesRound = 99;
 				do
 				{
@@ -75,24 +72,16 @@ void BSP::split()
 					rect2.Set(splitPoint, parent.y1, parent.x2, parent.y2);
 					if (timesRound-- < 0)
 					{
+						success = false;
 						printf("Unable to break out of do while loop for ensuring minimum room size. Splitting parent at index %d\n", parentIndex);
 						break;
 					}
 				} while (!rect1.CheckIfMeetsOrExceedsMin(3, 3) || !rect2.CheckIfMeetsOrExceedsMin(3, 3));
 
-				m_tree.push_back(new BSPNode(rect1, parentIndex - 1, m_tree.size() -1));
-				m_tree.push_back(new BSPNode(rect2, parentIndex - 1, m_tree.size() -1));
-
-
-
 			}
 			if (direction == DTS::HORIZONTAL)
 			{
-				int height = parent.y2 - parent.y1;
-				
-				
-				BSPNode::RectA rect1 = BSPNode::RectA();
-				BSPNode::RectA rect2 = BSPNode::RectA();
+				int height = parent.y2 - parent.y1;				
 				int timesRound = 99;
 				do
 				{
@@ -103,26 +92,54 @@ void BSP::split()
 
 					if (timesRound-- < 0)
 					{
+						success = false;
 						printf("Unable to break out of do while loop for ensuring minimum room size. Splitting parent at index %d\n", parentIndex);
 						break;
 					}
 				} while (!rect1.CheckIfMeetsOrExceedsMin(3, 3) || !rect2.CheckIfMeetsOrExceedsMin(3, 3));
-
-				m_tree.push_back(new BSPNode(rect1, parentIndex - 1, m_tree.size() -1));
-				m_tree.push_back(new BSPNode(rect2, parentIndex - 1, m_tree.size() -1));
-
 			}
+			if (success)
+			{
+				m_tree.push_back(new BSPNode(rect1, parentIndex - 1, m_tree.size() - 1));
+				m_tree.push_back(new BSPNode(rect2, parentIndex - 1, m_tree.size() - 1));
+			}
+			
 		}
-		split();
+		if (success)
+		{
+			split();
+		}
+		else
+		{
+			StartOver();
+			return;
+		}
 	}
 
+}
+void BSP::WipeTree() {
+	for (size_t i = 0; i < m_tree.size(); i++)
+	{
+		if (m_tree[i] != nullptr)
+		{
+			delete(m_tree[i]);
+			m_tree[i] = nullptr;
+		}
+	}
+	m_tree.erase(m_tree.begin(), m_tree.end());
+}
+
+void BSP::StartOver() 
+{
+	WipeTree();
+	BeginSplit(m_targetNumOfSplits);
 }
 void BSP::print(std::vector<int>& _toPrint, int _width) {
 	//print
 	printf("\n\n");
 	for (size_t i = 0; i < _toPrint.size(); i++)
 	{
-		std::string message = _toPrint[i] < 10 ? "0" + std::to_string(_toPrint[i]) : std::to_string(_toPrint[i]);
+		std::string message = _toPrint[i] < 10 ? "|0" + std::to_string(_toPrint[i]) : "|" + std::to_string(_toPrint[i]);
 		
 		printf("%s", message.c_str());
 		if (i % _width == _width - 1)
