@@ -22,10 +22,16 @@ void BSP::BeginSplit(int _timesToSplit) {
 	m_targetNumOfSplits = _timesToSplit;
 	m_numberOfSplits = 0;
 	m_tree.push_back(new BSPNode(0, 0, m_width, m_height, -1, 0));
-	split();
-	printf("For a target number of splits %d the total size is %d and leaf count is %d\n", m_targetNumOfSplits, m_tree.size(), GetLeaves().size());
-	m_previousRotations.erase(m_previousRotations.begin(), m_previousRotations.end());		
-	printLeafResults();
+	split();	
+	m_previousRotations.erase(m_previousRotations.begin(), m_previousRotations.end());	
+	if (!printedOnce)
+	{
+		printf("For a target number of splits %d the total size is %d and leaf count is %d\n", m_targetNumOfSplits, m_tree.size(), GetLeaves().size());
+		printedOnce = true;
+		printLeafResults();
+		printf("\nTotal number of generation attempts is %d\n", m_generationAttempt);
+	}
+	
 }
 
 void BSP::split()
@@ -60,6 +66,11 @@ void BSP::split()
 
 			RectA rect1 = RectA();
 			RectA rect2 = RectA();
+			
+
+			int mhps = m_ensureRoomSeperation ? 5 : 3;//Minimum Horizontal Partion Size
+			int mvps = m_ensureRoomSeperation ? 5 : 3;//Minimum Vertical Partion Size
+				
 
 			if (direction == DTS::VERTICAL)
 			{
@@ -76,7 +87,7 @@ void BSP::split()
 						printf("Unable to break out of do while loop for ensuring minimum room size. Splitting parent at index %d\n", parentIndex);
 						break;
 					}
-				} while (!rect1.CheckIfMeetsOrExceedsMin(3, 3) || !rect2.CheckIfMeetsOrExceedsMin(3, 3));
+				} while (!rect1.CheckIfMeetsOrExceedsMin(mhps, mvps) || !rect2.CheckIfMeetsOrExceedsMin(mhps, mvps));
 
 			}
 			if (direction == DTS::HORIZONTAL)
@@ -96,7 +107,7 @@ void BSP::split()
 						printf("Unable to break out of do while loop for ensuring minimum room size. Splitting parent at index %d\n", parentIndex);
 						break;
 					}
-				} while (!rect1.CheckIfMeetsOrExceedsMin(3, 3) || !rect2.CheckIfMeetsOrExceedsMin(3, 3));
+				} while (!rect1.CheckIfMeetsOrExceedsMin(mhps, mvps) || !rect2.CheckIfMeetsOrExceedsMin(mhps, mvps));
 			}
 			if (success)
 			{
@@ -132,12 +143,14 @@ void BSP::WipeTree() {
 void BSP::StartOver() 
 {
 	WipeTree();
+	m_generationAttempt++;
 	BeginSplit(m_targetNumOfSplits);
 }
 
 std::vector<RectA> BSP::GenerateRooms() {
 	std::vector<BSPNode*> leaves = GetLeaves();
 	std::vector<RectA> roomRegions;
+
 	for (size_t i = 0; i < leaves.size(); i++)
 	{
 		RectA currentPartion = leaves[i]->GetRect();
@@ -146,21 +159,47 @@ std::vector<RectA> BSP::GenerateRooms() {
 		int y1 = 0;
 		int x2 = 0;
 		int y2 = 0;
-		float a1 = 0;
-		float a2 = currentPartion.Area() * 0.5f;
-		bool minSize = false;
-		do
+		int timesRound = 500;
+		if (leaves[i]->GetSelfIndex() == 9)
 		{
+			int foo = 0;
+		}
+		if (m_ensureRoomSeperation)
+		{
+			RectA partionWithEnforcedWalls = RectA(currentPartion.x1 + 1, currentPartion.y1 + 1, currentPartion.x2 - 1, currentPartion.y2 -1);
 			
-			x1 = currentPartion.x1 + rand() % (currentPartion.x2 - currentPartion.x1 + 1);
-			y1 = currentPartion.y1 + rand() % (currentPartion.y2 - currentPartion.y1 + 1);
-			x2 = x1 + rand() % (currentPartion.x2 - x1 + 1);
-			y2 = y1 + rand() % (currentPartion.y2 - y1 + 1);;
-			generatedRoom.Set(x1, y1, x2, y2);
-			a1 = generatedRoom.Area();
-			minSize = generatedRoom.CheckIfMeetsOrExceedsMin(3, 3);
-		} while (a1 <  a2 && !minSize); 
-		//room must use at least half the partion and be at least a 3x3 sized room
+			do
+			{
+
+				x1 = partionWithEnforcedWalls.x1 + rand() % (partionWithEnforcedWalls.x2 - partionWithEnforcedWalls.x1 + 1);
+				y1 = partionWithEnforcedWalls.y1 + rand() % (partionWithEnforcedWalls.y2 - partionWithEnforcedWalls.y1 + 1);
+				x2 = x1 + rand() % (partionWithEnforcedWalls.x2 - x1 + 1);
+				y2 = y1 + rand() % (partionWithEnforcedWalls.y2 - y1 + 1);
+				generatedRoom.Set(x1, y1, x2, y2);
+			} while (generatedRoom.Area() < partionWithEnforcedWalls.Area() * 0.5f || !generatedRoom.CheckIfMeetsOrExceedsMin(3, 3));
+			//room must use at least half the partion and be at least a 3x3 sized room
+			
+		}
+		else
+		{
+			do
+			{
+
+				x1 = currentPartion.x1 + rand() % (currentPartion.x2 - currentPartion.x1 + 1);
+				y1 = currentPartion.y1 + rand() % (currentPartion.y2 - currentPartion.y1 + 1);
+				x2 = x1 + rand() % (currentPartion.x2 - x1 + 1);
+				y2 = y1 + rand() % (currentPartion.y2 - y1 + 1);
+				generatedRoom.Set(x1, y1, x2, y2);
+			} while (generatedRoom.Area() < currentPartion.Area() * 0.5f || !generatedRoom.CheckIfMeetsOrExceedsMin(3, 3) ||
+				generatedRoom.x1 == 0 ||
+				generatedRoom.x2 == m_width ||
+				generatedRoom.y1 == 0 ||
+				generatedRoom.y2 == m_height
+				);
+			//room must use at least half the partion and be at least a 3x3 sized room
+		}
+		
+		
 		roomRegions.push_back(generatedRoom);
 		
 	}
@@ -173,11 +212,14 @@ void BSP::print(std::vector<int>& _toPrint, int _width) {
 	for (size_t i = 0; i < _toPrint.size(); i++)
 	{
 		std::string message = _toPrint[i] < 10 ? "|0" + std::to_string(_toPrint[i]) : "|" + std::to_string(_toPrint[i]);
-		
+		if (_toPrint[i] == 0)
+		{
+			message = "|__";
+		}
 		printf("%s", message.c_str());
 		if (i % _width == _width - 1)
 		{
-			printf("\n");
+			printf("*\n");
 		}
 
 	}

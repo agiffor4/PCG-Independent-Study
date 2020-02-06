@@ -19,6 +19,9 @@ private:
 	int m_currentHead = 0;
 	int m_numberOfSplits = 0;
 	int m_targetNumOfSplits = 0;
+	int m_generationAttempt = 1;
+	bool printedOnce = false;
+	bool m_ensureRoomSeperation = true;
 	std::vector<BSPNode*> m_tree;
 	std::vector<DTS> m_previousRotations;
 	void split();

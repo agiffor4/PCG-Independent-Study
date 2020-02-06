@@ -26,7 +26,7 @@ void mainLoop()
 	InputManager::GetInputManager()->SubscribeToInput(&quit, InputManager::KeyPressType::DOWN);
 	
 	//Init SDL
-	SDL_Window* window = SDL_CreateWindow("test", 0, 0, 640, 480, 0);	
+	/*SDL_Window* window = SDL_CreateWindow("test", 0, 0, 640, 480, 0);	
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
 
 	int width = SDL_GetWindowSurface(window)->w;
@@ -36,21 +36,22 @@ void mainLoop()
 
 	std::unique_ptr<Scene> scene(new Scene(renderer));//create scene
 	World myWorld = World(20, 15);
-	myWorld.GenerateTiles(scene.get(), width, height);
-	BSP bsp = BSP(20, 15);
+	myWorld.GenerateTiles(scene.get(), width, height);*/
+	//BSP bsp = BSP(20, 15);
+	BSP bsp = BSP(25, 25);
 	bsp.BeginSplit(4);
-	bsp.GetPartions(&myWorld);
+	//bsp.GetPartions(&myWorld);
 	Timer timer = Timer(3.0f);
 
 	while (play)
 	{
-		float dt = deltaTime.GetCurrentDeltaTime();
+		//float dt = deltaTime.GetCurrentDeltaTime();
 		InputManager::GetInputManager()->CheckInput();
-		scene->PlayAudio();
-		scene->Render();
+		/*scene->PlayAudio();
+		scene->Render();*/
 
 	}
-	CleanUpSDL(window, renderer);
+	//CleanUpSDL(window, renderer);
 }
 
 
