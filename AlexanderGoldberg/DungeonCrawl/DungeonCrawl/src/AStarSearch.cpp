@@ -117,9 +117,9 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 		Node checkingNode = (*openList.begin());
 		openList.erase(openList.begin());
 		closedList[checkingNode.m_IndexOfTile] = true;
-		double gNew = 0; 
-		double hNew = 0;
-		double fNew = 0;
+		float gNew = 0; 
+		float hNew = 0;
+		float fNew = 0;
 		std::vector<int> NodeNeighborIndexes = getNodeNeighbors(checkingNode.m_IndexOfTile);
 		std::vector<Node> neighbors;
 		for (size_t i = 0; i < NodeNeighborIndexes.size(); i++)
@@ -139,7 +139,7 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 			}
 			else if (!closedList[cn.m_IndexOfTile] && getTileAtIndex(cn.m_IndexOfTile)->IsPassable())
 			{
-				gNew = cn.gCost + getTileAtIndex(cn.m_IndexOfTile)->m_GCost;//Change the +1 to geting a value from the corisponding tile so terrain has weight
+				gNew = checkingNode.gCost + getTileAtIndex(cn.m_IndexOfTile)->m_GCost;//Change the +1 to geting a value from the corisponding tile so terrain has weight
 				hNew = calculateHValue(*getTileAtIndex(cn.m_IndexOfTile));
 				fNew = gNew + hNew;
 				if (cn.fCost == FLT_MAX || cn.fCost > fNew)
