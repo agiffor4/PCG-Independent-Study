@@ -335,12 +335,17 @@ void BSP::printLeafResults() {
 
 	AStarSearch AStar = AStarSearch();
 	AStar.CastIntVectorToAStarNodes(mapToPrint, m_width);
-	AStar.Initialize(Vector2(m_width, m_height), mapToPrint.size());
+	AStar.Initialize(Vector2(m_width, m_height), mapToPrint.size(), false);
 	int index2 = mapToPrint.size() - (m_width * 3) + 12;
 	int index1 = mapToPrint.size() - (m_width *2) +2;
-	AStar.BeginSearch(index1, index2);
-	
-
+	std::stack<int> path = AStar.BeginSearch(index1, index2);
+	int timesToPop = path.size();
+	for (size_t i = 0; i < timesToPop; i++)
+	{		
+		mapToPrint[path.top()] = 0;
+		path.pop();
+	}
+	print(mapToPrint, m_width);
 }
 
 BSPNode* BSP::GetFirstLeaf() {

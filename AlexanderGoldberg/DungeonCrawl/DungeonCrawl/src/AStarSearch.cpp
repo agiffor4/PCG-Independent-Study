@@ -11,14 +11,14 @@ AStarSearch::AStarSearch()
 }
 AStarSearch::~AStarSearch() {}
 
-void AStarSearch::Initialize(Vector2 _mapDimensions, int _worldSize) {
+void AStarSearch::Initialize(Vector2 _mapDimensions, int _worldSize, bool _useDiagonals) {
 
 	Vector2 size = _mapDimensions;
 	m_rowCount = size.X;
 	m_columnCount = size.Y;
 	m_worldSize = _worldSize;
 	m_inited = true;
-	
+	m_useDiagonals = _useDiagonals;
 }
 
 bool AStarSearch::isValid(AStarNode& _tile)
@@ -106,15 +106,15 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 	nodeData[startIndex].m_Parent = &nodeData[startIndex];
 
 
-	std::set<Node> openList;
+	std::vector<Node*> openList ;
 	
-	openList.insert(nodeData[startIndex]);
+	openList.push_back(&nodeData[startIndex]);
 	bool destinationFound = false;
 
 
 	while (!openList.empty())
 	{
-		Node checkingNode = (*openList.begin());
+		Node& checkingNode = (*(*openList.begin()));
 		openList.erase(openList.begin());
 		closedList[checkingNode.m_IndexOfTile] = true;
 		float gNew = 0; 
@@ -126,11 +126,9 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 		{
 			neighbors.push_back(nodeData[NodeNeighborIndexes[i]]);
 		}
-
-
 		for (size_t i = 0; i < neighbors.size(); i++)
 		{
-			Node cn = neighbors[i]; //current node
+			Node& cn = nodeData[neighbors[i].m_IndexOfTile]; //current node
 			if (isDestination(*getTileAtIndex(checkingNode.m_IndexOfTile)))
 			{
 				cn.m_Parent = &checkingNode;
@@ -149,7 +147,7 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 					cn.gCost = gNew;
 					cn.hCost = hNew; 
 					cn.m_Parent = &checkingNode;
-					openList.insert(cn);
+					openList.push_back(&cn);
 				}
 			}
 		}
@@ -256,7 +254,7 @@ AStarNode* AStarSearch::getAdjacentTile(int _currentTileIndex, TileDirection _di
 
 		return m_nodes[targIndex];
 	default:
-		printf("Collision check resulted in direction hitting default case.\n");
+		printf("A Star tile direction state is Unknown state value is %d.\n", (int)_direction);
 		return nullptr;
 	}
 }
@@ -265,7 +263,8 @@ AStarNode* AStarSearch::getAdjacentTile(int _currentTileIndex, TileDirection _di
 std::vector<AStarNode*> AStarSearch::getNeighbors(int _tileToFindNeighborsFor)
 {
 	std::vector<AStarNode*> neighbors;
-	for (size_t i = 0; i < 8; i++)
+	int numberOfNeighborsToFind = m_useDiagonals ? 8 : 4;
+	for (size_t i = 0; i < numberOfNeighborsToFind; i++)
 	{
 		AStarNode* currentCheck = getAdjacentTile(_tileToFindNeighborsFor, (TileDirection)i);
 		if (currentCheck != nullptr)

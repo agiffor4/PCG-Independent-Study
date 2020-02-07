@@ -24,6 +24,7 @@ protected:
     int m_columnCount = -1;
     int m_worldSize = 0;
     bool  m_inited = false;
+    bool m_useDiagonals = false;
     AStarNode* m_targetTile = nullptr;
     std::vector<AStarNode*> m_nodes;
     bool isValid(AStarNode& _tile);
@@ -40,7 +41,7 @@ public:
     
 	AStarSearch();
 	~AStarSearch();
-    void Initialize(Vector2 _mapDimensions, int _worldSize);
+    void Initialize(Vector2 _mapDimensions, int _worldSize, bool _useDiagonals);
     std::stack<int> BeginSearch(int _current, int _target);
     std::stack<int> BeginSearch(AStarNode& _current, AStarNode& _target);
     
