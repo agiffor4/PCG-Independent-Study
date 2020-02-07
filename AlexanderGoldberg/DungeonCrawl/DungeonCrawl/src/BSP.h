@@ -27,9 +27,11 @@ private:
 	void split();
 	void WipeTree();
 	void StartOver();
-	std::vector<RectA> GenerateRooms();
+	std::vector<RectA> generateRooms();
+	std::vector<int> generatePaths();
 	void print(std::vector<int>& _toPrint, int _width);	
 	void printLeafResults();
+
 public:
 	BSP(int _gridWidth, int _gridHeight);
 	~BSP();
@@ -39,7 +41,7 @@ public:
 	std::vector<BSPNode*> GetLeaves();
 	BSPNode* GetRandomLeaf();
 	std::vector<std::vector<int>> GetPartions(World* _world);
-	std::vector<int> GetRooms(World* _world);
+	std::vector<std::vector<int>> GetRooms(World* _world);
 	int Size();
 
 	

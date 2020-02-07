@@ -9,30 +9,46 @@
 //https://dev.to/jansonsa/a-star-a-path-finding-c-4a4h
 //https://www.youtube.com/watch?v=icZj67PTFhc
 
-class Tile;
+
 class World;
+class AStarNode;
 class AStarSearch
 {
 
 protected:
-    
-    World* m_world = nullptr;
+    enum class TileDirection
+    {
+        UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT
+    };
     int m_rowCount = -1;
     int m_columnCount = -1;
     int m_worldSize = 0;
-    Tile* m_targetTile = nullptr;
-    bool isValid(Tile& _tile);
-    bool isDestination(Tile& _tile);
-    double calculateHValue(Tile& _currentTile);
+    bool  m_inited = false;
+    AStarNode* m_targetTile = nullptr;
+    std::vector<AStarNode*> m_nodes;
+    bool isValid(AStarNode& _tile);
+    bool isDestination(AStarNode& _tile);
+    double calculateHValue(AStarNode& _currentTile);
     std::vector<int> getNodeNeighbors(int _indexToGetNeighborsFor);
+    AStarNode* getAdjacentTile(int _currentTileIndex, TileDirection _direction);
+    std::vector<AStarNode*> getNeighbors(int _tileToFindNeighborsFor);
+    std::stack<int> findPath(std::vector<Node>& _path);
+    void cleanNodes();
+    AStarNode* getTileAtIndex(int _index);
+    
 public:
     
 	AStarSearch();
 	~AStarSearch();
-    void Initialize(World& _world);
-    std::stack<int> AStar(Tile& _current, Tile& _target);
-    std::stack<int> FindPath(std::vector<Node>& _path);
-
+    void Initialize(Vector2 _mapDimensions, int _worldSize);
+    std::stack<int> BeginSearch(int _current, int _target);
+    std::stack<int> BeginSearch(AStarNode& _current, AStarNode& _target);
+    
+    
+    void CastTilesToAStarNodes(World& _world);
+    void CastIntVectorToAStarNodes(std::vector<int>& _world, int _width);
+    
+    
     
   
 

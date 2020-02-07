@@ -36,7 +36,7 @@ bool Tile::inBounds(int _x, int _y) {
 	return false;
 }
 int Tile::GetPositionInVector() { return m_posInVector; }
-Vector2 Tile::GetPositionInGrid() { return m_posInGrid; }
+const Vector2& Tile::GetPositionInGrid() { return m_posInGrid; }
 
 
 

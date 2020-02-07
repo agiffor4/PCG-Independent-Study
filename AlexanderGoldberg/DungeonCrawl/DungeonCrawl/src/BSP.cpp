@@ -3,6 +3,7 @@
 #include <string>
 #include"World.h"
 #include "Tile.h"
+#include "AStarSearch.h"
 BSP::BSP(int _gridWidth, int _gridHeight)
 {
 	m_width = _gridWidth;
@@ -23,242 +24,14 @@ void BSP::BeginSplit(int _timesToSplit) {
 	m_numberOfSplits = 0;
 	m_tree.push_back(new BSPNode(0, 0, m_width, m_height, -1, 0));
 	split();	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	m_previousRotations.erase(m_previousRotations.begin(), m_previousRotations.end());	
 	if (!printedOnce)
 	{
-		printf("For a target number of splits %d the total size is %d and leaf count is %d\n", m_targetNumOfSplits, m_tree.size(), GetLeaves().size());
+		
 		printedOnce = true;
 		printLeafResults();
-		printf("\nTotal number of generation attempts is %d\n", m_generationAttempt);
+		printf("For a target number of splits %d the total size is %d and leaf count is %d\n", m_targetNumOfSplits, m_tree.size(), GetLeaves().size());
+		printf("Total number of generation attempts is %d\n", m_generationAttempt);
 	}
 	
 }
@@ -376,7 +149,7 @@ void BSP::StartOver()
 	BeginSplit(m_targetNumOfSplits);
 }
 
-std::vector<RectA> BSP::GenerateRooms() {
+std::vector<RectA> BSP::generateRooms() {
 	std::vector<BSPNode*> leaves = GetLeaves();
 	std::vector<RectA> roomRegions;
 
@@ -435,6 +208,11 @@ std::vector<RectA> BSP::GenerateRooms() {
 	return roomRegions;
 }
 
+std::vector<int> BSP::generatePaths()
+{
+	return std::vector<int>();
+}
+
 void BSP::print(std::vector<int>& _toPrint, int _width) {
 	//print
 	printf("\n\n");
@@ -448,7 +226,7 @@ void BSP::print(std::vector<int>& _toPrint, int _width) {
 		printf("%s", message.c_str());
 		if (i % _width == _width - 1)
 		{
-			printf("*\n");
+			printf("|\n");
 		}
 
 	}
@@ -479,12 +257,14 @@ std::vector<std::vector<int>> BSP::GetPartions(World* _world) {
 	return partions;
 
 }
-std::vector<int> BSP::GetRooms(World* _world)
+std::vector<std::vector<int>> BSP::GetRooms(World* _world)
 {
-	std::vector<int> indexesOfRoomTiles = std::vector<int>();
-	std::vector<RectA> rooms = GenerateRooms();
+	//each std::vector<int> is a collection of indexes for a given room
+	std::vector<std::vector<int>> indexesOfRoomTiles = std::vector<std::vector<int>>();
+	std::vector<RectA> rooms = generateRooms();
 	for (size_t i = 0; i < rooms.size(); i++)
 	{
+		indexesOfRoomTiles.push_back(std::vector<int>());
 		RectA rect = rooms[i];
 		int x1 = rect.x1;
 		int y1 = m_height - rect.y1;
@@ -494,7 +274,7 @@ std::vector<int> BSP::GetRooms(World* _world)
 		{
 			for (size_t x = x1; x < x2; x++)
 			{
-				indexesOfRoomTiles.push_back(_world->GetTileAtPosition(x, y)->GetPositionInVector());
+				indexesOfRoomTiles[i].push_back(_world->GetTileAtPosition(x, y)->GetPositionInVector());
 			}
 		}
 	}
@@ -531,7 +311,7 @@ void BSP::printLeafResults() {
 
 	print(mapToPrint, m_width);
 
-	std::vector<RectA> rooms = GenerateRooms();
+	std::vector<RectA> rooms = generateRooms();
 	
 
 	for (size_t i = 0; i < rooms.size(); i++)
@@ -551,6 +331,16 @@ void BSP::printLeafResults() {
 	}
 
 	print(mapToPrint, m_width);
+
+
+	AStarSearch AStar = AStarSearch();
+	AStar.CastIntVectorToAStarNodes(mapToPrint, m_width);
+	AStar.Initialize(Vector2(m_width, m_height), mapToPrint.size());
+	int index2 = mapToPrint.size() - (m_width * 3) + 12;
+	int index1 = mapToPrint.size() - (m_width *2) +2;
+	AStar.BeginSearch(index1, index2);
+	
+
 }
 
 BSPNode* BSP::GetFirstLeaf() {

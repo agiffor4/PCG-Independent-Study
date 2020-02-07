@@ -36,20 +36,22 @@ void mainLoop()
 	int height = SDL_GetWindowSurface(window)->h;	
 
 	DeltaTime deltaTime = DeltaTime();
-
+	int gridSizeX = 25;
+	int gridSizeY = 25;
 	std::unique_ptr<Scene> scene(new Scene(renderer));//create scene
-	World myWorld = World(40, 30);
+	World myWorld = World(gridSizeX, gridSizeY);
 	myWorld.GenerateTiles(scene.get(), width, height);
-	BSP bsp = BSP(40, 30);
-	//BSP bsp = BSP(25, 25);
+	//BSP bsp = BSP(40, 30);
+	BSP bsp = BSP(gridSizeX, gridSizeY);
 	bsp.BeginSplit(4);
-	std::vector<int> rooms = bsp.GetRooms(&myWorld);
+	std::vector<std::vector<int>> rooms = bsp.GetRooms(&myWorld);
 	for (size_t i = 0; i < rooms.size(); i++)
 	{
-		myWorld.GetTileAtIndex(rooms[i])->SetPassable(true);
+		for (size_t j = 0; j < rooms[i].size(); j++)
+			myWorld.GetTileAtIndex(rooms[i][j])->SetPassable(true);
 	}
-	Timer timer = Timer(3.0f);
 
+	Timer timer = Timer(3.0f);
 	while (play)
 	{
 		float dt = deltaTime.GetCurrentDeltaTime();

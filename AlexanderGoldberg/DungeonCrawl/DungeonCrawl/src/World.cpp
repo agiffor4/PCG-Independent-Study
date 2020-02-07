@@ -20,13 +20,15 @@ int World::GetTileCount() {
 
 bool World::IsViableDirectionToMoveIn(int _currentTileIndex, TileDirection _direction)
 {
+	if (m_tiles.size() < 1)
+		return false;
 	int targIndex = 0;
 	switch (_direction)
 	{
 	case TileDirection::UP:
 		targIndex = _currentTileIndex - m_horizontalTileCount;
 		//not in top row, is passable
-		if (_currentTileIndex < m_horizontalTileCount || (m_tiles.size() > 0 && !m_tiles[targIndex]->IsPassable()))
+		if (_currentTileIndex < m_horizontalTileCount || (!m_tiles[targIndex]->IsPassable()))
 		{
 			return false;
 		}
@@ -34,7 +36,7 @@ bool World::IsViableDirectionToMoveIn(int _currentTileIndex, TileDirection _dire
 	case TileDirection::DOWN:
 		targIndex = _currentTileIndex + m_horizontalTileCount;
 		//not in bottom row, is passable
-		if (_currentTileIndex > (m_tiles.size() - 1) - m_horizontalTileCount || (m_tiles.size() > 0 && !m_tiles[targIndex]->IsPassable()))
+		if (_currentTileIndex > (m_tiles.size() - 1) - m_horizontalTileCount || (!m_tiles[targIndex]->IsPassable()))
 		{
 			return false;
 		}
@@ -44,7 +46,7 @@ bool World::IsViableDirectionToMoveIn(int _currentTileIndex, TileDirection _dire
 		//does not carry over to previous row, is in bounds, is passible
 		if (targIndex < 0 || 
 			targIndex % m_horizontalTileCount == m_horizontalTileCount -1 ||
-			(m_tiles.size() > 0 && !m_tiles[targIndex]->IsPassable()))
+			(!m_tiles[targIndex]->IsPassable()))
 		{
 			return false;
 		}
@@ -54,8 +56,7 @@ bool World::IsViableDirectionToMoveIn(int _currentTileIndex, TileDirection _dire
 		//does not carry over to next row, is in bounds, is passible
 		if (targIndex % m_horizontalTileCount == 0 ||
 			targIndex > m_tiles.size() -1 ||
-			(m_tiles.size() > 0 &&
-			!m_tiles[targIndex]->IsPassable()))
+			(!m_tiles[targIndex]->IsPassable()))
 		{
 			return false;
 		}
@@ -64,10 +65,9 @@ bool World::IsViableDirectionToMoveIn(int _currentTileIndex, TileDirection _dire
 		targIndex = _currentTileIndex - m_horizontalTileCount - 1;
 		//not in top row, in bounds, does not carry over to end of above row, is passable
 		if (_currentTileIndex < m_horizontalTileCount ||
-			_currentTileIndex -1 > -1 ||
+			targIndex < 0 ||
 			targIndex % m_horizontalTileCount == (m_horizontalTileCount - 1) ||
-			(m_tiles.size() > 0 &&
-			!m_tiles[targIndex]->IsPassable()))
+			(!m_tiles[targIndex]->IsPassable()))
 		{
 			return false;
 		}
@@ -77,8 +77,7 @@ bool World::IsViableDirectionToMoveIn(int _currentTileIndex, TileDirection _dire
 		//not in top row, does not carry over to current row, is passable
 		if (_currentTileIndex < m_horizontalTileCount ||
 			targIndex % m_horizontalTileCount == 0 ||
-			(m_tiles.size() > 0 &&
-			!m_tiles[targIndex]->IsPassable()))
+			(!m_tiles[targIndex]->IsPassable()))
 		{
 			return false;
 		}
@@ -87,18 +86,18 @@ bool World::IsViableDirectionToMoveIn(int _currentTileIndex, TileDirection _dire
 		//not in bottom row, does not carry over to end of current row, is passable
 		targIndex = _currentTileIndex + m_horizontalTileCount - 1;
 		if (_currentTileIndex > (m_tiles.size() - 1) - m_horizontalTileCount ||
-			targIndex % m_horizontalTileCount == m_horizontalTileCount  -1 ||
-			(m_tiles.size() > 0 &&
-			!m_tiles[targIndex]->IsPassable()))
-			return false;
+			targIndex % m_horizontalTileCount == m_horizontalTileCount - 1 ||
+			(!m_tiles[targIndex]->IsPassable()))
+			{
+				return false;
+			}
 		break;
 	case TileDirection::DOWNRIGHT:
 		//not in bottom row, does not carry over to beginning of next row, is passable
 		targIndex = _currentTileIndex + m_horizontalTileCount + 1;
 		if(_currentTileIndex > (m_tiles.size() - 1) - m_horizontalTileCount  ||
 			targIndex % m_horizontalTileCount == 0 ||
-			(m_tiles.size() > 0 &&
-			!m_tiles[(targIndex)]->IsPassable()))
+			(!m_tiles[(targIndex)]->IsPassable()))
 		{
 			return false;
 		}
@@ -113,13 +112,18 @@ bool World::IsViableDirectionToMoveIn(int _currentTileIndex, TileDirection _dire
 
 Tile* World::GetAdjacentTile(int _currentTileIndex, TileDirection _direction)
 {
+	if (_currentTileIndex < 0 || _currentTileIndex > m_tiles.size())
+	{
+		printf("_currentTileIndex is out of bounds\n");
+		return nullptr;
+	}
 	int targIndex = 0;
 	switch (_direction)
 	{
 	case TileDirection::UP:
 		targIndex = _currentTileIndex - m_horizontalTileCount;
 		//not in top row, is passable
-		if (_currentTileIndex < m_horizontalTileCount || (m_tiles.size() > 0))
+		if (_currentTileIndex < m_horizontalTileCount)
 		{
 			return nullptr;
 		}
@@ -127,7 +131,7 @@ Tile* World::GetAdjacentTile(int _currentTileIndex, TileDirection _direction)
 	case TileDirection::DOWN:
 		targIndex = _currentTileIndex + m_horizontalTileCount;
 		//not in bottom row, is passable
-		if (_currentTileIndex > (m_tiles.size() - 1) - m_horizontalTileCount || (m_tiles.size() > 0))
+		if (_currentTileIndex > (m_tiles.size() - 1) - m_horizontalTileCount)
 		{
 			return nullptr;
 		}
@@ -136,8 +140,7 @@ Tile* World::GetAdjacentTile(int _currentTileIndex, TileDirection _direction)
 		targIndex = _currentTileIndex - 1;
 		//does not carry over to previous row, is in bounds, is passible
 		if (targIndex < 0 ||
-			targIndex % m_horizontalTileCount == m_horizontalTileCount - 1 ||
-			(m_tiles.size() > 0 && !m_tiles[targIndex]->IsPassable()))
+			targIndex % m_horizontalTileCount == m_horizontalTileCount - 1)
 		{
 			return nullptr;
 		}
@@ -146,9 +149,7 @@ Tile* World::GetAdjacentTile(int _currentTileIndex, TileDirection _direction)
 		targIndex = _currentTileIndex + 1;
 		//does not carry over to next row, is in bounds, is passible
 		if (targIndex % m_horizontalTileCount == 0 ||
-			targIndex > m_tiles.size() - 1 ||
-			(m_tiles.size() > 0 &&
-				!m_tiles[targIndex]->IsPassable()))
+			targIndex > m_tiles.size() - 1)
 		{
 			return nullptr;
 		}
@@ -157,10 +158,8 @@ Tile* World::GetAdjacentTile(int _currentTileIndex, TileDirection _direction)
 		targIndex = _currentTileIndex - m_horizontalTileCount - 1;
 		//not in top row, in bounds, does not carry over to end of above row, is passable
 		if (_currentTileIndex < m_horizontalTileCount ||
-			_currentTileIndex - 1 > -1 ||
-			targIndex % m_horizontalTileCount == (m_horizontalTileCount - 1) ||
-			(m_tiles.size() > 0 &&
-				!m_tiles[targIndex]->IsPassable()))
+			targIndex < 0 ||
+			targIndex % m_horizontalTileCount == (m_horizontalTileCount - 1))
 		{
 			return nullptr;
 		}
@@ -169,9 +168,7 @@ Tile* World::GetAdjacentTile(int _currentTileIndex, TileDirection _direction)
 		targIndex = _currentTileIndex - m_horizontalTileCount + 1;
 		//not in top row, does not carry over to current row, is passable
 		if (_currentTileIndex < m_horizontalTileCount ||
-			targIndex % m_horizontalTileCount == 0 ||
-			(m_tiles.size() > 0 &&
-				!m_tiles[targIndex]->IsPassable()))
+			targIndex % m_horizontalTileCount == 0)
 		{
 			return nullptr;
 		}
@@ -180,18 +177,16 @@ Tile* World::GetAdjacentTile(int _currentTileIndex, TileDirection _direction)
 		//not in bottom row, does not carry over to end of current row, is passable
 		targIndex = _currentTileIndex + m_horizontalTileCount - 1;
 		if (_currentTileIndex > (m_tiles.size() - 1) - m_horizontalTileCount ||
-			targIndex % m_horizontalTileCount == m_horizontalTileCount - 1 ||
-			(m_tiles.size() > 0 &&
-				!m_tiles[targIndex]->IsPassable()))
+			targIndex % m_horizontalTileCount == m_horizontalTileCount - 1)
+		{
 			return nullptr;
+		}
 		return m_tiles[targIndex];
 	case TileDirection::DOWNRIGHT:
 		//not in bottom row, does not carry over to beginning of next row, is passable
 		targIndex = _currentTileIndex + m_horizontalTileCount + 1;
 		if (_currentTileIndex > (m_tiles.size() - 1) - m_horizontalTileCount ||
-			targIndex % m_horizontalTileCount == 0 ||
-			(m_tiles.size() > 0 &&
-				!m_tiles[(targIndex)]->IsPassable()))
+			targIndex % m_horizontalTileCount == 0)
 		{
 			return nullptr;
 		}
