@@ -283,7 +283,7 @@ void World::GenerateTiles(Scene* _scene, int _screenWidth, int _screenHeight) {
 			std::string name = "Tile (" + std::to_string(j) + ", " + std::to_string(i) + ")";
 			Tile* t = new Tile();
 			t->Init("img/blank_tile.bmp", name, GetTileCount(), j, i, Vector2(j * targetSize.X, i * targetSize.Y), _scene->GetRenderer());
-			
+			t->SetPassable(false);
 			t->SetSize(targetSize);
 			AddTile(t);
 			InputManager::GetInputManager()->SubscribeToInput(t, InputManager::KeyPressType::MOUSEUP);

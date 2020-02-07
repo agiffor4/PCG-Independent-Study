@@ -39,6 +39,7 @@ public:
 	std::vector<BSPNode*> GetLeaves();
 	BSPNode* GetRandomLeaf();
 	std::vector<std::vector<int>> GetPartions(World* _world);
+	std::vector<int> GetRooms(World* _world);
 	int Size();
 
 	

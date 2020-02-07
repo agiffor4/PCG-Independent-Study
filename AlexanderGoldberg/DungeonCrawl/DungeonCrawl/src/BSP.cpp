@@ -18,11 +18,240 @@ BSP::~BSP()
 
 
 void BSP::BeginSplit(int _timesToSplit) {
-	
+	WipeTree();
 	m_targetNumOfSplits = _timesToSplit;
 	m_numberOfSplits = 0;
 	m_tree.push_back(new BSPNode(0, 0, m_width, m_height, -1, 0));
 	split();	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	m_previousRotations.erase(m_previousRotations.begin(), m_previousRotations.end());	
 	if (!printedOnce)
 	{
@@ -248,6 +477,28 @@ std::vector<std::vector<int>> BSP::GetPartions(World* _world) {
 		}
 	}
 	return partions;
+
+}
+std::vector<int> BSP::GetRooms(World* _world)
+{
+	std::vector<int> indexesOfRoomTiles = std::vector<int>();
+	std::vector<RectA> rooms = GenerateRooms();
+	for (size_t i = 0; i < rooms.size(); i++)
+	{
+		RectA rect = rooms[i];
+		int x1 = rect.x1;
+		int y1 = m_height - rect.y1;
+		int x2 = rect.x2;
+		int y2 = m_height - rect.y2;
+		for (size_t y = y2; y < y1; y++)
+		{
+			for (size_t x = x1; x < x2; x++)
+			{
+				indexesOfRoomTiles.push_back(_world->GetTileAtPosition(x, y)->GetPositionInVector());
+			}
+		}
+	}
+	return indexesOfRoomTiles;
 
 }
 
