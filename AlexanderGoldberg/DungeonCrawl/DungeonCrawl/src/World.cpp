@@ -267,6 +267,10 @@ std::vector<Tile*> World::GetTiles()
 }
 
 
+Vector2 World::GetTileSize(){
+	return m_tiles[0]->GetCurrentSize();
+}
+
 void World::GenerateTiles(Scene* _scene, int _screenWidth, int _screenHeight) {
 	Vector2 targetSize = Vector2(_screenWidth / m_horizontalTileCount, _screenHeight / m_verticalTileCount);
 	

@@ -32,6 +32,7 @@ public:
 	std::vector<Tile*> GetTiles();
 	void AddTile(Tile* _renderable);
 	int GetTileCount();	
+	Vector2 GetTileSize();
 	void GenerateTiles(Scene* _scene, int _screenWidth, int _screenHeight);
 
 	void AddRoomsAndPaths(std::vector<std::vector<int>>& const _rooms, std::vector<int>& const _paths);

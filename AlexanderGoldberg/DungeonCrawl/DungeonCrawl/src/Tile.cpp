@@ -1,4 +1,5 @@
 #include "Tile.h"
+#include "Thing.h"
 #include "World.h"
 Tile::Tile() {
 
@@ -25,7 +26,20 @@ void Tile::SetPassable(bool _val) {
 		changeImage("img/block_tile.bmp");
 	}
 }
-bool Tile::IsPassable() { return m_passable; }
+void Tile::SetContents(Thing* _newContents)
+{
+	m_contents = _newContents;
+}
+Thing* Tile::GetContents()
+{
+	return m_contents;
+}
+void Tile::MoveContentsTo(Tile* _newLocation)
+{
+	_newLocation->SetContents(m_contents);
+	SetContents(nullptr);
+}
+bool Tile::IsPassable() { return m_passable && m_contents == nullptr; }
 
 bool Tile::inBounds(int _x, int _y) {
 	if (_x > GetPosition().X && _x < GetPosition().X + GetDestination().w &&
@@ -58,5 +72,16 @@ void Tile::InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y)
 		break;
 	default:
 		break;
+	}
+}
+
+void Tile::Render(SDL_Renderer* _renderer)
+{
+	Renderable::Render(_renderer);
+	if (m_contents != nullptr)
+	{
+		
+		m_contents->SetPosition(GetPosition().X, GetPosition().Y);
+		
 	}
 }

@@ -5,14 +5,18 @@
 #include "InputManager.h"
 #include "Quit.h"
 #include "SDL.h"
+#include "SDL_mixer.h"
+#include "World.h"
+
+#include "BSP.h"
+#include "AStarSearch.h"
+
+#include"Player.h"
+
 #include <vector>
 #include <stack>
 #include<memory>
 #include <iostream>
-#include "SDL_mixer.h"
-#include "World.h"
-#include "BSP.h"
-#include "AStarSearch.h"
 
 void CleanUpSDL(SDL_Window* _window, SDL_Renderer* _renderer);
 
@@ -53,9 +57,14 @@ void mainLoop()
 	std::vector<std::vector<int>> rooms;
 	std::vector<int> paths;
 	bsp.GenerateRoomsAndPaths(AStar, rooms, paths);
-	myWorld.AddRooms(rooms);
-	myWorld.AddPaths(paths);
-
+	myWorld.AddRoomsAndPaths(rooms, paths);
+	int roomToSpawnIn = rand() % rooms.size();
+	int tileInRoom = rand() % rooms[roomToSpawnIn].size();
+	int playerStart = rooms[roomToSpawnIn][tileInRoom];
+	Player* p = new Player();
+	p->Initalize(scene.get(), myWorld, "img/Player.bmp", "Player", renderer);
+	p->SetLocation(myWorld.GetTileAtIndex(playerStart));
+	myWorld.GetTileAtIndex(playerStart)->SetContents(p);
 
 	Timer timer = Timer(3.0f);
 	while (play)

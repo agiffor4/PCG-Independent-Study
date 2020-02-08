@@ -151,6 +151,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\AStarNode.cpp" />
+    <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\RectA.cpp" />
     <ClCompile Include="src\BSPNode.cpp" />
     <ClCompile Include="src\BinaryTree.cpp" />
@@ -173,6 +174,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\AStarNode.h" />
+    <ClInclude Include="src\Player.h" />
     <ClInclude Include="src\RectA.h" />
     <ClInclude Include="src\BSPNode.h" />
     <ClInclude Include="src\BSP.h" />

@@ -36,6 +36,8 @@ public:
 			printf("Unable to cast pointer to IInputHandler.  Not subscribing to InputManager.");
 	}
 
+
+
 	static InputManager* GetInputManager() {
 		static InputManager singleton;
 		return &singleton;
