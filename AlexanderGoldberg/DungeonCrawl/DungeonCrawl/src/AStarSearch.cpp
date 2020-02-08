@@ -110,6 +110,11 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 
 
 	int neighborChecks = 0;
+	/*if (m_logPathFinding)
+	{
+		m_logfile.open(m_logFileName.c_str(), std::fstream::in | std::fstream::out | std::fstream::trunc);
+		m_logfile << "\n";
+	} || true */
 	while (!openList.empty())
 	{
 		Node& checkingNode = (*(*openList.begin()));
@@ -127,15 +132,22 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 		for (size_t i = 0; i < neighbors.size(); i++)
 		{
 			Node& cn = nodeData[neighbors[i].m_IndexOfTile]; //current node
-			std::string m = "Current node is " + std::to_string(cn.m_IndexOfTile) + " " + cn.GetXY(m_columnCount) + " check is " + std::to_string(neighborChecks) + " \n";
+			
+			
 			neighborChecks++;
-			printf(m.c_str());
+			/*
+			std::string m = "Current node is " + std::to_string(cn.m_IndexOfTile) + " " + cn.GetXY(m_columnCount) + " check is " + std::to_string(neighborChecks) + " \n";
+			if (m_logPathFinding)
+				m_logfile << m.c_str();
+			|| true */
 			if (isDestination(*getTileAtIndex(cn.m_IndexOfTile)))
 			{
 				cn.m_Parent = &checkingNode;
 				destinationFound = true;
 				neighborChecks = 0;
-
+				/*if (m_logPathFinding)
+					m_logfile.close();
+					|| true */
 				return findPath(nodeData);
 			}
 			else if (!closedList[cn.m_IndexOfTile] && getTileAtIndex(cn.m_IndexOfTile)->IsPassable())
@@ -157,19 +169,26 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 		
 	}
 	if (destinationFound == false)
+	{
+		
+		/*if (m_logPathFinding)
+			m_logfile.close();
+		|| true */		
 		printf("Failed to find the Destination Cell.\n");
+	}
+		
 	return empty;
 }
 
 std::stack<int> AStarSearch::findPath(std::vector<Node>& _path)
 {
-
+	
 	int currentIndexToCheck = m_targetTile->GetPositionInVector();
+
 	int x = (_path[currentIndexToCheck].m_IndexOfTile % m_columnCount);
-	int y = m_columnCount - (_path[currentIndexToCheck].m_IndexOfTile - x) / m_columnCount;
+	int y = m_rowCount - (_path[currentIndexToCheck].m_IndexOfTile - x) / m_columnCount;
 	printf("The path is %d (%d, %d)", currentIndexToCheck, x, y);
 	std::stack<int> path;
-	int timesRound = 150;
 	while (_path[currentIndexToCheck].m_IndexOfTile != _path[currentIndexToCheck].m_Parent->m_IndexOfTile)
 	{
 		path.push(_path[currentIndexToCheck].m_IndexOfTile);
@@ -177,10 +196,7 @@ std::stack<int> AStarSearch::findPath(std::vector<Node>& _path)
 		x = (_path[currentIndexToCheck].m_IndexOfTile % m_columnCount);
 		y = m_columnCount - (_path[currentIndexToCheck].m_IndexOfTile - x) / m_columnCount;
 		printf(", %d (%d, %d)", _path[currentIndexToCheck].m_IndexOfTile, x, y);
-		if (timesRound-- < 1)
-		{
-			break;
-		}
+
 	}
 	path.push(_path[currentIndexToCheck].m_IndexOfTile);
 	printf("\n");
@@ -295,7 +311,8 @@ void AStarSearch::CastTilesToAStarNodes(World& _world)
 		AStarNode* asn = new AStarNode();
 		Tile* t = _world.GetTileAtIndex(i);
 		asn->Init(i, t->GetPositionInGrid().X, t->GetPositionInGrid().Y);
-		asn->SetPassable(t->IsPassable());
+		asn->SetPassable(true);
+		asn->m_GCost = t->IsPassable() ? 10 : 1;
 		m_nodes.push_back(asn);
 	}
 

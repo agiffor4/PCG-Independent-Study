@@ -3,6 +3,7 @@
 #include "RectA.h"
 class BSPNode;
 class World;
+class AStarSearch;
 struct RectA;
 class BSP
 {
@@ -24,15 +25,14 @@ private:
 	bool m_ensureRoomSeperation = true;
 	std::vector<BSPNode*> m_tree;
 	std::vector<DTS> m_previousRotations;
+	std::vector<RectA> m_roomRegions;
+	std::vector<int> m_usablePaths;
 	void split();
 	void WipeTree();
 	void StartOver();
-	std::vector<RectA> generateRooms();
-	std::vector<int> generatePaths();
+
 	void print(std::vector<int>& _toPrint, int _width);	
 	void printLeafResults();
-
-	void CarveHalls();
 
 public:
 	BSP(int _gridWidth, int _gridHeight);
@@ -42,8 +42,12 @@ public:
 	int GetFirstLeafIndex();
 	std::vector<BSPNode*> GetLeaves();
 	BSPNode* GetRandomLeaf();
-	std::vector<std::vector<int>> GetPartions(World* _world);
-	std::vector<std::vector<int>> GetRooms(World* _world);
+	std::vector<std::vector<int>> GetPartions();
+	std::vector<std::vector<int>> GetRoomTileIndexes();
+	void GenerateRoomsAndPaths(AStarSearch& _AStar, std::vector<std::vector<int>>& _generatedRooms, std::vector<int>& _generatedPaths);
+	std::vector<RectA> GetRoomRegions(bool _overwritePreviousRooms = false);
+	std::vector<int> GeneratePaths(AStarSearch& _AStar, bool _overwritePreviousPaths = false, std::vector<std::vector<int>>* const _roomTileIndexes = nullptr);
+	
 	int Size();
 
 	

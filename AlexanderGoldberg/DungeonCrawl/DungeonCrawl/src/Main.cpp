@@ -46,39 +46,16 @@ void mainLoop()
 	//BSP bsp = BSP(40, 30);
 	BSP bsp = BSP(gridSizeX, gridSizeY);
 	bsp.BeginSplit(4);
-	std::vector<std::vector<int>> rooms = bsp.GetRooms(&myWorld);
-	for (size_t i = 0; i < rooms.size(); i++)
-	{
-		for (size_t j = 0; j < rooms[i].size(); j++)
-		{
-			myWorld.GetTileAtIndex(rooms[i][j])->SetPassable(true);
-		}
-	}
-
-	/*AStarSearch AStar = AStarSearch();
+	
+	AStarSearch AStar = AStarSearch();
 	AStar.CastTilesToAStarNodes(myWorld);
 	AStar.Initialize(myWorld.GetMapDimentions(), myWorld.GetTileCount(), false);
+	std::vector<std::vector<int>> rooms;
+	std::vector<int> paths;
+	bsp.GenerateRoomsAndPaths(AStar, rooms, paths);
+	myWorld.AddRooms(rooms);
+	//myWorld.AddPaths(paths);
 
-	int timesToDig = rooms.size() / 2;
-	int worldWidth = myWorld.GetMapDimentions().X;
-	for (size_t i = 0; i < timesToDig; i++)
-	{
-		int lastRoom = rooms.size() - (i + 1);
-		int firstRoom = i;
-		int index1 = rooms[firstRoom][rooms[firstRoom].size() / 2];
-		int index2 = rooms[lastRoom][rooms[lastRoom].size() / 2];
-		int x1 = index1 % worldWidth;
-		int y1 = worldWidth - ((index1 - x1) / worldWidth);
-		int x2 = index2 % worldWidth;
-		int y2 = width - ((index2 - x2) / worldWidth);
-		std::stack<int> path = AStar.BeginSearch(index1, index2);
-		int timesToPop = path.size();
-		for (size_t j = 0; j < timesToPop; j++)
-		{
-			myWorld.GetTileAtIndex(path.top())->SetPassable(true);
-			path.pop();
-		}
-	}*/
 
 	Timer timer = Timer(3.0f);
 	while (play)

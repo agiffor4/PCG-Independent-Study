@@ -4,6 +4,8 @@
 #include <stack>
 #include "Node.h"
 #include "Vector2.h"
+#include <fstream>
+#include <iostream>
 //references
 //https://www.geeksforgeeks.org/a-search-algorithm/
 //https://dev.to/jansonsa/a-star-a-path-finding-c-4a4h
@@ -20,6 +22,9 @@ protected:
     {
         UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT
     };
+    /*std::string m_logFileName = "PathFindingLog.txt";
+    std::fstream m_logfile;
+    bool m_logPathFinding = false;*/
     int m_rowCount = -1;
     int m_columnCount = -1;
     int m_worldSize = 0;

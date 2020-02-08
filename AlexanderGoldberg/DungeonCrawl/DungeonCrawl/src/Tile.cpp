@@ -48,7 +48,7 @@ void Tile::InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y)
 	case IInputHandler::MouseButton::LEFT:
 		if (inBounds(_x, _y))
 		{
-			printf("clicked on tile %s, setting passable to %s\n", m_name.c_str(), (!IsPassable() ? "true." : "false."));
+			printf("clicked on tile %s (index %d), setting passable to %s\n", m_name.c_str(), GetPositionInVector(), (!IsPassable() ? "true." : "false."));
 			SetPassable(!IsPassable());
 		}
 		break;

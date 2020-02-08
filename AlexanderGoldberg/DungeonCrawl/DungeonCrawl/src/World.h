@@ -34,5 +34,11 @@ public:
 	int GetTileCount();	
 	void GenerateTiles(Scene* _scene, int _screenWidth, int _screenHeight);
 
+	void AddRoomsAndPaths(std::vector<std::vector<int>>& const _rooms, std::vector<int>& const _paths);
+
+	void AddRooms(std::vector<std::vector<int>>& const _rooms);
+
+	void AddPaths(std::vector<int>& const _paths);
+
 };
 

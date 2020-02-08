@@ -286,3 +286,26 @@ void World::GenerateTiles(Scene* _scene, int _screenWidth, int _screenHeight) {
 		}
 	}
 }
+
+void World::AddRoomsAndPaths(std::vector<std::vector<int>>& const _rooms, std::vector<int>& const _paths) {
+	AddRooms(_rooms);
+	AddPaths(_paths);
+}
+
+void World::AddRooms(std::vector<std::vector<int>>& const _rooms) {
+	for (size_t i = 0; i < _rooms.size(); i++)
+	{
+		for (size_t j = 0; j < _rooms[i].size(); j++)
+		{
+			GetTileAtIndex(_rooms[i][j])->SetPassable(true);
+		}
+	}
+}
+
+void World::AddPaths(std::vector<int>& const _paths) {
+
+	for (size_t j = 0; j < _paths.size(); j++)
+	{
+		GetTileAtIndex(_paths[j])->SetPassable(true);
+	}
+}

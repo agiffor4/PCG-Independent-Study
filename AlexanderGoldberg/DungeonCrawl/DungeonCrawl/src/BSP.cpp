@@ -149,90 +149,107 @@ void BSP::StartOver()
 	BeginSplit(m_targetNumOfSplits);
 }
 
-std::vector<RectA> BSP::generateRooms() {
-	std::vector<BSPNode*> leaves = GetLeaves();
-	std::vector<RectA> roomRegions;
 
-	for (size_t i = 0; i < leaves.size(); i++)
-	{
-		RectA currentPartion = leaves[i]->GetRect();
-		RectA generatedRoom = RectA();
-		int x1 = 0;
-		int y1 = 0;
-		int x2 = 0;
-		int y2 = 0;
-		int timesRound = 500;
-		if (leaves[i]->GetSelfIndex() == 9)
-		{
-			int foo = 0;
-		}
-		if (m_ensureRoomSeperation)
-		{
-			RectA partionWithEnforcedWalls = RectA(currentPartion.x1 + 1, currentPartion.y1 + 1, currentPartion.x2 - 1, currentPartion.y2 -1);
-			
-			do
-			{
-
-				x1 = partionWithEnforcedWalls.x1 + rand() % (partionWithEnforcedWalls.x2 - partionWithEnforcedWalls.x1 + 1);
-				y1 = partionWithEnforcedWalls.y1 + rand() % (partionWithEnforcedWalls.y2 - partionWithEnforcedWalls.y1 + 1);
-				x2 = x1 + rand() % (partionWithEnforcedWalls.x2 - x1 + 1);
-				y2 = y1 + rand() % (partionWithEnforcedWalls.y2 - y1 + 1);
-				generatedRoom.Set(x1, y1, x2, y2);
-			} while (generatedRoom.Area() < partionWithEnforcedWalls.Area() * 0.5f || !generatedRoom.CheckIfMeetsOrExceedsMin(3, 3));
-			//room must use at least half the partion and be at least a 3x3 sized room
-			
-		}
-		else
-		{
-			do
-			{
-
-				x1 = currentPartion.x1 + rand() % (currentPartion.x2 - currentPartion.x1 + 1);
-				y1 = currentPartion.y1 + rand() % (currentPartion.y2 - currentPartion.y1 + 1);
-				x2 = x1 + rand() % (currentPartion.x2 - x1 + 1);
-				y2 = y1 + rand() % (currentPartion.y2 - y1 + 1);
-				generatedRoom.Set(x1, y1, x2, y2);
-			} while (generatedRoom.Area() < currentPartion.Area() * 0.5f || !generatedRoom.CheckIfMeetsOrExceedsMin(3, 3) ||
-				generatedRoom.x1 == 0 ||
-				generatedRoom.x2 == m_width ||
-				generatedRoom.y1 == 0 ||
-				generatedRoom.y2 == m_height
-				);
-			//room must use at least half the partion and be at least a 3x3 sized room
-		}
-		
-		
-		roomRegions.push_back(generatedRoom);
-		
-	}
-	return roomRegions;
-}
-
-std::vector<int> BSP::generatePaths()
+void BSP::GenerateRoomsAndPaths(AStarSearch& _AStar, std::vector<std::vector<int>>& _generatedRooms, std::vector<int>& _generatedPaths)
 {
-	return std::vector<int>();
-}
+	_generatedRooms = GetRoomTileIndexes();
+	_generatedPaths = GeneratePaths(_AStar, &_generatedRooms);
 
-void BSP::print(std::vector<int>& _toPrint, int _width) {
-	//print
-	printf("\n\n");
-	for (size_t i = 0; i < _toPrint.size(); i++)
+}
+std::vector<RectA> BSP::GetRoomRegions(bool _overwritePreviousRooms) {
+	if (_overwritePreviousRooms || m_roomRegions.size() < 1)
 	{
-		std::string message = _toPrint[i] < 10 ? "|0" + std::to_string(_toPrint[i]) : "|" + std::to_string(_toPrint[i]);
-		if (_toPrint[i] == 0)
-		{
-			message = "|__";
-		}
-		printf("%s", message.c_str());
-		if (i % _width == _width - 1)
-		{
-			printf("|\n");
-		}
+		std::vector<BSPNode*> leaves = GetLeaves();
+		m_roomRegions.erase(m_roomRegions.begin(), m_roomRegions.end());
 
+		for (size_t i = 0; i < leaves.size(); i++)
+		{
+			RectA currentPartion = leaves[i]->GetRect();
+			RectA generatedRoom = RectA();
+			int x1 = 0;
+			int y1 = 0;
+			int x2 = 0;
+			int y2 = 0;
+			int timesRound = 500;
+			if (m_ensureRoomSeperation)
+			{
+				RectA partionWithEnforcedWalls = RectA(currentPartion.x1 + 1, currentPartion.y1 + 1, currentPartion.x2 - 1, currentPartion.y2 - 1);
+
+				do
+				{
+
+					x1 = partionWithEnforcedWalls.x1 + rand() % (partionWithEnforcedWalls.x2 - partionWithEnforcedWalls.x1 + 1);
+					y1 = partionWithEnforcedWalls.y1 + rand() % (partionWithEnforcedWalls.y2 - partionWithEnforcedWalls.y1 + 1);
+					x2 = x1 + rand() % (partionWithEnforcedWalls.x2 - x1 + 1);
+					y2 = y1 + rand() % (partionWithEnforcedWalls.y2 - y1 + 1);
+					generatedRoom.Set(x1, y1, x2, y2);
+				} while (generatedRoom.Area() < partionWithEnforcedWalls.Area() * 0.5f || !generatedRoom.CheckIfMeetsOrExceedsMin(3, 3));
+				//room must use at least half the partion and be at least a 3x3 sized room
+
+			}
+			else
+			{
+				do
+				{
+
+					x1 = currentPartion.x1 + rand() % (currentPartion.x2 - currentPartion.x1 + 1);
+					y1 = currentPartion.y1 + rand() % (currentPartion.y2 - currentPartion.y1 + 1);
+					x2 = x1 + rand() % (currentPartion.x2 - x1 + 1);
+					y2 = y1 + rand() % (currentPartion.y2 - y1 + 1);
+					generatedRoom.Set(x1, y1, x2, y2);
+				} while (generatedRoom.Area() < currentPartion.Area() * 0.5f || !generatedRoom.CheckIfMeetsOrExceedsMin(3, 3) ||
+					generatedRoom.x1 == 0 ||
+					generatedRoom.x2 == m_width ||
+					generatedRoom.y1 == 0 ||
+					generatedRoom.y2 == m_height
+					);
+				//room must use at least half the partion and be at least a 3x3 sized room
+			}
+
+
+			m_roomRegions.push_back(generatedRoom);
+		}
 	}
-	printf("\n\n");
+	return m_roomRegions;
 }
-std::vector<std::vector<int>> BSP::GetPartions(World* _world) {
+std::vector<int> BSP::GeneratePaths(AStarSearch& _AStar, bool _overwritePreviousPaths, std::vector<std::vector<int>>* const _roomTileIndexes)
+{
+
+
+	if (_overwritePreviousPaths || m_usablePaths.size() < 1)
+	{
+		std::vector<std::vector<int>> indexesOfRoomTiles = _roomTileIndexes == nullptr ? GetRoomTileIndexes() : (*_roomTileIndexes);
+		m_usablePaths.erase(m_usablePaths.begin(), m_usablePaths.end());
+		int timesToDig = indexesOfRoomTiles.size() / 2;
+
+		for (size_t i = 0; i < timesToDig; i++)
+		{
+			int lastRoom = indexesOfRoomTiles.size() - (i + 1);
+			int firstRoom = i;
+			int index1 = indexesOfRoomTiles[firstRoom][indexesOfRoomTiles[firstRoom].size() / 2];
+			int index2 = indexesOfRoomTiles[lastRoom][indexesOfRoomTiles[lastRoom].size() / 2];
+			int x1 = index1 % m_width;
+			int y1 = ((index1 - x1) / m_width);
+			int x2 = index2 % m_width;
+			int y2 = ((index2 - x2) / m_width);
+			printf("\nAttempting dig from %d <%d, %d> to %d <%d, %d>.  This is dig %d\n", index1, x1, y1, index2, x2, y2, i);
+			std::stack<int> path = _AStar.BeginSearch(index1, index2);
+			int timesToPop = path.size();
+			for (size_t j = 0; j < timesToPop; j++)
+			{
+				m_usablePaths.push_back(path.top());
+				path.pop();
+			}
+			printf("\nDug path from <%d, %d> to <%d, %d>.  This is dig %d\n", x1, y1, x2, y2, i);
+		}
+	}
+	return m_usablePaths;
+}
+
+
+
+
+std::vector<std::vector<int>> BSP::GetPartions() {
 	std::vector<std::vector<int>> partions = std::vector<std::vector<int>>();
 	std::vector<BSPNode*> leaves = GetLeaves();
 	for (size_t i = 0; i < leaves.size(); i++)
@@ -250,21 +267,20 @@ std::vector<std::vector<int>> BSP::GetPartions(World* _world) {
 		{
 			for (size_t x = x1; x < x2; x++)
 			{
-				partions[i].push_back(_world->GetTileAtPosition(x, y)->GetPositionInVector());
+				partions[i].push_back((m_width * y) + x);
 			}
 		}
 	}
 	return partions;
 
 }
-std::vector<std::vector<int>> BSP::GetRooms(World* _world)
-{
+std::vector<std::vector<int>> BSP::GetRoomTileIndexes() {
+	std::vector<RectA> rooms = GetRoomRegions();
 	//each std::vector<int> is a collection of indexes for a given room
-	std::vector<std::vector<int>> indexesOfRoomTiles = std::vector<std::vector<int>>();
-	std::vector<RectA> rooms = generateRooms();
+	std::vector<std::vector<int>> roomTileIndexes = std::vector<std::vector<int>>();
 	for (size_t i = 0; i < rooms.size(); i++)
 	{
-		indexesOfRoomTiles.push_back(std::vector<int>());
+		roomTileIndexes.push_back(std::vector<int>());
 		RectA rect = rooms[i];
 		int x1 = rect.x1;
 		int y1 = m_height - rect.y1;
@@ -274,70 +290,55 @@ std::vector<std::vector<int>> BSP::GetRooms(World* _world)
 		{
 			for (size_t x = x1; x < x2; x++)
 			{
-				indexesOfRoomTiles[i].push_back(_world->GetTileAtPosition(x, y)->GetPositionInVector());
+				roomTileIndexes[i].push_back((m_width * y) + x);
 			}
 		}
 	}
-	return indexesOfRoomTiles;
-
+	return roomTileIndexes;
 }
+
+
 
 void BSP::printLeafResults() {
 	std::vector<BSPNode*> leaves = GetLeaves();
 	std::vector<int> mapToPrint = std::vector<int>();
+	int size = m_height * m_width;
 	//(m_width * y) + x
-	for (size_t i = 0; i < m_height * m_width; i++)
+	for (size_t i = 0; i < size; i++)
 	{
 		mapToPrint.push_back(0);
 	}
-	
-	print(mapToPrint, m_width);
 
-	for (size_t i = 0; i < leaves.size(); i++)
+	std::vector<std::vector<int>> partions = GetPartions();
+	for (size_t i = 0; i < partions.size(); i++)
 	{
-		RectA rect = leaves[i]->GetRect();
-		int x1 = rect.x1;		
-		int y1 = m_height - rect.y1;
-		int x2 = rect.x2;
-		int y2 = m_height - rect.y2;
-		for (size_t y = y2; y < y1; y++)
+		for (size_t j = 0; j < partions[i].size(); j++)
 		{
-			for (size_t x = x1; x < x2; x++)
-			{
-				mapToPrint[(m_width * y) + x] = (leaves[i]->GetSelfIndex() + 1);
-			}
+			mapToPrint[partions[i][j]] = (i + 7);
 		}
 	}
-
-	print(mapToPrint, m_width);
-
-	std::vector<RectA> rooms = generateRooms();
+	std::vector<RectA> rooms = GetRoomRegions();
 	
-	std::vector<std::vector<int>> indexesOfRoomTiles = std::vector<std::vector<int>>();
-	for (size_t i = 0; i < rooms.size(); i++)
+	std::vector<std::vector<int>> indexesOfRoomTiles = GetRoomTileIndexes();
+	std::vector<int> paths;
+	for (size_t i = 0; i < indexesOfRoomTiles.size(); i++)
 	{
-		indexesOfRoomTiles.push_back(std::vector<int>());
-		RectA rect = rooms[i];
-		int x1 = rect.x1;
-		int y1 = m_height - rect.y1;
-		int x2 = rect.x2;
-		int y2 = m_height - rect.y2;
-		for (size_t y = y2; y < y1; y++)
+		for (size_t j = 0; j < indexesOfRoomTiles[i].size(); j++)
 		{
-			for (size_t x = x1; x < x2; x++)
-			{
-				mapToPrint[(m_width * y) + x] = 0;
-				indexesOfRoomTiles[i].push_back((m_width * y) + x);
-			}
+			mapToPrint[indexesOfRoomTiles[i][j]] = 0;
 		}
-	}
-
-	print(mapToPrint, m_width);
-
-	/*AStarSearch AStar = AStarSearch();
+	}	
+	
+	print(mapToPrint, m_width); //regions and rooms
+	/*//begin digging
+	AStarSearch AStar = AStarSearch();
 	AStar.CastIntVectorToAStarNodes(mapToPrint, m_width);
 	AStar.Initialize(Vector2(m_width, m_height), mapToPrint.size(), false);
+	paths = GeneratePaths(AStar);
+	for (size_t i = 0; i < paths.size(); i++)
+		mapToPrint[paths[i]] = 0;
 
+	//set the dig start point as -1 
 	int timesToDig = indexesOfRoomTiles.size() / 2;
 	for (size_t i = 0; i < timesToDig; i++)
 	{
@@ -345,24 +346,51 @@ void BSP::printLeafResults() {
 		int firstRoom = i;
 		int index1 = indexesOfRoomTiles[firstRoom][indexesOfRoomTiles[firstRoom].size() / 2];
 		int index2 = indexesOfRoomTiles[lastRoom][indexesOfRoomTiles[lastRoom].size() / 2];
-		int x1 = index1 % m_width;
-		int y1 = m_width - ((index1 - x1) / m_width);
-		int x2 = index2 % m_width;
-		int y2 = m_width - ((index2 - x2) / m_width);
-		printf("\nAttempting dig from %d <%d, %d> to %d <%d, %d>.  This is dig %d\n", index1, x1, y1, index2, x2, y2, i);
-		std::stack<int> path = AStar.BeginSearch(index1, index2);
-		int timesToPop = path.size();
-		for (size_t j = 0; j < timesToPop; j++)
-		{
-			mapToPrint[path.top()] = 0;
-			path.pop();
-		}
-		printf("\nDug path from <%d, %d> to <%d, %d>.  This is dig %d\n", x1, y1, x2, y2, i);		
+		mapToPrint[index1] = -1;
+		mapToPrint[index2] = -1;
+		
 	}
-	
-	print(mapToPrint, m_width);*/
+	print(mapToPrint, m_width); //halls
+	*/
 }
+void BSP::print(std::vector<int>& _toPrint, int _width) {	
+	printf("\n\n");
+	int y = 24;
+	std::string lineNumber = (y < 10 ? "0" : "") + std::to_string(y);
+	printf("%s-", lineNumber.c_str());
+	for (size_t i = 0; i < _toPrint.size(); i++)
+	{
+		std::string message = (_toPrint[i] < 10 ? "|0" : "|") + std::to_string(_toPrint[i]);
+		if (_toPrint[i] == 0)
+			message = "|__";
+		if (_toPrint[i] == -1)
+			message = "|AA";
 
+		printf("%s", message.c_str());
+		if (i % _width == _width - 1)
+		{
+			y--;
+			if (y > -1)
+			{
+				std::string lineNumber = (y < 10 ? "0" : "") + std::to_string(y);
+				printf("|\n%s-", lineNumber.c_str());
+				
+			}
+			else
+			{
+				printf("|\nxx-");
+			}
+			
+		}
+
+	}
+	for (size_t i = 0; i < 25; i++)
+	{
+		std::string lineNumber = (i < 10 ? "0" : "") + std::to_string(i);
+		printf("|%s", lineNumber.c_str());
+	}
+	printf("|\n\n");
+}
 
 BSPNode* BSP::GetFirstLeaf() {
 	if (m_tree.size() < 1)
