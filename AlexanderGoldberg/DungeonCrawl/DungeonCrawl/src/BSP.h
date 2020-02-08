@@ -32,6 +32,8 @@ private:
 	void print(std::vector<int>& _toPrint, int _width);	
 	void printLeafResults();
 
+	void CarveHalls();
+
 public:
 	BSP(int _gridWidth, int _gridHeight);
 	~BSP();

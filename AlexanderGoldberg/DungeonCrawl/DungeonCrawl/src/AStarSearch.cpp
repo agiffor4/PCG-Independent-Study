@@ -3,7 +3,6 @@
 #include "World.h"
 #include <set>
 #include "AStarNode.h"
-
 AStarSearch::AStarSearch() 
 {
 	
@@ -48,7 +47,6 @@ std::vector<int> AStarSearch::getNodeNeighbors(int _indexToGetNeighborsFor) {
 }
 
 std::stack<int> AStarSearch::BeginSearch(int _current, int _target) {
-	
 	return BeginSearch((*getTileAtIndex(_current)), (*getTileAtIndex(_target)));
 }
 std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target)
@@ -63,9 +61,9 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 		printf("Must call convert function of some kind and pass in a set of nodes before begining search.\n");
 		return std::stack<int>();
 	}
-
 	int startIndex = _current.GetPositionInVector();
 	std::stack<int> empty;
+	
 	if (!isValid(_target))
 	{
 		printf("Chosen destination is invalid.\n");
@@ -89,7 +87,6 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 
 	std::vector<bool> closedList;
 	closedList.resize(m_worldSize);
-	std::fill(closedList.begin(), closedList.end(), false);
 
 	std::vector<Node> nodeData;
 	
@@ -112,6 +109,7 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 	bool destinationFound = false;
 
 
+	int neighborChecks = 0;
 	while (!openList.empty())
 	{
 		Node& checkingNode = (*(*openList.begin()));
@@ -129,10 +127,15 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 		for (size_t i = 0; i < neighbors.size(); i++)
 		{
 			Node& cn = nodeData[neighbors[i].m_IndexOfTile]; //current node
-			if (isDestination(*getTileAtIndex(checkingNode.m_IndexOfTile)))
+			std::string m = "Current node is " + std::to_string(cn.m_IndexOfTile) + " " + cn.GetXY(m_columnCount) + " check is " + std::to_string(neighborChecks) + " \n";
+			neighborChecks++;
+			printf(m.c_str());
+			if (isDestination(*getTileAtIndex(cn.m_IndexOfTile)))
 			{
 				cn.m_Parent = &checkingNode;
 				destinationFound = true;
+				neighborChecks = 0;
+
 				return findPath(nodeData);
 			}
 			else if (!closedList[cn.m_IndexOfTile] && getTileAtIndex(cn.m_IndexOfTile)->IsPassable())
@@ -140,9 +143,9 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 				gNew = checkingNode.gCost + getTileAtIndex(cn.m_IndexOfTile)->m_GCost;//Change the +1 to geting a value from the corisponding tile so terrain has weight
 				hNew = calculateHValue(*getTileAtIndex(cn.m_IndexOfTile));
 				fNew = gNew + hNew;
-				if (cn.fCost == FLT_MAX || cn.fCost > fNew)
+				if ((cn.fCost == FLT_MAX || cn.fCost > fNew))
 				{
-					
+					// && (!isDestination((*getTileAtIndex(cn.m_IndexOfTile))))
 					cn.fCost = fNew;
 					cn.gCost = gNew;
 					cn.hCost = hNew; 
@@ -160,15 +163,24 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 
 std::stack<int> AStarSearch::findPath(std::vector<Node>& _path)
 {
-	
+
 	int currentIndexToCheck = m_targetTile->GetPositionInVector();
-	printf("The path is %d", currentIndexToCheck);
+	int x = (_path[currentIndexToCheck].m_IndexOfTile % m_columnCount);
+	int y = m_columnCount - (_path[currentIndexToCheck].m_IndexOfTile - x) / m_columnCount;
+	printf("The path is %d (%d, %d)", currentIndexToCheck, x, y);
 	std::stack<int> path;
+	int timesRound = 150;
 	while (_path[currentIndexToCheck].m_IndexOfTile != _path[currentIndexToCheck].m_Parent->m_IndexOfTile)
 	{
 		path.push(_path[currentIndexToCheck].m_IndexOfTile);
 		currentIndexToCheck = _path[currentIndexToCheck].m_Parent->m_IndexOfTile;
-		printf(", %d", _path[currentIndexToCheck].m_IndexOfTile);
+		x = (_path[currentIndexToCheck].m_IndexOfTile % m_columnCount);
+		y = m_columnCount - (_path[currentIndexToCheck].m_IndexOfTile - x) / m_columnCount;
+		printf(", %d (%d, %d)", _path[currentIndexToCheck].m_IndexOfTile, x, y);
+		if (timesRound-- < 1)
+		{
+			break;
+		}
 	}
 	path.push(_path[currentIndexToCheck].m_IndexOfTile);
 	printf("\n");

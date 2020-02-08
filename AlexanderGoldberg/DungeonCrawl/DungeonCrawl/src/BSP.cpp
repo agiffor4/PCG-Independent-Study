@@ -313,9 +313,10 @@ void BSP::printLeafResults() {
 
 	std::vector<RectA> rooms = generateRooms();
 	
-
+	std::vector<std::vector<int>> indexesOfRoomTiles = std::vector<std::vector<int>>();
 	for (size_t i = 0; i < rooms.size(); i++)
 	{
+		indexesOfRoomTiles.push_back(std::vector<int>());
 		RectA rect = rooms[i];
 		int x1 = rect.x1;
 		int y1 = m_height - rect.y1;
@@ -326,27 +327,42 @@ void BSP::printLeafResults() {
 			for (size_t x = x1; x < x2; x++)
 			{
 				mapToPrint[(m_width * y) + x] = 0;
+				indexesOfRoomTiles[i].push_back((m_width * y) + x);
 			}
 		}
 	}
 
 	print(mapToPrint, m_width);
 
-
-	AStarSearch AStar = AStarSearch();
+	/*AStarSearch AStar = AStarSearch();
 	AStar.CastIntVectorToAStarNodes(mapToPrint, m_width);
 	AStar.Initialize(Vector2(m_width, m_height), mapToPrint.size(), false);
-	int index2 = mapToPrint.size() - (m_width * 3) + 12;
-	int index1 = mapToPrint.size() - (m_width *2) +2;
-	std::stack<int> path = AStar.BeginSearch(index1, index2);
-	int timesToPop = path.size();
-	for (size_t i = 0; i < timesToPop; i++)
-	{		
-		mapToPrint[path.top()] = 0;
-		path.pop();
+
+	int timesToDig = indexesOfRoomTiles.size() / 2;
+	for (size_t i = 0; i < timesToDig; i++)
+	{
+		int lastRoom = indexesOfRoomTiles.size() - (i + 1);
+		int firstRoom = i;
+		int index1 = indexesOfRoomTiles[firstRoom][indexesOfRoomTiles[firstRoom].size() / 2];
+		int index2 = indexesOfRoomTiles[lastRoom][indexesOfRoomTiles[lastRoom].size() / 2];
+		int x1 = index1 % m_width;
+		int y1 = m_width - ((index1 - x1) / m_width);
+		int x2 = index2 % m_width;
+		int y2 = m_width - ((index2 - x2) / m_width);
+		printf("\nAttempting dig from %d <%d, %d> to %d <%d, %d>.  This is dig %d\n", index1, x1, y1, index2, x2, y2, i);
+		std::stack<int> path = AStar.BeginSearch(index1, index2);
+		int timesToPop = path.size();
+		for (size_t j = 0; j < timesToPop; j++)
+		{
+			mapToPrint[path.top()] = 0;
+			path.pop();
+		}
+		printf("\nDug path from <%d, %d> to <%d, %d>.  This is dig %d\n", x1, y1, x2, y2, i);		
 	}
-	print(mapToPrint, m_width);
+	
+	print(mapToPrint, m_width);*/
 }
+
 
 BSPNode* BSP::GetFirstLeaf() {
 	if (m_tree.size() < 1)
