@@ -153,7 +153,7 @@ void BSP::StartOver()
 void BSP::GenerateRoomsAndPaths(AStarSearch& _AStar, std::vector<std::vector<int>>& _generatedRooms, std::vector<int>& _generatedPaths)
 {
 	_generatedRooms = GetRoomTileIndexes();
-	_generatedPaths = GeneratePaths(_AStar, &_generatedRooms);
+	_generatedPaths = GeneratePaths(_AStar, false, &_generatedRooms);
 
 }
 std::vector<RectA> BSP::GetRoomRegions(bool _overwritePreviousRooms) {
@@ -330,7 +330,7 @@ void BSP::printLeafResults() {
 	}	
 	
 	print(mapToPrint, m_width); //regions and rooms
-	/*//begin digging
+	//begin digging
 	AStarSearch AStar = AStarSearch();
 	AStar.CastIntVectorToAStarNodes(mapToPrint, m_width);
 	AStar.Initialize(Vector2(m_width, m_height), mapToPrint.size(), false);
@@ -351,7 +351,7 @@ void BSP::printLeafResults() {
 		
 	}
 	print(mapToPrint, m_width); //halls
-	*/
+	
 }
 void BSP::print(std::vector<int>& _toPrint, int _width) {	
 	printf("\n\n");

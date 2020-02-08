@@ -54,7 +54,7 @@ void mainLoop()
 	std::vector<int> paths;
 	bsp.GenerateRoomsAndPaths(AStar, rooms, paths);
 	myWorld.AddRooms(rooms);
-	//myWorld.AddPaths(paths);
+	myWorld.AddPaths(paths);
 
 
 	Timer timer = Timer(3.0f);
