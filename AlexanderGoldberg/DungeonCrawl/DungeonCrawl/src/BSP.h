@@ -50,10 +50,9 @@ public:
 	std::vector<int> GeneratePaths(AStarSearch& _AStar, bool _overwritePreviousPaths = false, std::vector<std::vector<int>>* const _roomTileIndexes = nullptr);
 	int convertXYToIndex(int _x, int _y, int _width);
 	const Vector2 convertIndexToXY(int _index, int _width);
-	void Tunneling1(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles);
-	void Tunneling2(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _repeatRoomDigs);
-
-	void Tunneling3(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _randomizeWhichRoomIsOrigin = true, int _centralRoomToSpiralFrom = 0);
+	void TunnelingWorkInwards(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
+	void TunnelingRoomToRoom(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _repeatRoomDigs, bool _updateMapWithPreviousPaths);
+	void TunnelingSpiderOut(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths, bool _randomizeWhichRoomIsOrigin = true, int _centralRoomToSpiralFrom = 0);
 	
 	int Size();
 
