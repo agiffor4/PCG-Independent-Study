@@ -22,7 +22,7 @@ void AStarSearch::Initialize(Vector2 _mapDimensions, int _worldSize, bool _useDi
 
 bool AStarSearch::isValid(AStarNode& _tile)
 {
-	return _tile.GetPositionInVector() > -1 && _tile.GetPositionInVector() < m_worldSize;
+	return (&_tile != nullptr) && (_tile.GetPositionInVector() > -1 && _tile.GetPositionInVector() < m_worldSize);
 }
 bool AStarSearch::isDestination(AStarNode& _tile) {
 	return _tile.GetPositionInVector() == m_targetTile->GetPositionInVector();

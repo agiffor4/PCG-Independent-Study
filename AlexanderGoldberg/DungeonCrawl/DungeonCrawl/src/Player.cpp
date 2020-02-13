@@ -61,7 +61,7 @@ void Player::move(Vector2 _direction)
 	{
 		GetLocation()->MoveContentsTo(toMoveTo);
 		SetLocation(toMoveTo);
-	}
+	} 
 	
 	
 }

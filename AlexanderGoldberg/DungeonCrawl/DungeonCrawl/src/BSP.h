@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "RectA.h"
+#include "Vector2.h"
 class BSPNode;
 class World;
 class AStarSearch;
@@ -47,6 +48,12 @@ public:
 	void GenerateRoomsAndPaths(AStarSearch& _AStar, std::vector<std::vector<int>>& _generatedRooms, std::vector<int>& _generatedPaths);
 	std::vector<RectA> GetRoomRegions(bool _overwritePreviousRooms = false);
 	std::vector<int> GeneratePaths(AStarSearch& _AStar, bool _overwritePreviousPaths = false, std::vector<std::vector<int>>* const _roomTileIndexes = nullptr);
+	int convertXYToIndex(int _x, int _y, int _width);
+	const Vector2 convertIndexToXY(int _index, int _width);
+	void Tunneling1(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles);
+	void Tunneling2(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _repeatRoomDigs);
+
+	void Tunneling3(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _randomizeWhichRoomIsOrigin = true, int _centralRoomToSpiralFrom = 0);
 	
 	int Size();
 
