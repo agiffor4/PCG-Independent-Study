@@ -25,7 +25,9 @@ void CleanUpSDL(SDL_Window* _window, SDL_Renderer* _renderer);
 
 void mainLoop()
 {
-	srand(1024);// time(NULL));
+	const int seed = 1024;// time(NULL));
+	printf("Using seed %d.\n", seed);
+	srand(seed);
 	//quit functionality
 	bool play = true;
 	Quit quit = Quit(&play);
@@ -60,6 +62,7 @@ void mainLoop()
 
 	}
 	CleanUpSDL(window, renderer);
+	printf("Used seed %d.\n", seed);
 }
 
 

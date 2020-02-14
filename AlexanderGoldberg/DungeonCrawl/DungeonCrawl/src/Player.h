@@ -15,6 +15,9 @@ public:
 	void Initalize(World& _world, const std::string _path, const std::string _name, SDL_Renderer* _renderer, Uint32 _transparentColor = -999);
 protected:
 	World* m_world;
+	std::vector<Thing*> m_inventory;
+	int m_inventoryMax = -1;
+	void takeThingsInSpace();
 	void attack(Vector2 _direction);
 	void move(Vector2 _direction);
 	World::TileDirection convertVectorToDirection(Vector2& const _toConvert);

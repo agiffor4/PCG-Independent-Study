@@ -1,6 +1,7 @@
 #pragma once
 #include "Renderable.h"
 #include "IInputHandler.h"
+#include <vector>
 class Thing;
 class World;
 
@@ -9,6 +10,7 @@ class Tile :
 {
 private:
 	Thing* m_contents = nullptr;
+	std::vector<Thing*> m_items;
 	Vector2 m_posInGrid = Vector2();
 	World* m_world;
 	int m_posInVector = -1;
@@ -26,8 +28,10 @@ public:
 	Thing* GetContents();
 	void MoveContentsTo(Tile* _newLocation);
 	int GetPositionInVector();
+	Thing* RemoveItem();
 	const Vector2& GetPositionInGrid();
 	void InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y) override;
+	void ClearTileContents();
 	void Render(SDL_Renderer* _renderer) override;
 	
 };

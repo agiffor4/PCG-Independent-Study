@@ -50,6 +50,16 @@ bool Tile::inBounds(int _x, int _y) {
 	return false;
 }
 int Tile::GetPositionInVector() { return m_posInVector; }
+Thing* Tile::RemoveItem()
+{	
+	if (!m_items.empty())
+	{
+		Thing* toReturn = m_items[m_items.size() -1];
+		m_items.erase(m_items.end(), m_items.end() -1);
+		return toReturn;
+	}
+	return nullptr;
+}
 const Vector2& Tile::GetPositionInGrid() { return m_posInGrid; }
 
 
@@ -75,6 +85,29 @@ void Tile::InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y)
 	}
 }
 
+void Tile::ClearTileContents() {
+
+	if (m_contents != nullptr)
+	{
+		if (m_contents->ShouldDelete())
+			delete(m_contents);
+		else
+			m_contents->SetLocation(nullptr);
+	}
+	SetContents(nullptr);
+	SetPassable(false);
+	int size = m_items.size();
+	for (size_t i = 0; i < size; i++)
+	{
+		if (m_items[i] != nullptr)
+		{
+			delete(m_items[i]);
+			m_items[i] = nullptr;
+		}
+	}
+	m_items.erase(m_items.begin(), m_items.end());
+}
+
 void Tile::Render(SDL_Renderer* _renderer)
 {
 	Renderable::Render(_renderer);
@@ -83,6 +116,14 @@ void Tile::Render(SDL_Renderer* _renderer)
 		m_contents->SetPosition(GetPosition().X, GetPosition().Y);
 		m_contents->Render(_renderer);
 	}
-		
 	
+	for (size_t i = 0; i < m_items.size(); i++)
+	{
+		if (m_items[i] != nullptr)
+		{
+			m_items[i]->SetPosition(GetPosition().X, GetPosition().Y);
+			m_items[i]->Render(_renderer);
+		}
+			
+	}
 }

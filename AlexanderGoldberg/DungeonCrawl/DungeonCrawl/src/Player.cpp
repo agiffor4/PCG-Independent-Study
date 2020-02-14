@@ -36,6 +36,9 @@ void Player::InvokeKeyUp(SDL_Keycode _key)
 	case SDLK_d:
 		move(Vector2(1, 0));
 		break;
+	case SDLK_e:
+		takeThingsInSpace();
+		break;
 	default:
 		break;
 	}
@@ -46,6 +49,18 @@ void Player::Initalize(World& _world, const std::string _path, const std::string
 	Renderable::Init(_path, _name, _renderer, _transparentColor);
 	m_world = &_world;
 	SetSize(m_world->GetTileSize().X, m_world->GetTileSize().Y);
+}
+
+void Player::takeThingsInSpace()
+{
+	if (m_location != nullptr && (m_inventory.size() < m_inventoryMax || m_inventoryMax == -1))
+	{
+		Thing* retrievedItem = m_location->RemoveItem();
+		if (retrievedItem != nullptr)
+		{
+			m_inventory.push_back(retrievedItem);
+		}
+	}
 }
 
 void Player::attack(Vector2 _direction)

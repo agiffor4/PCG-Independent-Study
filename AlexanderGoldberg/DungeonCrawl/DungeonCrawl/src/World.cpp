@@ -299,16 +299,8 @@ void World::GenerateTiles(int _screenWidth, int _screenHeight) {
 void World::clearPreviousLevel() {
 	for (size_t i = 0; i < m_tiles.size(); i++)
 	{
-		if (m_tiles[i]->GetContents() != nullptr)
-		{
-			if (m_tiles[i]->GetContents()->ShouldDelete())
-				delete(m_tiles[i]->GetContents());
-			else
-				m_tiles[i]->GetContents()->SetLocation(nullptr);
-		}
 		
-		m_tiles[i]->SetContents(nullptr);
-		m_tiles[i]->SetPassable(false);
+		m_tiles[i]->ClearTileContents();
 	}
 }
 
@@ -321,7 +313,7 @@ void World::GenerateLevel()
 	AStarSearch AStar = AStarSearch();	
 	AStar.Initialize(GetMapDimentions(), GetTileCount(), false);
 	AStar.CastTilesToAStarNodes((*this));
-	BSP::TunnelingType tuntype = (BSP::TunnelingType)(rand() % 3);
+	BSP::TunnelingType tuntype = (BSP::TunnelingType)(rand() % 6);
 	printf("Using tunneling algorithm %s.\n", bsp.GetEnumName(tuntype).c_str());
 	bsp.SetTunnelingType(tuntype);
 	std::vector<std::vector<int>> rooms;

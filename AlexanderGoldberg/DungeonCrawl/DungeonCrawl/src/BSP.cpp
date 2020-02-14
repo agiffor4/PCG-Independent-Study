@@ -453,18 +453,29 @@ std::vector<int> BSP::GeneratePaths(AStarSearch& _AStar, bool _overwritePrevious
 	{
 		std::vector<std::vector<int>> indexesOfRoomTiles = _roomTileIndexes == nullptr ? GetRoomTileIndexes() : (*_roomTileIndexes);
 		m_usablePaths.erase(m_usablePaths.begin(), m_usablePaths.end());
+
 		switch (m_tunnelingType)
 		{
 		case BSP::TunnelingType::FirstToLast:
-			TunnelingWorkInwards(_AStar, indexesOfRoomTiles, false);
+			TunnelingWorkInwards(_AStar, indexesOfRoomTiles, m_usePreviouslyDugPathsInPathGeneration);
 			break;
 		case BSP::TunnelingType::RoomToRoom:
-			TunnelingRoomToRoom(_AStar, indexesOfRoomTiles, false, true);
+			TunnelingRoomToRoom(_AStar, indexesOfRoomTiles, false, m_usePreviouslyDugPathsInPathGeneration);
 			break;
 		case BSP::TunnelingType::Hub:
-			TunnelingSpiderOut(_AStar, indexesOfRoomTiles, true, true);
+			TunnelingSpiderOut(_AStar, indexesOfRoomTiles, m_usePreviouslyDugPathsInPathGeneration, true);
+			break;
+		case BSP::TunnelingType::Sequential:
+			TunnelingSequential(_AStar, indexesOfRoomTiles, m_usePreviouslyDugPathsInPathGeneration);
+			break;
+		case BSP::TunnelingType::RegionToRegion:
+			TunnelingRegionToRegion(_AStar, indexesOfRoomTiles, m_usePreviouslyDugPathsInPathGeneration);
+			break;
+		case BSP::TunnelingType::StringOfRooms:
+			TunnelingCorridorsThroughRooms(_AStar, indexesOfRoomTiles, m_usePreviouslyDugPathsInPathGeneration);
 			break;
 		default:
+			printf("No established function for case %d.\n", (int)m_tunnelingType);
 			break;
 		}
 		
@@ -501,36 +512,7 @@ void BSP::TunnelingRoomToRoom(AStarSearch& _AStar, std::vector<std::vector<int>>
 	//path find from the top center of each room to the bottom center of each room
 	// if _repeatRoomDigs there will be more paths connecting rooms and existing paths may be  wider
 	const std::vector<RectA>& roomRegions = m_roomRegions;
-	/*
-	//_____________________________________________ create ASCII MAP
-	std::vector<BSPNode*> leaves = GetLeaves();
-	std::vector<int> mapToPrint = std::vector<int>();
-	int size = m_height * m_width;
-	for (size_t i = 0; i < size; i++)
-	{
-		mapToPrint.push_back(0);
-	}
-
-	std::vector<std::vector<int>> partions = GetPartions();
-	for (size_t i = 0; i < partions.size(); i++)
-	{
-		for (size_t j = 0; j < partions[i].size(); j++)
-		{
-			mapToPrint[partions[i][j]] = (i + 7);
-		}
-	}
-	std::vector<RectA> rooms = GetRoomRegions();
-	std::vector<int> paths;
-	for (size_t i = 0; i < indexesOfRoomTiles.size(); i++)
-	{
-		for (size_t j = 0; j < indexesOfRoomTiles[i].size(); j++)
-		{
-			mapToPrint[indexesOfRoomTiles[i][j]] = 0;
-		}
-	}
-
-	//_____________________________________________
-	*/
+	
 	for (size_t i = 0; i < indexesOfRoomTiles.size(); i++)
 	{
 		for (size_t j = (_repeatRoomDigs ? 0 : i); j < indexesOfRoomTiles.size(); j++)
@@ -549,14 +531,6 @@ void BSP::TunnelingRoomToRoom(AStarSearch& _AStar, std::vector<std::vector<int>>
 					m_usablePaths.push_back(path.top());
 					path.pop();
 				}
-				/*
-				//_____________________________________________ Print ASCII map
-				for (size_t i = 0; i < m_usablePaths.size(); i++)
-					mapToPrint[m_usablePaths[i]] = 0;
-				print(mapToPrint, m_width);
-				int foo = 0;
-				//_____________________________________________
-				*/
 			}
 		}
 
@@ -588,4 +562,119 @@ void BSP::TunnelingSpiderOut(AStarSearch& _AStar, std::vector<std::vector<int>>&
 		}
 	}
 }
+void BSP::TunnelingSequential(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths) {
+	
 
+	for (size_t i = 0; i < indexesOfRoomTiles.size() - 1; i++)
+	{
+		int firstRoom = i;
+		int secondRoom = i + 1;
+		int index1 = indexesOfRoomTiles[firstRoom][indexesOfRoomTiles[firstRoom].size() / 2];
+		int index2 = indexesOfRoomTiles[secondRoom][indexesOfRoomTiles[secondRoom].size() /2];
+
+		
+		std::stack<int> path = _AStar.BeginSearch(index1, index2, _updateMapWithPreviousPaths);
+		int timesToPop = path.size();
+		for (size_t j = 0; j < timesToPop; j++)
+		{
+			m_usablePaths.push_back(path.top());
+			path.pop();
+		}
+		
+	}
+}
+void BSP::TunnelingRegionToRegion(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths) {
+	//produces longer corridors
+	std::vector<int> pathCenters;
+	for (size_t i = 0; i < indexesOfRoomTiles.size(); i+=2)
+	{
+		int index1 = indexesOfRoomTiles[i][0];
+		int index2 = indexesOfRoomTiles[i + 1][0];
+
+		
+		std::stack<int> path = _AStar.BeginSearch(index1, index2, _updateMapWithPreviousPaths);
+		int timesToPop = path.size();
+		for (size_t j = 0; j < timesToPop; j++)
+		{
+			if (j == timesToPop / 2)
+			{
+				pathCenters.push_back(path.top());
+			}
+			m_usablePaths.push_back(path.top());
+			path.pop();
+		}
+
+	}
+	for (size_t i = 0; i < pathCenters.size() / 2; i++)
+	{
+		int index1 = pathCenters[i];
+		int index2 = pathCenters[(pathCenters.size() - 1) -  i];
+
+
+		std::stack<int> path = _AStar.BeginSearch(index1, index2, _updateMapWithPreviousPaths);
+		int timesToPop = path.size();
+		for (size_t j = 0; j < timesToPop; j++)
+		{
+			m_usablePaths.push_back(path.top());
+			path.pop();
+		}
+
+	}
+
+}
+void BSP::TunnelingCorridorsThroughRooms(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths) {
+	//tends toward producing strings of rooms, occasionally with a central area, but rooms tend to run in strings with corridors running through them extending to corridor
+	std::vector<int> pathCenters;
+	for (size_t i = 0; i < indexesOfRoomTiles.size(); i += 2)
+	{
+		int index1 = indexesOfRoomTiles[i][0];
+		int index2 = indexesOfRoomTiles[i + 1][0];
+
+
+		std::stack<int> path = _AStar.BeginSearch(index1, index2, _updateMapWithPreviousPaths);
+		int timesToPop = path.size();
+		for (size_t j = 0; j < timesToPop; j++)
+		{
+			m_usablePaths.push_back(path.top());
+			path.pop();
+		}
+	}
+
+	for (size_t i = 1; i < indexesOfRoomTiles.size() - 1; i += 2)
+	{
+		int index1 = indexesOfRoomTiles[i][0];
+		int index2 = indexesOfRoomTiles[i + 1][0];
+
+
+		std::stack<int> path = _AStar.BeginSearch(index1, index2, _updateMapWithPreviousPaths);
+		int timesToPop = path.size();
+		for (size_t j = 0; j < timesToPop; j++)
+		{
+			m_usablePaths.push_back(path.top());
+			path.pop();
+		}
+
+	}
+
+}
+/*
+void BSP::Tunneling4(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths) {
+
+
+	for (size_t i = 0; i < indexesOfRoomTiles.size() - 1; i++)
+	{
+		int index1 = indexesOfRoomTiles[i][0];
+		int index2 = indexesOfRoomTiles[i+1][0];
+
+
+		std::stack<int> path = _AStar.BeginSearch(index1, index2, _updateMapWithPreviousPaths);
+		int timesToPop = path.size();
+		for (size_t j = 0; j < timesToPop; j++)
+		{
+			m_usablePaths.push_back(path.top());
+			path.pop();
+		}
+
+	}
+}
+*/

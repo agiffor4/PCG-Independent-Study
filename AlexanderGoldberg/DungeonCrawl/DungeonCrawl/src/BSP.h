@@ -17,20 +17,23 @@ public:
 	enum class TunnelingType {
 		FirstToLast,
 		RoomToRoom,
-		Hub
+		Hub,
+		Sequential,
+		RegionToRegion, 
+		StringOfRooms
 
 	};
 private:
-	std::string m_enumNames[3] = { "FirstToLast", "RoomToRoom", "Hub" };
-	int m_width = 0;
-	int m_height = 0;
-	int m_currentHead = 0;
+	std::string m_enumNames[7] = { "FirstToLast", "RoomToRoom", "Hub", "Sequential", "RegionToRegion", "StringOfRooms", "" };
+	int m_width = 0;//width of rectangle to be divided up
+	int m_height = 0;//height of rectangle to be divided up
 	int m_numberOfSplits = 0;
-	int m_targetNumOfSplits = 0;
-	int m_generationAttempt = 1;
+	int m_targetNumOfSplits = 0; //the number of times to split the base grid.  Resulting number of regions is equal to 2^(m_targetNumOfSplits-1)
+	int m_generationAttempt = 1; //tracks how many failed generation attempts before finidng a viable generation
 	bool printedOnce = false;
-	bool m_ensureRoomSeperation = true;
-	
+
+	bool m_ensureRoomSeperation = true; //forces each room to have a minimum one square border, if false rooms can bleed into eachother.
+	bool m_usePreviouslyDugPathsInPathGeneration = true; //if false each path is dug in isolation of the other paths, if true each path takes into account the previously dug paths.
 
 	std::vector<BSPNode*> m_tree;
 	std::vector<DTS> m_previousRotations;
@@ -65,6 +68,9 @@ public:
 	void TunnelingWorkInwards(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
 	void TunnelingRoomToRoom(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _repeatRoomDigs, bool _updateMapWithPreviousPaths);
 	void TunnelingSpiderOut(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths, bool _randomizeWhichRoomIsOrigin = true, int _centralRoomToSpiralFrom = 0);
+	void TunnelingSequential(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
+	void TunnelingRegionToRegion(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
+	void TunnelingCorridorsThroughRooms(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
 	const std::string& GetEnumName(TunnelingType _enumValueToGetNameOf);
 	int Size();
 
