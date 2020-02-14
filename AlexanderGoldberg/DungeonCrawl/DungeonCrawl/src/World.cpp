@@ -2,11 +2,16 @@
 #include "Tile.h"
 #include "Scene.h"
 #include "InputManager.h"
+#include "Player.h"
+#include "BSP.h"
+#include "AStarSearch.h"
+#include"Player.h"
 
-World::World(int _hTileCount, int _vTileCount)
+World::World(int _hTileCount, int _vTileCount, Scene* _scene)
 {
 	m_horizontalTileCount = _hTileCount;
 	m_verticalTileCount = _vTileCount;
+	m_scene = _scene;
 }
 World::~World() {}
 void World::AddTile(Tile* _tile)
@@ -271,7 +276,7 @@ Vector2 World::GetTileSize(){
 	return m_tiles[0]->GetCurrentSize();
 }
 
-void World::GenerateTiles(Scene* _scene, int _screenWidth, int _screenHeight) {
+void World::GenerateTiles(int _screenWidth, int _screenHeight) {
 	Vector2 targetSize = Vector2(_screenWidth / m_horizontalTileCount, _screenHeight / m_verticalTileCount);
 	
 	for (size_t i = 0; i < m_verticalTileCount; i++)
@@ -281,14 +286,56 @@ void World::GenerateTiles(Scene* _scene, int _screenWidth, int _screenHeight) {
 
 			std::string name = "Tile (" + std::to_string(j) + ", " + std::to_string(i) + ")";
 			Tile* t = new Tile();
-			t->Init("img/blank_tile.bmp", name, GetTileCount(), j, i, Vector2(j * targetSize.X, i * targetSize.Y), _scene->GetRenderer());
+			t->Init("img/blank_tile.bmp", name, GetTileCount(), j, i, Vector2(j * targetSize.X, i * targetSize.Y), m_scene->GetRenderer());
 			t->SetPassable(false);
 			t->SetSize(targetSize);
 			AddTile(t);
 			InputManager::GetInputManager()->SubscribeToInput(t, InputManager::KeyPressType::MOUSEUP);
-			_scene->AddRenderable(t);
+			m_scene->AddRenderable(t);
 		}
 	}
+}
+
+void World::clearPreviousLevel() {
+	for (size_t i = 0; i < m_tiles.size(); i++)
+	{
+		if (m_tiles[i]->GetContents() != nullptr)
+		{
+			if (m_tiles[i]->GetContents()->ShouldDelete())
+				delete(m_tiles[i]->GetContents());
+			else
+				m_tiles[i]->GetContents()->SetLocation(nullptr);
+		}
+		
+		m_tiles[i]->SetContents(nullptr);
+		m_tiles[i]->SetPassable(false);
+	}
+}
+
+void World::GenerateLevel()
+{
+	clearPreviousLevel();
+	BSP bsp = BSP(m_horizontalTileCount, m_verticalTileCount);
+	bsp.BeginSplit(4);
+
+	AStarSearch AStar = AStarSearch();	
+	AStar.Initialize(GetMapDimentions(), GetTileCount(), false);
+	AStar.CastTilesToAStarNodes((*this));
+	BSP::TunnelingType tuntype = (BSP::TunnelingType)(rand() % 3);
+	printf("Using tunneling algorithm %s.\n", bsp.GetEnumName(tuntype).c_str());
+	bsp.SetTunnelingType(tuntype);
+	std::vector<std::vector<int>> rooms;
+	std::vector<int> paths;
+	bsp.GenerateRoomsAndPaths(AStar, rooms, paths);
+	AddRoomsAndPaths(rooms, paths);
+	if (!m_playerCreated)
+	{
+		m_player = CreatePlayer();
+	}		
+	int playerStart = GetPlayerStartLocation(rooms);
+	Tile* t = GetTileAtIndex(playerStart);
+	m_player->SetLocation(t);
+	t->SetContents(m_player);
 }
 
 void World::AddRoomsAndPaths(std::vector<std::vector<int>>& const _rooms, std::vector<int>& const _paths) {
@@ -313,3 +360,33 @@ void World::AddPaths(std::vector<int>& const _paths) {
 		GetTileAtIndex(_paths[j])->SetPassable(true);
 	}
 }
+
+int World::GetPlayerStartLocation(const std::vector<std::vector<int>>& _rooms) {
+	int roomToSpawnIn = rand() % _rooms.size();
+	int tileInRoom = rand() % _rooms[roomToSpawnIn].size();
+	return _rooms[roomToSpawnIn][tileInRoom];
+}
+
+Player* World::CreatePlayer()
+{
+		m_playerCreated = true;		
+		Player* p = new Player();		
+		p->Initalize((*this), "img/Player.bmp", "Player", m_scene->GetRenderer());
+		return p;
+	
+}
+
+void World::InvokeKeyUp(SDL_Keycode _key)
+{
+	switch (_key)
+	{
+	case SDLK_g:
+		GenerateLevel();
+		break;
+	default:
+		break;
+	}
+}
+	
+
+

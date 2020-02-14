@@ -19,7 +19,6 @@ public:
 	void AddRenderable(const std::string _path, const std::string _name, Vector2 _position);
 	void AddRenderable(Renderable* _renderable);
 
-
 	//int AddSound(AudioFileA& _sound, bool _playOnCreate);
 	void StartPlayingLastSound();
 	void StartPlayingSoundAtIndex(int _index);

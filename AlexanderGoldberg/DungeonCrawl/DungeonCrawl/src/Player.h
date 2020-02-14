@@ -12,7 +12,7 @@ public:
 	~Player();
 	void InvokeKeyDown(SDL_Keycode _key) override;
 	void InvokeKeyUp(SDL_Keycode _key) override;
-	void Initalize(Scene* _Scene, World& _world, const std::string _path, const std::string _name, SDL_Renderer* _renderer, Uint32 _transparentColor = -999);
+	void Initalize(World& _world, const std::string _path, const std::string _name, SDL_Renderer* _renderer, Uint32 _transparentColor = -999);
 protected:
 	World* m_world;
 	void attack(Vector2 _direction);

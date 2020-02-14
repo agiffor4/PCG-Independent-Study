@@ -80,8 +80,9 @@ void Tile::Render(SDL_Renderer* _renderer)
 	Renderable::Render(_renderer);
 	if (m_contents != nullptr)
 	{
-		
 		m_contents->SetPosition(GetPosition().X, GetPosition().Y);
-		
+		m_contents->Render(_renderer);
 	}
+		
+	
 }

@@ -45,26 +45,10 @@ void mainLoop()
 	int gridSizeX = 25;
 	int gridSizeY = 25;
 	std::unique_ptr<Scene> scene(new Scene(renderer));//create scene
-	World myWorld = World(gridSizeX, gridSizeY);
-	myWorld.GenerateTiles(scene.get(), width, height);
-	//BSP bsp = BSP(40, 30);
-	BSP bsp = BSP(gridSizeX, gridSizeY);
-	bsp.BeginSplit(4);
-	
-	AStarSearch AStar = AStarSearch();
-	AStar.CastTilesToAStarNodes(myWorld);
-	AStar.Initialize(myWorld.GetMapDimentions(), myWorld.GetTileCount(), false);
-	std::vector<std::vector<int>> rooms;
-	std::vector<int> paths;
-	bsp.GenerateRoomsAndPaths(AStar, rooms, paths);
-	myWorld.AddRoomsAndPaths(rooms, paths);
-	int roomToSpawnIn = rand() % rooms.size();
-	int tileInRoom = rand() % rooms[roomToSpawnIn].size();
-	int playerStart = rooms[roomToSpawnIn][tileInRoom];
-	Player* p = new Player();
-	p->Initalize(scene.get(), myWorld, "img/Player.bmp", "Player", renderer);
-	p->SetLocation(myWorld.GetTileAtIndex(playerStart));
-	myWorld.GetTileAtIndex(playerStart)->SetContents(p);
+	World myWorld = World(gridSizeX, gridSizeY, scene.get());
+	myWorld.GenerateTiles(width, height);
+	myWorld.GenerateLevel();
+	InputManager::GetInputManager()->SubscribeToInput(&myWorld, InputManager::KeyPressType::UP);
 
 	Timer timer = Timer(3.0f);
 	while (play)

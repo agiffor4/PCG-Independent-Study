@@ -14,8 +14,14 @@ public:
 		HORIZONTAL,
 		VERTICAL
 	};
-private:
+	enum class TunnelingType {
+		FirstToLast,
+		RoomToRoom,
+		Hub
 
+	};
+private:
+	std::string m_enumNames[3] = { "FirstToLast", "RoomToRoom", "Hub" };
 	int m_width = 0;
 	int m_height = 0;
 	int m_currentHead = 0;
@@ -24,10 +30,16 @@ private:
 	int m_generationAttempt = 1;
 	bool printedOnce = false;
 	bool m_ensureRoomSeperation = true;
+	
+
 	std::vector<BSPNode*> m_tree;
 	std::vector<DTS> m_previousRotations;
 	std::vector<RectA> m_roomRegions;
 	std::vector<int> m_usablePaths;
+
+	TunnelingType m_tunnelingType = TunnelingType::FirstToLast;
+	
+
 	void split();
 	void WipeTree();
 	void StartOver();
@@ -53,9 +65,10 @@ public:
 	void TunnelingWorkInwards(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
 	void TunnelingRoomToRoom(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _repeatRoomDigs, bool _updateMapWithPreviousPaths);
 	void TunnelingSpiderOut(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths, bool _randomizeWhichRoomIsOrigin = true, int _centralRoomToSpiralFrom = 0);
-	
+	const std::string& GetEnumName(TunnelingType _enumValueToGetNameOf);
 	int Size();
 
+	void SetTunnelingType(TunnelingType _tunnelingType);
 	
 };
 

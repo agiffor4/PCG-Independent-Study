@@ -6,11 +6,14 @@ class Thing :
 {
 protected:
 	Tile* m_location = nullptr;
+	bool m_shouldDelete = true;
 public:
 	Thing();
 	~Thing();
 	void SetLocation(Tile* _newLocation);
 	Tile* GetLocation();
+
+	bool ShouldDelete();
 
 };
 

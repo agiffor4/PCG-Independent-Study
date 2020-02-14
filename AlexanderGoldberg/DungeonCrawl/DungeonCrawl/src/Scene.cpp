@@ -20,6 +20,8 @@ void Scene::AddRenderable(Renderable* _renderable)
 	m_renderables.push_back(std::unique_ptr<Renderable>(_renderable));
 }
 
+
+
 void Scene::AddRenderable(const std::string _path, const std::string _name, Vector2 _position)
 {
 	m_renderables.push_back(std::unique_ptr<Renderable>(new Renderable()));

@@ -15,7 +15,7 @@ AStarSearch::~AStarSearch()
 }
 
 void AStarSearch::Initialize(Vector2 _mapDimensions, int _worldSize, bool _useDiagonals) {
-
+	ResetAStar();
 	Vector2 size = _mapDimensions;
 	m_rowCount = size.X;
 	m_columnCount = size.Y;
@@ -60,7 +60,7 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 		printf("Must call Initialize for AStar before searching.\n");
 		return std::stack<int>();
 	}
-	if (m_nodes.size() < 1)
+	if ((_usePreviousPathsInEachItteration ? m_modifableNodes.size() : m_nodes.size()) < 1)
 	{
 		printf("Must call convert function of some kind and pass in a set of nodes before begining search.\n");
 		return std::stack<int>();
@@ -174,7 +174,6 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 				fNew = gNew + hNew;
 				if ((cn.fCost == FLT_MAX || cn.fCost > fNew))
 				{
-					// && (!isDestination((*getTileAtIndex(cn.m_IndexOfTile))))
 					cn.fCost = fNew;
 					cn.gCost = gNew;
 					cn.hCost = hNew; 
@@ -203,6 +202,12 @@ void AStarSearch::SetWallDigCost(int _newCost)
 	m_DigCost = _newCost;
 }
 
+void AStarSearch::ResetAStar()
+{
+	cleanNodes();
+	cleanModifiableNodes();
+}
+
 std::stack<int> AStarSearch::findPath(std::vector<Node>& _path)
 {
 	
@@ -210,7 +215,7 @@ std::stack<int> AStarSearch::findPath(std::vector<Node>& _path)
 
 	int x = (_path[currentIndexToCheck].m_IndexOfTile % m_columnCount);
 	int y = m_rowCount - (_path[currentIndexToCheck].m_IndexOfTile - x) / m_columnCount;
-	printf("The path is %d (%d, %d)", currentIndexToCheck, x, y);
+	//printf("The path is %d (%d, %d)", currentIndexToCheck, x, y);
 	std::stack<int> path;
 	while (_path[currentIndexToCheck].m_IndexOfTile != _path[currentIndexToCheck].m_Parent->m_IndexOfTile)
 	{
@@ -218,11 +223,11 @@ std::stack<int> AStarSearch::findPath(std::vector<Node>& _path)
 		currentIndexToCheck = _path[currentIndexToCheck].m_Parent->m_IndexOfTile;
 		x = (_path[currentIndexToCheck].m_IndexOfTile % m_columnCount);
 		y = m_columnCount - (_path[currentIndexToCheck].m_IndexOfTile - x) / m_columnCount;
-		printf(", %d (%d, %d)", _path[currentIndexToCheck].m_IndexOfTile, x, y);
+		//printf(", %d (%d, %d)", _path[currentIndexToCheck].m_IndexOfTile, x, y);
 
 	}
 	path.push(_path[currentIndexToCheck].m_IndexOfTile);
-	printf("\n");
+	//printf("\n");
 	return path;
 }
 
@@ -332,6 +337,10 @@ bool AStarSearch::isTileEdge(int _index) {
 		_index % m_columnCount == m_columnCount - 1;
 		
 }
+
+
+
+
 
 void AStarSearch::CastTilesToAStarNodes(World& _world)
 {

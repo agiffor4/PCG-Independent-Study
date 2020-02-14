@@ -4,22 +4,27 @@
 #include <Vector>
 #include <string>
 #include "Vector2.h"
+#include "IInputHandler.h"
 class Tile;
 class Scene;
 class Vector2;
-class World
+class Player;
+class World : public IInputHandler
 {
 protected:
 	std::vector<Tile*> m_tiles;
 	int m_horizontalTileCount = 0;
 	int m_verticalTileCount = 0;
+	bool m_playerCreated = false;
+	Player* m_player = nullptr;
+	Scene* m_scene = nullptr;
 public:
 
 	enum class TileDirection
 	{
 		UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT
 	};
-	World(int _hTileCount, int _vTileCount);
+	World(int _hTileCount, int _vTileCount, Scene* _scene);
 	~World();
 	bool IsViableDirectionToMoveIn(int _currentTileIndex, TileDirection _direction);
 	Tile* GetAdjacentTile(int _currentTileIndex, TileDirection _direction);
@@ -33,13 +38,19 @@ public:
 	void AddTile(Tile* _renderable);
 	int GetTileCount();	
 	Vector2 GetTileSize();
-	void GenerateTiles(Scene* _scene, int _screenWidth, int _screenHeight);
+	
+	void GenerateTiles(int _screenWidth, int _screenHeight);
+	void GenerateLevel();
+	void clearPreviousLevel();
+	
 
 	void AddRoomsAndPaths(std::vector<std::vector<int>>& const _rooms, std::vector<int>& const _paths);
-
 	void AddRooms(std::vector<std::vector<int>>& const _rooms);
-
 	void AddPaths(std::vector<int>& const _paths);
+
+	int GetPlayerStartLocation(const std::vector<std::vector<int>>& _rooms);
+	Player* CreatePlayer();
+	void InvokeKeyUp(SDL_Keycode _key) override;
 
 };
 

@@ -17,3 +17,7 @@ Tile* Thing::GetLocation()
 {
 	return m_location;
 }
+
+bool Thing::ShouldDelete() {
+	return m_shouldDelete;
+}

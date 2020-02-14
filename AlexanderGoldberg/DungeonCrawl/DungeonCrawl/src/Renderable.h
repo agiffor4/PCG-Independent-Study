@@ -32,7 +32,7 @@ public:
 	virtual void Render(SDL_Renderer* renderer);
 	void SetPosition(float x, float y);
 	void SetPosition(Vector2& pos);
-	Vector2 GetPosition();
+	const Vector2& GetPosition();
 	SDL_Rect GetDestination();
 	void SetSize(Vector2& _scale);
 	void SetSize(float _x, float _y);

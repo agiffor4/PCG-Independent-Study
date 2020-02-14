@@ -31,7 +31,7 @@ protected:
     bool  m_inited = false;
     bool m_useDiagonals = false;
     bool m_allowPathsAlongEdges = false;
-    int m_DigCost = 200;
+    int m_DigCost = 10;
     AStarNode* m_targetTile = nullptr;
     std::vector<AStarNode*> m_nodes;
     std::vector<AStarNode*> m_modifableNodes;
@@ -46,7 +46,7 @@ protected:
     void cleanNodes();
     void cleanModifiableNodes();
     AStarNode* getTileAtIndex(int _index, std::vector<AStarNode*>& _nodesToUse);
-    
+    void ResetAStar();
 public:
     
 	AStarSearch();

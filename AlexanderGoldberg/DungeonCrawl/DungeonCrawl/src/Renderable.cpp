@@ -45,7 +45,7 @@ void Renderable::SetPosition(Vector2& _pos) {
 	
 }
 
-Vector2 Renderable::GetPosition() { return m_position;}
+const Vector2& Renderable::GetPosition() { return m_position;}
 SDL_Rect Renderable::GetDestination() { return m_destination; }
 
 void Renderable::SetSize(Vector2& _scale) {
