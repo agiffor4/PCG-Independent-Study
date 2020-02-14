@@ -15,6 +15,7 @@ private:
 	World* m_world;
 	int m_posInVector = -1;
 	bool m_passable = true;
+	bool m_corridor = false;
 public:
 
 
@@ -24,6 +25,8 @@ public:
 	bool IsPassable();
 	bool inBounds(int _x, int _y);
 	void SetPassable(bool _val);
+	void SetCorridor(bool _val);
+	bool IsCorridor();
 	void SetContents(Thing* _newContents);
 	Thing* GetContents();
 	void MoveContentsTo(Tile* _newLocation);

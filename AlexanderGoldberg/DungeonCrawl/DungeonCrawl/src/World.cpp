@@ -308,6 +308,7 @@ void World::GenerateLevel()
 {
 	clearPreviousLevel();
 	BSP bsp = BSP(m_horizontalTileCount, m_verticalTileCount);
+	//2^n ~= gridsize / 3
 	bsp.BeginSplit(4);
 
 	AStarSearch AStar = AStarSearch();	
@@ -349,7 +350,10 @@ void World::AddPaths(std::vector<int>& const _paths) {
 
 	for (size_t j = 0; j < _paths.size(); j++)
 	{
+		if (!GetTileAtIndex(_paths[j])->IsPassable())
+			GetTileAtIndex(_paths[j])->SetCorridor(true);
 		GetTileAtIndex(_paths[j])->SetPassable(true);
+		
 	}
 }
 

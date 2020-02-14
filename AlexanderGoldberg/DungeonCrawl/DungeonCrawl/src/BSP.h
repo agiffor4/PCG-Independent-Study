@@ -32,13 +32,14 @@ private:
 	int m_generationAttempt = 1; //tracks how many failed generation attempts before finidng a viable generation
 	bool printedOnce = false;
 
-	bool m_ensureRoomSeperation = true; //forces each room to have a minimum one square border, if false rooms can bleed into eachother.
+	bool m_ensureRoomSeperation = true; //forces each room to have a minimum one square border, if false rooms will bleed into eachother creating larger open areas.
 	bool m_usePreviouslyDugPathsInPathGeneration = true; //if false each path is dug in isolation of the other paths, if true each path takes into account the previously dug paths.
 
 	std::vector<BSPNode*> m_tree;
 	std::vector<DTS> m_previousRotations;
 	std::vector<RectA> m_roomRegions;
 	std::vector<int> m_usablePaths;
+	std::vector<Vector2> m_IndexesOfStartEndPointsForPathSegments;
 
 	TunnelingType m_tunnelingType = TunnelingType::FirstToLast;
 	

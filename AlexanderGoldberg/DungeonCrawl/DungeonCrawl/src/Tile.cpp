@@ -26,6 +26,14 @@ void Tile::SetPassable(bool _val) {
 		changeImage("img/block_tile.bmp");
 	}
 }
+void Tile::SetCorridor(bool _val)
+{
+	m_corridor = _val;
+}
+bool Tile::IsCorridor()
+{
+	return m_corridor;
+}
 void Tile::SetContents(Thing* _newContents)
 {
 	m_contents = _newContents;
