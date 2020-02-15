@@ -1,6 +1,7 @@
 #include "Tile.h"
 #include "Thing.h"
 #include "World.h"
+#include "Interactable.h"
 Tile::Tile() {
 
 }
@@ -58,15 +59,23 @@ bool Tile::inBounds(int _x, int _y) {
 	return false;
 }
 int Tile::GetPositionInVector() { return m_posInVector; }
-Thing* Tile::RemoveItem()
+Interactable* Tile::InteractWithItem()
 {	
 	if (!m_items.empty())
 	{
-		Thing* toReturn = m_items[m_items.size() -1];
-		m_items.erase(m_items.end(), m_items.end() -1);
-		return toReturn;
+		Interactable* toReturn = m_items[m_items.size() -1];
+		if (toReturn->Interaction())
+		{
+			m_items.erase(m_items.end() - 1, m_items.end());
+			return toReturn;
+		}
+		
 	}
 	return nullptr;
+}
+void Tile::AddItem(Interactable* _newItem)
+{
+	m_items.push_back(_newItem);
 }
 const Vector2& Tile::GetPositionInGrid() { return m_posInGrid; }
 
@@ -119,12 +128,6 @@ void Tile::ClearTileContents() {
 void Tile::Render(SDL_Renderer* _renderer)
 {
 	Renderable::Render(_renderer);
-	if (m_contents != nullptr)
-	{
-		m_contents->SetPosition(GetPosition().X, GetPosition().Y);
-		m_contents->Render(_renderer);
-	}
-	
 	for (size_t i = 0; i < m_items.size(); i++)
 	{
 		if (m_items[i] != nullptr)
@@ -132,6 +135,13 @@ void Tile::Render(SDL_Renderer* _renderer)
 			m_items[i]->SetPosition(GetPosition().X, GetPosition().Y);
 			m_items[i]->Render(_renderer);
 		}
-			
+
 	}
+	if (m_contents != nullptr)
+	{
+		m_contents->SetPosition(GetPosition().X, GetPosition().Y);
+		m_contents->Render(_renderer);
+	}
+	
+	
 }

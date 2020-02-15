@@ -150,6 +150,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Exit.cpp" />
+    <ClCompile Include="src\Interactable.cpp" />
     <ClCompile Include="src\AStarNode.cpp" />
     <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\RectA.cpp" />
@@ -173,6 +175,8 @@
     <ClCompile Include="src\TreeNode.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Exit.h" />
+    <ClInclude Include="src\Interactable.h" />
     <ClInclude Include="src\AStarNode.h" />
     <ClInclude Include="src\Player.h" />
     <ClInclude Include="src\RectA.h" />

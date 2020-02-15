@@ -48,7 +48,7 @@ public:
 	void AddRooms(std::vector<std::vector<int>>& const _rooms);
 	void AddPaths(std::vector<int>& const _paths);
 
-	int GetPlayerStartLocation(const std::vector<std::vector<int>>& _rooms);
+	int GetPlayerStartLocation(const std::vector<std::vector<int>>& _rooms, int* roomSpawnedIn);
 	Player* CreatePlayer();
 	void InvokeKeyUp(SDL_Keycode _key) override;
 

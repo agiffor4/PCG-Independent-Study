@@ -93,6 +93,12 @@
     <ClCompile Include="src\Node.cpp">
       <Filter>Source Files\Astar</Filter>
     </ClCompile>
+    <ClCompile Include="src\Interactable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Exit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\DeltaTime.h">
@@ -402,6 +408,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Interactable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Exit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

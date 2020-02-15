@@ -164,7 +164,6 @@ void BSP::GenerateRoomsAndPaths(AStarSearch& _AStar, std::vector<std::vector<int
 {
 	_generatedRooms = GetRoomTileIndexes();
 	_generatedPaths = GeneratePaths(_AStar, true, &_generatedRooms);
-
 }
 std::vector<RectA> BSP::GetRoomRegions(bool _overwritePreviousRooms) {
 	if (_overwritePreviousRooms || m_roomRegions.size() < 1)
@@ -484,6 +483,50 @@ std::vector<int> BSP::GeneratePaths(AStarSearch& _AStar, bool _overwritePrevious
 	return m_usablePaths;
 }
 
+int BSP::GenerateExitLocation(int _startingIndex, int _startingRegion)
+{
+	Vector2 xyStart = convertIndexToXY(_startingIndex, m_width);
+	std::vector<std::vector<int>> roomTileIndexes = GetRoomTileIndexes();
+	float currentMaxDistance = 0;
+	int exitIndex = 0;
+	switch (m_tunnelingType)
+	{
+	case BSP::TunnelingType::FirstToLast:
+		
+		for (size_t i = 0; i < roomTileIndexes.size(); i++)
+		{
+			if (i != _startingRegion)
+			{
+				
+				for (size_t j = 0; j < roomTileIndexes[i].size(); j++)
+				{
+					if (Vector2::GetDistanceGreaterThan(xyStart, convertIndexToXY(roomTileIndexes[i][j], m_width), currentMaxDistance))
+					{
+						exitIndex = roomTileIndexes[i][j];
+					}
+				}
+			}
+		}
+		break;
+	case BSP::TunnelingType::RoomToRoom:
+		break;
+	case BSP::TunnelingType::Hub:
+		break;
+	case BSP::TunnelingType::Sequential:
+		break;
+	case BSP::TunnelingType::RegionToRegion:
+		break;
+	case BSP::TunnelingType::StringOfRooms:
+		break;
+	default:
+		printf("Cannot cretate exit, unknown tunneling type enum with value %d.\n", (int)(m_tunnelingType));
+		break;
+	}
+
+	return exitIndex;
+}
+
+
 void BSP::TunnelingWorkInwards(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths) {
 	int timesToDig = indexesOfRoomTiles.size() / 2;
 
@@ -541,7 +584,7 @@ void BSP::TunnelingRoomToRoom(AStarSearch& _AStar, std::vector<std::vector<int>>
 
 	}
 }
-void BSP::TunnelingSpiderOut(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths, bool _randomizeWhichRoomIsOrigin, int _centralRoomToSpiralFrom) {
+int BSP::TunnelingSpiderOut(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths, bool _randomizeWhichRoomIsOrigin, int _centralRoomToSpiralFrom) {
 	//path find from the top center of each room to the bottom center of each room
 	// if _repeatRoomDigs there will be more paths connecting rooms and existing paths may be  wider
 	int originRoom = _centralRoomToSpiralFrom;
@@ -568,6 +611,7 @@ void BSP::TunnelingSpiderOut(AStarSearch& _AStar, std::vector<std::vector<int>>&
 			m_IndexesOfStartEndPointsForPathSegments[m_IndexesOfStartEndPointsForPathSegments.size() - 1].Y = m_usablePaths.size() - 1;
 		}
 	}
+	return originRoom; //returns the room that is used as the origin
 }
 void BSP::TunnelingSequential(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths) {
 	

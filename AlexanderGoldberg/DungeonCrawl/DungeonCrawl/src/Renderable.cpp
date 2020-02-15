@@ -23,7 +23,6 @@ void Renderable::Init(const std::string _path, const std::string _name, SDL_Rend
 		m_destination.h = surface->h;
 		m_scaleDefault.X = surface->w;
 		m_scaleDefault.Y = surface->h;
-		//SDL_CreateTextureFromSurface(_renderer, surface);
 		
 	}
 	else

@@ -3,6 +3,7 @@
 #include "World.h"
 #include "InputManager.h"
 #include "Scene.h"
+#include "Interactable.h"
 Player::Player()
 {
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::UP);
@@ -37,7 +38,7 @@ void Player::InvokeKeyUp(SDL_Keycode _key)
 		move(Vector2(1, 0));
 		break;
 	case SDLK_e:
-		takeThingsInSpace();
+		InteractWithThingInSpace();
 		break;
 	default:
 		break;
@@ -51,11 +52,11 @@ void Player::Initalize(World& _world, const std::string _path, const std::string
 	SetSize(m_world->GetTileSize().X, m_world->GetTileSize().Y);
 }
 
-void Player::takeThingsInSpace()
+void Player::InteractWithThingInSpace()
 {
 	if (m_location != nullptr && (m_inventory.size() < m_inventoryMax || m_inventoryMax == -1))
 	{
-		Thing* retrievedItem = m_location->RemoveItem();
+		Interactable* retrievedItem = m_location->InteractWithItem();
 		if (retrievedItem != nullptr)
 		{
 			m_inventory.push_back(retrievedItem);

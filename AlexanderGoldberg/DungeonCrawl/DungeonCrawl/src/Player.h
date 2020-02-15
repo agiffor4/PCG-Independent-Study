@@ -3,6 +3,7 @@
 #include "IInputHandler.h"
 #include "World.h"
 class Scene;
+class Interactable;
 class Player :
 	public Thing, public IInputHandler
 {
@@ -17,7 +18,7 @@ protected:
 	World* m_world;
 	std::vector<Thing*> m_inventory;
 	int m_inventoryMax = -1;
-	void takeThingsInSpace();
+	void InteractWithThingInSpace();
 	void attack(Vector2 _direction);
 	void move(Vector2 _direction);
 	World::TileDirection convertVectorToDirection(Vector2& const _toConvert);
