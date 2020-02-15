@@ -500,8 +500,10 @@ int BSP::GenerateExitLocation(int _startingIndex, int _startingRegion)
 				
 				for (size_t j = 0; j < roomTileIndexes[i].size(); j++)
 				{
-					if (Vector2::GetDistanceGreaterThan(xyStart, convertIndexToXY(roomTileIndexes[i][j], m_width), currentMaxDistance))
+					Vector2 otherXY = convertIndexToXY(roomTileIndexes[i][j], m_width);
+					if (Vector2::GetDistanceGreaterThan(xyStart, otherXY, currentMaxDistance))
 					{
+						currentMaxDistance = Vector2::GetMagnitude(xyStart, otherXY);
 						exitIndex = roomTileIndexes[i][j];
 					}
 				}
