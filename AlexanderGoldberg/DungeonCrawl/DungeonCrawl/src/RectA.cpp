@@ -1,4 +1,5 @@
 #include "RectA.h"
+
 RectA::RectA() {}
 RectA::RectA(int _x1, int _y1, int _x2, int _y2) {
 	x1 = _x1;
@@ -29,4 +30,21 @@ int RectA::Area() {
 	if (height < 0)
 		height *= -1;
 	return width * height;
+}
+
+
+bool RectA::Contains(int _x, int _y)
+{
+	return _x > x1 && _x < x2 && _y > y1&& _y < y2;
+}
+
+void RectA::GetCenter(int* _x, int* _y)
+{
+	(*_x) = (x2 - x1) / 2;
+	(*_y) = (y2 - y1) / 2;
+}
+void RectA::GetCenter(double* _x, double* _y)
+{
+	(*_x) = (x2 - x1) / 2;
+	(*_y) = (y2 - y1) / 2;
 }

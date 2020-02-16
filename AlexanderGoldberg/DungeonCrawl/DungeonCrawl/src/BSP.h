@@ -78,7 +78,7 @@ public:
 	void SetTunnelingType(TunnelingType _tunnelingType);
 	void TunnelingWorkInwards(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
 	void TunnelingRoomToRoom(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _repeatRoomDigs, bool _updateMapWithPreviousPaths);
-	int TunnelingSpiderOut(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths, bool _randomizeWhichRoomIsOrigin = true, int _centralRoomToSpiralFrom = 0); // returns "hub" room index
+	int TunnelingHub(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths, bool _randomizeWhichRoomIsOrigin = true, bool _tryToPickCenteralRoom = true, int _centralRoomToSpiralFrom = 0); // returns "hub" room index
 	void TunnelingSequential(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
 	void TunnelingRegionToRegion(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
 	void TunnelingCorridorsThroughRooms(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);

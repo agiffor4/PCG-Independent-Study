@@ -44,8 +44,15 @@ void mainLoop()
 	int height = SDL_GetWindowSurface(window)->h;	
 
 	DeltaTime deltaTime = DeltaTime();
+	bool use50 = true;
 	int gridSizeX = 25;
 	int gridSizeY = 25;
+	if (use50)
+	{
+		gridSizeX = 50;
+		gridSizeY = 50;
+	}
+	
 	std::unique_ptr<Scene> scene(new Scene(renderer));//create scene
 	World myWorld = World(gridSizeX, gridSizeY, scene.get());
 	myWorld.GenerateTiles(width, height);

@@ -456,17 +456,18 @@ std::vector<int> BSP::GeneratePaths(AStarSearch& _AStar, bool _overwritePrevious
 		std::vector<std::vector<int>> indexesOfRoomTiles = _roomTileIndexes == nullptr ? GetRoomTileIndexes() : (*_roomTileIndexes);
 		m_usablePaths.erase(m_usablePaths.begin(), m_usablePaths.end());
 		m_IndexesOfStartEndPointsForPathSegments.erase(m_IndexesOfStartEndPointsForPathSegments.begin(), m_IndexesOfStartEndPointsForPathSegments.end());
-
+		_AStar.SetWallDigCost(200);
 		switch (m_tunnelingType)
 		{
 		case BSP::TunnelingType::FirstToLast:
-			TunnelingWorkInwards(_AStar, indexesOfRoomTiles, m_usePreviouslyDugPathsInPathGeneration);
+			TunnelingWorkInwards(_AStar, indexesOfRoomTiles, false);
 			break;
 		case BSP::TunnelingType::RoomToRoom:
-			TunnelingRoomToRoom(_AStar, indexesOfRoomTiles, false, m_usePreviouslyDugPathsInPathGeneration);
+			//with the last parameter false generates map where each room has a link to each adjacent room, more open than other generations, distinct rooms but they flow into eachother.
+			TunnelingRoomToRoom(_AStar, indexesOfRoomTiles, false, false); 
 			break;
 		case BSP::TunnelingType::Hub:
-			TunnelingSpiderOut(_AStar, indexesOfRoomTiles, m_usePreviouslyDugPathsInPathGeneration, true);
+			TunnelingHub(_AStar, indexesOfRoomTiles, m_usePreviouslyDugPathsInPathGeneration, false, true);
 			break;
 		case BSP::TunnelingType::Sequential:
 			TunnelingSequential(_AStar, indexesOfRoomTiles, m_usePreviouslyDugPathsInPathGeneration);
@@ -540,7 +541,7 @@ void BSP::longestPathToFromStart(int& _exitIndex, int _startingIndex, World& _wo
 {
 	AStarSearch AStar = AStarSearch();
 	AStar.Initialize(_world.GetMapDimentions(), _world.GetTileCount(), false);
-	AStar.SetWallDigCost(2000);
+	AStar.SetWallDigCost(200);
 	AStar.CastTilesToAStarNodes(_world);
 	int currentTargetRoomRegion = -1;
 	int currentPathLength = 0;	
@@ -588,7 +589,7 @@ void BSP::SetTunnelingType(TunnelingType _tunnelingType)
 }
 void BSP::TunnelingWorkInwards(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths) {
 	int timesToDig = indexesOfRoomTiles.size() / 2;
-
+	
 	for (size_t i = 0; i < timesToDig; i++)
 	{
 		int lastRoom = indexesOfRoomTiles.size() - (i + 1);
@@ -616,6 +617,7 @@ void BSP::TunnelingWorkInwards(AStarSearch& _AStar, std::vector<std::vector<int>
 void BSP::TunnelingRoomToRoom(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _repeatRoomDigs, bool _updateMapWithPreviousPaths) {
 	//path find from the top center of each room to the bottom center of each room
 	// if _repeatRoomDigs there will be more paths connecting rooms and existing paths may be  wider
+	//if _updateMapWithPreviousPaths is false generates more open areas
 	const std::vector<RectA>& roomRegions = m_roomRegions;
 	
 	for (size_t i = 0; i < indexesOfRoomTiles.size(); i++)
@@ -629,6 +631,7 @@ void BSP::TunnelingRoomToRoom(AStarSearch& _AStar, std::vector<std::vector<int>>
 				int endTile = indexesOfRoomTiles[j].size() - ((roomRegions[j].x2 - roomRegions[j].x1) * 0.5f);
 				int index1 = indexesOfRoomTiles[i][startingTile];
 				int index2 = indexesOfRoomTiles[j][endTile];
+				_AStar.SetWallDigCost(10);
 				std::stack<int> path = _AStar.BeginSearch(index1, index2, _updateMapWithPreviousPaths);
 				int timesToPop = path.size();
 				m_IndexesOfStartEndPointsForPathSegments.push_back(Vector2(m_usablePaths.size(), 0));
@@ -643,13 +646,52 @@ void BSP::TunnelingRoomToRoom(AStarSearch& _AStar, std::vector<std::vector<int>>
 
 	}
 }
-int BSP::TunnelingSpiderOut(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths, bool _randomizeWhichRoomIsOrigin, int _centralRoomToSpiralFrom) {
-	//path find from the top center of each room to the bottom center of each room
+int BSP::TunnelingHub(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths, bool _randomizeWhichRoomIsOrigin, bool _tryToPickCenteralRoom, int _centralRoomToSpiralFrom) {
+	
 	// if _repeatRoomDigs there will be more paths connecting rooms and existing paths may be  wider
 	int originRoom = _centralRoomToSpiralFrom;
-	if (_randomizeWhichRoomIsOrigin)
-		originRoom = rand() % indexesOfRoomTiles.size();
 	const std::vector<RectA>& roomRegions = m_roomRegions;
+	
+	Vector2 worldCenter = Vector2(m_tree[0]->GetRect().x2 / 2, m_tree[0]->GetRect().y2 / 2);
+	if (_randomizeWhichRoomIsOrigin)
+	{
+		originRoom = rand() % indexesOfRoomTiles.size();
+	}
+	else
+	{
+		bool foundCenter = false;
+		if (_tryToPickCenteralRoom)
+		{
+			for (size_t i = 0; i < roomRegions.size(); i++)
+			{
+				RectA r = roomRegions[i];
+				if (r.Contains(worldCenter.X, worldCenter.Y))
+				{
+					originRoom = i;
+					foundCenter = true;
+					break;
+				}
+			}
+			if (!foundCenter)
+			{
+				int currentMinDist = 9999;
+				for (size_t i = 0; i < roomRegions.size(); i++)
+				{
+					RectA r = roomRegions[i];
+					Vector2 RecCenter = Vector2();
+					r.GetCenter(&RecCenter.X, &RecCenter.Y);
+					if (Vector2::GetDistanceLessThan(RecCenter, worldCenter, currentMinDist))
+					{
+						currentMinDist = Vector2::GetMagnitude(RecCenter, worldCenter);
+						originRoom = i;						
+					}
+				}
+			}
+
+		}
+	}
+	
+	
 	int startingTile = ((roomRegions[originRoom].x2 - roomRegions[originRoom].x1) * 0.5f);
 	for (size_t i = 0; i < indexesOfRoomTiles.size(); i++)
 	{
