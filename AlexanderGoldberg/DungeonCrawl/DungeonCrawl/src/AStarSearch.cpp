@@ -35,7 +35,7 @@ bool AStarSearch::isDestination(AStarNode& _tile) {
 double AStarSearch::calculateHValue(AStarNode& _currentTile)
 {
 	// Return using the distance formula 
-	return Vector2::GetSquareDistance(m_targetTile->GetPositionInGrid(), _currentTile.GetPositionInGrid()) + (double)(!_currentTile.IsPassable() ? +20 : 0);
+	return Vector2::GetSquareDistance(m_targetTile->GetPositionInGrid(), _currentTile.GetPositionInGrid());
 }
 
 std::vector<int> AStarSearch::getNodeNeighbors(int _indexToGetNeighborsFor, std::vector<AStarNode*>& _nodesToUse) {
@@ -159,6 +159,10 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 			}			
 			else if (!closedList[cn.m_IndexOfTile] && isPass && (m_allowPathsAlongEdges ? true : !isTileEdge(cn.m_IndexOfTile)))
 			{
+				if (checkingNode.m_IndexOfTile == 1847 && _current.GetPositionInVector() == 2097 && m_targetTile->GetPositionInVector() == 1394)
+				{
+					int foo = 0;
+				}
 				gNew = checkingNode.gCost + getTileAtIndex(cn.m_IndexOfTile, refToNodeVector)->m_GCost;
 				hNew = calculateHValue(*getTileAtIndex(cn.m_IndexOfTile, refToNodeVector));
 				fNew = gNew + hNew;
@@ -186,6 +190,11 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 void AStarSearch::SetWallDigCost(int _newCost) 
 {
 	m_DigCost = _newCost;
+}
+
+void AStarSearch::SetEmptyTileCost(int _newCost)
+{
+	m_emptyTileGCost = _newCost;
 }
 
 void AStarSearch::ResetAStar()

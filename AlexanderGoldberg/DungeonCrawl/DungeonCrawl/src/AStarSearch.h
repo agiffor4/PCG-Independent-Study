@@ -71,7 +71,7 @@ public:
     std::stack<int> BeginSearch(int _current, int _target, bool _usePreviousPathsInEachItteration);
     
     void SetWallDigCost(int _newCost);
-    
+    void SetEmptyTileCost(int _newCost);
     void CastTilesToAStarNodes(World& _world);
     void CastIntVectorToAStarNodes(std::vector<int>& _world, int _width);
     

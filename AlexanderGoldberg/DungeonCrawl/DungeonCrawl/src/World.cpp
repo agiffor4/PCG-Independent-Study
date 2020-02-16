@@ -345,6 +345,7 @@ void World::GenerateLevel()
 }
 
 
+
 void World::AddRoomsAndPaths(std::vector<std::vector<int>>& const _rooms, std::vector<int>& const _paths) {
 	AddRooms(_rooms);
 	AddPaths(_paths);
@@ -391,14 +392,20 @@ Player* World::CreatePlayer()
 
 void World::InvokeKeyUp(SDL_Keycode _key)
 {
+	BSP bsp = BSP(1,1);
 	switch (_key)
 	{
+	case SDLK_q:
+		m_resetSeed = !m_resetSeed;
+		printf("Reset seed set to %s\n", (m_resetSeed ? "true" : "false"));
+		break;
 	case SDLK_g:
+		if (m_resetSeed)
+			srand(1024);
 		if (m_cycleGenerationType)
 		{
-			srand(1024);
 			m_pathGenerationType++;
-			if (m_pathGenerationType > 5)
+			if (m_pathGenerationType > 4)
 				m_pathGenerationType = 0;
 		}
 		GenerateLevel();
@@ -408,21 +415,27 @@ void World::InvokeKeyUp(SDL_Keycode _key)
 		break;
 	case SDLK_1:
 		m_pathGenerationType = 0;
+		printf("Path generation type set to %s\n", bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType).c_str());
 		break;
 	case SDLK_2:
 		m_pathGenerationType = 1;
+		printf("Path generation type set to %s\n", bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType).c_str());
 		break;
 	case SDLK_3:
 		m_pathGenerationType = 2;
+		printf("Path generation type set to %s\n", bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType).c_str());
 		break;
 	case SDLK_4:
 		m_pathGenerationType = 3;
+		printf("Path generation type set to %s\n", bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType).c_str());
 		break;
 	case SDLK_5:
 		m_pathGenerationType = 4;
+		printf("Path generation type set to %s\n", bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType).c_str());
 		break;
 	case SDLK_6:
-		m_pathGenerationType = 5;
+		//m_pathGenerationType = 5;
+		//printf("Path generation type set to %s\n", bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType).c_str());
 		break;
 	default:
 		break;

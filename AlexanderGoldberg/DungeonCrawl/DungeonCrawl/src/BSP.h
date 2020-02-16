@@ -15,16 +15,16 @@ public:
 		VERTICAL
 	};
 	enum class TunnelingType {
-		FirstToLast,
-		RoomToRoom,
+		Base,		
 		Hub,
-		Sequential,
+		StringOfRooms,
+		RoomToRoom,
+
 		RegionToRegion, 
-		StringOfRooms
 
 	};
 private:
-	std::string m_enumNames[7] = { "FirstToLast", "RoomToRoom", "Hub", "Sequential", "RegionToRegion", "StringOfRooms", "" };
+	std::string m_enumNames[7] = { "Base", "Hub", "StringOfRooms", "RoomToRoom", "RegionToRegion", "other", "" };
 	int m_width = 0;//width of rectangle to be divided up
 	int m_height = 0;//height of rectangle to be divided up
 	int m_numberOfSplits = 0;
@@ -34,18 +34,22 @@ private:
 
 	bool m_ensureRoomSeperation = true; //forces each room to have a minimum one square border, if false rooms will bleed into eachother creating larger open areas.
 	bool m_usePreviouslyDugPathsInPathGeneration = true; //if false each path is dug in isolation of the other paths, if true each path takes into account the previously dug paths.
+
 	std::vector<BSPNode*> m_tree;
 	std::vector<DTS> m_previousRotations;
 	std::vector<RectA> m_roomRegions;
 	std::vector<int> m_usablePaths;
 	std::vector<Vector2> m_IndexesOfStartEndPointsForPathSegments; //the indexs of start and end points for the paths withing m_usablePath. e.g. m_usablePaths[m_IndexesOfStartEndPointsForPathSegments[1].x] is the start tile index of the path and m_usablePaths[m_IndexesOfStartEndPointsForPathSegments[1].y] is the end tile index of the second path
 
-	TunnelingType m_tunnelingType = TunnelingType::FirstToLast;
+	TunnelingType m_tunnelingType = TunnelingType::Base;
 	
 
 	void split();
 	void WipeTree();
 	void StartOver();
+
+	int RoomIndexTileIsIn(int _tileIndex);
+	bool IsIndexInRoom(int _tileIndex, int _roomIndex);
 
 	void print(std::vector<int>& _toPrint, int _width);	
 	void printLeafResults();
@@ -76,13 +80,14 @@ public:
 
 	//PATH GENERATION FUNCTIONS
 	void SetTunnelingType(TunnelingType _tunnelingType);
-	void TunnelingWorkInwards(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
-	void TunnelingRoomToRoom(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _repeatRoomDigs, bool _updateMapWithPreviousPaths);
+	void TunnelingBase(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
 	int TunnelingHub(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths, bool _randomizeWhichRoomIsOrigin = true, bool _tryToPickCenteralRoom = true, int _centralRoomToSpiralFrom = 0); // returns "hub" room index
-	void TunnelingSequential(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
+	void TunnelingStringsOfRooms(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
+	void TunnelingRoomToRoom(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _repeatRoomDigs = true, bool _updateMapWithPreviousPaths = true);	
 	void TunnelingRegionToRegion(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
-	void TunnelingCorridorsThroughRooms(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
-	
+
+	std::vector<std::vector<int>> GetCorridorOnlyTiles();
+
 	//UTILITY
 	int convertXYToIndex(int _x, int _y, int _width);
 	const Vector2 convertIndexToXY(int _index, int _width);
@@ -117,3 +122,5 @@ public:
 				lhs.y1 = root.y1
 				lhs.x2 = root.x2
 				lhs.y2 = split point*/
+
+std::vector<std::vector<int>> GetCorridorOnlyTiles();

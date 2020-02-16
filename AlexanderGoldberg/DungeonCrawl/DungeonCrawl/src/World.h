@@ -20,6 +20,7 @@ protected:
 	Scene* m_scene = nullptr;
 	int m_pathGenerationType = 0;
 	bool m_cycleGenerationType = false;
+	bool m_resetSeed = false;
 public:
 
 	enum class TileDirection
