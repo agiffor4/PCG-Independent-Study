@@ -309,19 +309,24 @@ void World::GenerateLevel()
 {
 	clearPreviousLevel();
 	BSP bsp = BSP(m_horizontalTileCount, m_verticalTileCount);
-	//2^n ~= gridsize / 3
+	//when width = height = x round(log(x / 3) / log(2)) = number of times to split	
+	//bsp.BeginSplit(round(std::log(m_horizontalTileCount / 3) / std::log(2))); //seems to produce a good ratio of rooms as long as the width = height
 	bsp.BeginSplit(4);
-
+	
 	AStarSearch AStar = AStarSearch();	
 	AStar.Initialize(GetMapDimentions(), GetTileCount(), false);
-	AStar.CastTilesToAStarNodes((*this));
-	BSP::TunnelingType tuntype = BSP::TunnelingType::FirstToLast;//(BSP::TunnelingType)(rand() % 6);
+	AStar.SetWallDigCost(200);		
+	BSP::TunnelingType tuntype = (BSP::TunnelingType)(rand() % 6);
+	//BSP::TunnelingType tuntype = BSP::TunnelingType::Sequential;
 	printf("Using tunneling algorithm %s.\n", bsp.GetEnumName(tuntype).c_str());
 	bsp.SetTunnelingType(tuntype);
-	std::vector<std::vector<int>> rooms;
-	std::vector<int> paths;
-	bsp.GenerateRoomsAndPaths(AStar, rooms, paths);
-	AddRoomsAndPaths(rooms, paths);
+	std::vector<std::vector<int>> rooms = bsp.GetRoomTileIndexes();
+	AddRooms(rooms);
+	AStar.CastTilesToAStarNodes((*this));
+	std::vector<int> paths = bsp.GeneratePaths(AStar);	
+	AddPaths(paths);
+	//bsp.GenerateRoomsAndPaths(AStar, rooms, paths);
+	//AddRoomsAndPaths(rooms, paths);
 	if (!m_playerCreated)
 		m_player = CreatePlayer();
 	int roomPlayerSpawnin;
@@ -329,15 +334,18 @@ void World::GenerateLevel()
 	Tile* t = GetTileAtIndex(playerStart);
 	m_player->SetLocation(t);
 	t->SetContents(m_player);
-	t = GetTileAtIndex(bsp.GenerateExitLocation(playerStart, roomPlayerSpawnin));
+	
+	//EXIT generation
+	/*t = GetTileAtIndex(bsp.GenerateExitLocation(playerStart, roomPlayerSpawnin, (*this)));
 	Exit* e = new Exit(this);
 	e->Init("img/Exit.bmp", "Exit", m_scene->GetRenderer());
 	e->SetSize(GetTileSize().X, GetTileSize().Y);
 	e->SetLocation(t);
-	t->AddItem(e);
+	t->AddItem(e);*/
 	
 
 }
+
 
 void World::AddRoomsAndPaths(std::vector<std::vector<int>>& const _rooms, std::vector<int>& const _paths) {
 	AddRooms(_rooms);
@@ -350,6 +358,7 @@ void World::AddRooms(std::vector<std::vector<int>>& const _rooms) {
 		for (size_t j = 0; j < _rooms[i].size(); j++)
 		{
 			GetTileAtIndex(_rooms[i][j])->SetPassable(true);
+			GetTileAtIndex(_rooms[i][j])->changeImage("img/blank_tile" + std::to_string(i) + ".bmp");
 		}
 	}
 }
@@ -368,6 +377,7 @@ void World::AddPaths(std::vector<int>& const _paths) {
 int World::GetPlayerStartLocation(const std::vector<std::vector<int>>& _rooms, int* roomSpawnedIn) {
 	int roomToSpawnIn = rand() % _rooms.size();
 	int tileInRoom = rand() % _rooms[roomToSpawnIn].size();
+	(*roomSpawnedIn) = roomToSpawnIn;
 	return _rooms[roomToSpawnIn][tileInRoom];
 }
 

@@ -15,6 +15,14 @@ void AStarNode::SetPassable(bool _val) {
 	m_passable = _val;
 
 }
+bool AStarNode::IsCorridor()
+{
+	return m_corridor;
+}
+void AStarNode::SetCorridor(bool _val)
+{
+	m_corridor = _val;
+}
 bool AStarNode::IsPassable() { return m_passable; }
 
 

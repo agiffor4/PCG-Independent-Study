@@ -17,6 +17,7 @@ void Tile::Init(const std::string _path, const std::string _name, int _currentIn
 	SetPosition(_startPos);
 }
 void Tile::SetPassable(bool _val) {
+
 	m_passable = _val;
 	if (m_passable)
 	{
@@ -94,6 +95,21 @@ void Tile::InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y)
 		}
 		break;
 	case IInputHandler::MouseButton::RIGHT:
+		if (inBounds(_x, _y))
+		{
+			printf("clicked on tile %s (index %d), \n", m_name.c_str(), GetPositionInVector());
+			printf("Passable = %s\n", (IsPassable() ? "true." : "false."));
+			printf("Corridor = %s\n", (IsCorridor() ? "true." : "false."));
+			printf("Contains %s, \n", (m_contents != nullptr ? m_contents->GetName().c_str() : "Nothing"));
+			if (m_items.size() > 0)
+			{
+				printf("Other items present include, ");
+				for (size_t i = 0; i < m_items.size(); i++)
+					printf("%s, ", m_items[i]->GetName().c_str());
+				printf("\n");
+			}
+
+		}		
 		break;
 	case IInputHandler::MouseButton::MIDDLE:
 		break;

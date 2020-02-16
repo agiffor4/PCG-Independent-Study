@@ -24,8 +24,9 @@ protected:
 	std::string m_name = "NO NAME SET";
 	void updateDestination();
 	void updateScale();
-	void changeImage(std::string _imagePath, Uint32 _transparentColor = -999);
+	//void changeImage(std::string _imagePath, Uint32 _transparentColor = -999);
 public:
+	void changeImage(std::string _imagePath, Uint32 _transparentColor = -999);
 	Renderable();
 	virtual ~Renderable();
 	virtual void Init(const std::string _path, const std::string _name, SDL_Renderer* _renderer, Uint32 _transparentColor = -999);
@@ -37,6 +38,7 @@ public:
 	void SetSize(Vector2& _scale);
 	void SetSize(float _x, float _y);
 	Vector2 GetCurrentSize();
+	const std::string& GetName();
 	void CleanUp();
 };
 

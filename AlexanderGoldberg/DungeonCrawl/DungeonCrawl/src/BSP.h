@@ -34,12 +34,11 @@ private:
 
 	bool m_ensureRoomSeperation = true; //forces each room to have a minimum one square border, if false rooms will bleed into eachother creating larger open areas.
 	bool m_usePreviouslyDugPathsInPathGeneration = true; //if false each path is dug in isolation of the other paths, if true each path takes into account the previously dug paths.
-
 	std::vector<BSPNode*> m_tree;
 	std::vector<DTS> m_previousRotations;
 	std::vector<RectA> m_roomRegions;
 	std::vector<int> m_usablePaths;
-	std::vector<Vector2> m_IndexesOfStartEndPointsForPathSegments;
+	std::vector<Vector2> m_IndexesOfStartEndPointsForPathSegments; //the indexs of start and end points for the paths withing m_usablePath. e.g. m_usablePaths[m_IndexesOfStartEndPointsForPathSegments[1].x] is the start tile index of the path and m_usablePaths[m_IndexesOfStartEndPointsForPathSegments[1].y] is the end tile index of the second path
 
 	TunnelingType m_tunnelingType = TunnelingType::FirstToLast;
 	
@@ -54,29 +53,44 @@ private:
 public:
 	BSP(int _gridWidth, int _gridHeight);
 	~BSP();
-	void BeginSplit(int _timesToSplit);
+	
 	BSPNode* GetFirstLeaf();
 	int GetFirstLeafIndex();
 	std::vector<BSPNode*> GetLeaves();
 	BSPNode* GetRandomLeaf();
+	
+	//AREA DIVSION
+	void BeginSplit(int _timesToSplit);
+	void GenerateRoomsAndPaths(AStarSearch& _AStar, std::vector<std::vector<int>>& _generatedRooms, std::vector<int>& _generatedPaths);
 	std::vector<std::vector<int>> GetPartions();
 	std::vector<std::vector<int>> GetRoomTileIndexes();
-	void GenerateRoomsAndPaths(AStarSearch& _AStar, std::vector<std::vector<int>>& _generatedRooms, std::vector<int>& _generatedPaths);
 	std::vector<RectA> GetRoomRegions(bool _overwritePreviousRooms = false);
 	std::vector<int> GeneratePaths(AStarSearch& _AStar, bool _overwritePreviousPaths = false, std::vector<std::vector<int>>* const _roomTileIndexes = nullptr);
-	int GenerateExitLocation(int _startingIndex, int _startingRegion);
-	int convertXYToIndex(int _x, int _y, int _width);
-	const Vector2 convertIndexToXY(int _index, int _width);
+
+
+	
+	//EXIT LOCATION SETTING FUNCTION
+	int GenerateExitLocation(int _startingIndex, int _startingRegion, World& _world); //calls function based on alg used to generate paths
+	void furthestExitAsTheCrowFlies(int& _exitIndex, int _startingRegion, Vector2& const _startingPosition);
+	void longestPathToFromStart(int& _exitIndex, int _startingIndex, World& _world);
+
+	//PATH GENERATION FUNCTIONS
+	void SetTunnelingType(TunnelingType _tunnelingType);
 	void TunnelingWorkInwards(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
 	void TunnelingRoomToRoom(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _repeatRoomDigs, bool _updateMapWithPreviousPaths);
-	int TunnelingSpiderOut(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths, bool _randomizeWhichRoomIsOrigin = true, int _centralRoomToSpiralFrom = 0);
+	int TunnelingSpiderOut(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths, bool _randomizeWhichRoomIsOrigin = true, int _centralRoomToSpiralFrom = 0); // returns "hub" room index
 	void TunnelingSequential(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
 	void TunnelingRegionToRegion(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
 	void TunnelingCorridorsThroughRooms(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
+	
+	//UTILITY
+	int convertXYToIndex(int _x, int _y, int _width);
+	const Vector2 convertIndexToXY(int _index, int _width);
 	const std::string& GetEnumName(TunnelingType _enumValueToGetNameOf);
+	int getRandomTileInRoom(int _roomRegion);
 	int Size();
 
-	void SetTunnelingType(TunnelingType _tunnelingType);
+	
 	
 };
 

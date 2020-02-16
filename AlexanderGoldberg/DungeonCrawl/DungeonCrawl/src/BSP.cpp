@@ -5,6 +5,7 @@
 #include "Tile.h"
 #include "AStarSearch.h"
 
+#define PathStarts m_IndexesOfStartEndPointsForPathSegments
 BSP::BSP(int _gridWidth, int _gridHeight)
 {
 	m_width = _gridWidth;
@@ -36,14 +37,16 @@ void BSP::BeginSplit(int _timesToSplit) {
 	
 }
 
-void BSP::SetTunnelingType(TunnelingType _tunnelingType)
-{
-	m_tunnelingType = _tunnelingType;
-}
 
 const std::string& BSP::GetEnumName(TunnelingType _enumValueToGetNameOf)
 {
 	return m_enumNames[(int)_enumValueToGetNameOf];
+}
+
+int BSP::getRandomTileInRoom(int _roomRegion)
+{
+	std::vector<std::vector<int>> roomtiles = GetRoomTileIndexes();
+	return roomtiles[_roomRegion][rand() % roomtiles[_roomRegion].size()];
 }
 
 void BSP::split()
@@ -483,38 +486,24 @@ std::vector<int> BSP::GeneratePaths(AStarSearch& _AStar, bool _overwritePrevious
 	return m_usablePaths;
 }
 
-int BSP::GenerateExitLocation(int _startingIndex, int _startingRegion)
+int BSP::GenerateExitLocation(int _startingIndex, int _startingRegion, World& _world)
 {
 	Vector2 xyStart = convertIndexToXY(_startingIndex, m_width);
-	std::vector<std::vector<int>> roomTileIndexes = GetRoomTileIndexes();
-	float currentMaxDistance = 0;
+	
 	int exitIndex = 0;
+	longestPathToFromStart(exitIndex, _startingIndex, _world);
 	switch (m_tunnelingType)
 	{
 	case BSP::TunnelingType::FirstToLast:
 		
-		for (size_t i = 0; i < roomTileIndexes.size(); i++)
-		{
-			if (i != _startingRegion)
-			{
-				
-				for (size_t j = 0; j < roomTileIndexes[i].size(); j++)
-				{
-					Vector2 otherXY = convertIndexToXY(roomTileIndexes[i][j], m_width);
-					if (Vector2::GetDistanceGreaterThan(xyStart, otherXY, currentMaxDistance))
-					{
-						currentMaxDistance = Vector2::GetMagnitude(xyStart, otherXY);
-						exitIndex = roomTileIndexes[i][j];
-					}
-				}
-			}
-		}
+		//furthestExitAsTheCrowFlies(exitIndex, _startingRegion, xyStart);
 		break;
 	case BSP::TunnelingType::RoomToRoom:
 		break;
 	case BSP::TunnelingType::Hub:
 		break;
 	case BSP::TunnelingType::Sequential:
+		
 		break;
 	case BSP::TunnelingType::RegionToRegion:
 		break;
@@ -527,8 +516,76 @@ int BSP::GenerateExitLocation(int _startingIndex, int _startingRegion)
 
 	return exitIndex;
 }
+void BSP::furthestExitAsTheCrowFlies(int& _exitIndex, int _startingRegion, Vector2& const _startingPosition) {
+	std::vector<std::vector<int>> roomTileIndexes = GetRoomTileIndexes();
+	float currentMaxDistance = 0;
+	for (size_t i = 0; i < roomTileIndexes.size(); i++)
+	{
+		if (i != _startingRegion)
+		{
 
+			for (size_t j = 0; j < roomTileIndexes[i].size(); j++)
+			{
+				Vector2 otherXY = convertIndexToXY(roomTileIndexes[i][j], m_width);
+				if (Vector2::GetDistanceGreaterThan(_startingPosition, otherXY, currentMaxDistance))
+				{
+					currentMaxDistance = Vector2::GetMagnitude(_startingPosition, otherXY);
+					_exitIndex = roomTileIndexes[i][j];
+				}
+			}
+		}
+	}
+}
+void BSP::longestPathToFromStart(int& _exitIndex, int _startingIndex, World& _world)
+{
+	AStarSearch AStar = AStarSearch();
+	AStar.Initialize(_world.GetMapDimentions(), _world.GetTileCount(), false);
+	AStar.SetWallDigCost(2000);
+	AStar.CastTilesToAStarNodes(_world);
+	int currentTargetRoomRegion = -1;
+	int currentPathLength = 0;	
+	int targetIndex = -1;
+	std::stack<int> pathToExit;
+	
 
+	for (size_t j = 0; j < m_IndexesOfStartEndPointsForPathSegments.size(); j++)
+	{
+		targetIndex = m_usablePaths[PathStarts[j].X];
+		std::stack<int> pathFromIToJ = AStar.BeginSearch(_startingIndex, targetIndex, false);
+		if (pathFromIToJ.size() > currentPathLength)
+		{
+			currentPathLength = pathFromIToJ.size();
+			currentTargetRoomRegion = j;
+			pathToExit = pathFromIToJ;
+		}
+
+		targetIndex = m_usablePaths[PathStarts[j].Y];
+		pathFromIToJ = AStar.BeginSearch(_startingIndex, targetIndex, false);
+		if (pathFromIToJ.size() > currentPathLength)
+		{
+			currentPathLength = pathFromIToJ.size();
+			currentTargetRoomRegion = j;
+			pathToExit = pathFromIToJ;
+		}
+		
+	}
+	while (!pathToExit.empty())
+	{
+		if(_world.GetTileAtIndex(pathToExit.top())->IsPassable())
+			_world.GetTileAtIndex(pathToExit.top())->changeImage("img/corridor_tile.bmp");
+		else
+			_world.GetTileAtIndex(pathToExit.top())->changeImage("img/blockC_tile.bmp");
+		pathToExit.pop();
+	}
+	
+	_exitIndex = getRandomTileInRoom(currentTargetRoomRegion);
+}
+
+//PATH GENERATING FUNCTIONS
+void BSP::SetTunnelingType(TunnelingType _tunnelingType)
+{
+	m_tunnelingType = _tunnelingType;
+}
 void BSP::TunnelingWorkInwards(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths) {
 	int timesToDig = indexesOfRoomTiles.size() / 2;
 
@@ -618,7 +675,7 @@ int BSP::TunnelingSpiderOut(AStarSearch& _AStar, std::vector<std::vector<int>>& 
 void BSP::TunnelingSequential(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths) {
 	
 
-	for (size_t i = 0; i < indexesOfRoomTiles.size() - 1; i++)
+	for (size_t i = 0; i < indexesOfRoomTiles.size() -1; i++)
 	{
 		int firstRoom = i;
 		int secondRoom = i + 1;
@@ -626,7 +683,7 @@ void BSP::TunnelingSequential(AStarSearch& _AStar, std::vector<std::vector<int>>
 		int index2 = indexesOfRoomTiles[secondRoom][indexesOfRoomTiles[secondRoom].size() /2];
 
 		
-		std::stack<int> path = _AStar.BeginSearch(index1, index2, _updateMapWithPreviousPaths);
+		std::stack<int> path = _AStar.BeginSearch(index1, index2, _updateMapWithPreviousPaths);		
 		int timesToPop = path.size();
 		m_IndexesOfStartEndPointsForPathSegments.push_back(Vector2(m_usablePaths.size(), 0));
 		for (size_t j = 0; j < timesToPop; j++)
@@ -681,24 +738,7 @@ void BSP::TunnelingRegionToRegion(AStarSearch& _AStar, std::vector<std::vector<i
 void BSP::TunnelingCorridorsThroughRooms(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths) {
 	//tends toward producing strings of rooms, occasionally with a central area, but rooms tend to run in strings with corridors running through them extending to corridor
 	std::vector<int> pathCenters;
-	for (size_t i = 0; i < indexesOfRoomTiles.size(); i += 2)
-	{
-		int index1 = indexesOfRoomTiles[i][0];
-		int index2 = indexesOfRoomTiles[i + 1][0];
-
-
-		std::stack<int> path = _AStar.BeginSearch(index1, index2, _updateMapWithPreviousPaths);
-		int timesToPop = path.size();
-		m_IndexesOfStartEndPointsForPathSegments.push_back(Vector2(m_usablePaths.size(), 0));
-		for (size_t j = 0; j < timesToPop; j++)
-		{
-			m_usablePaths.push_back(path.top());
-			path.pop();
-		}
-		m_IndexesOfStartEndPointsForPathSegments[m_IndexesOfStartEndPointsForPathSegments.size() - 1].Y = m_usablePaths.size() - 1;
-	}
-
-	for (size_t i = 1; i < indexesOfRoomTiles.size() - 1; i += 2)
+	for (size_t i = 0; i < indexesOfRoomTiles.size() -1; i++)
 	{
 		int index1 = indexesOfRoomTiles[i][0];
 		int index2 = indexesOfRoomTiles[i + 1][0];

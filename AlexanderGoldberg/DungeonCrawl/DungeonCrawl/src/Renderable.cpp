@@ -60,6 +60,10 @@ Vector2 Renderable::GetCurrentSize() {
 	return Vector2(m_destination.w, m_destination.h);
 
 }
+const std::string& Renderable::GetName()
+{
+	return m_name;
+}
 void Renderable::SetSize(float _x, float _y) {
 	m_scale.X = _x;
 	m_scale.Y = _y;

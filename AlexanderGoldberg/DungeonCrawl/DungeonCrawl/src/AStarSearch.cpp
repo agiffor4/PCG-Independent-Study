@@ -35,7 +35,7 @@ bool AStarSearch::isDestination(AStarNode& _tile) {
 double AStarSearch::calculateHValue(AStarNode& _currentTile)
 {
 	// Return using the distance formula 
-	return Vector2::GetSquareDistance(m_targetTile->GetPositionInGrid(), _currentTile.GetPositionInGrid());
+	return Vector2::GetSquareDistance(m_targetTile->GetPositionInGrid(), _currentTile.GetPositionInGrid()) + (double)(!_currentTile.IsPassable() ? +20 : 0);
 }
 
 std::vector<int> AStarSearch::getNodeNeighbors(int _indexToGetNeighborsFor, std::vector<AStarNode*>& _nodesToUse) {
@@ -51,16 +51,18 @@ std::vector<int> AStarSearch::getNodeNeighbors(int _indexToGetNeighborsFor, std:
 }
 
 std::stack<int> AStarSearch::BeginSearch(int _current, int _target, bool _usePreviousPathsInEachItteration) {
-	return BeginSearch((*getTileAtIndex(_current, (_usePreviousPathsInEachItteration ? m_modifableNodes : m_nodes))), (*getTileAtIndex(_target, (_usePreviousPathsInEachItteration ? m_modifableNodes : m_nodes))), _usePreviousPathsInEachItteration);
+	std::vector<AStarNode*>& refToNodeVector = (_usePreviousPathsInEachItteration ? m_modifableNodes : m_nodes);	
+	return BeginSearch((*getTileAtIndex(_current, refToNodeVector)), (*getTileAtIndex(_target, refToNodeVector)), _usePreviousPathsInEachItteration);
 }
 std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target, bool _usePreviousPathsInEachItteration)
 {
+	std::vector<AStarNode*>& refToNodeVector = (_usePreviousPathsInEachItteration ? m_modifableNodes : m_nodes);
 	if (!m_inited)
 	{
 		printf("Must call Initialize for AStar before searching.\n");
 		return std::stack<int>();
 	}
-	if ((_usePreviousPathsInEachItteration ? m_modifableNodes.size() : m_nodes.size()) < 1)
+	if (refToNodeVector.size() < 1)
 	{
 		printf("Must call convert function of some kind and pass in a set of nodes before begining search.\n");
 		return std::stack<int>();
@@ -91,8 +93,8 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 
 	std::vector<bool> closedList;
 	closedList.resize(m_worldSize);
-
-	std::vector<Node> nodeData;
+	
+ 	std::vector<Node> nodeData;
 	
 	for (size_t i = 0; i < m_worldSize; i++)
 	{
@@ -106,27 +108,22 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 	nodeData[startIndex].fCost = 0;
 	nodeData[startIndex].m_Parent = &nodeData[startIndex];
 
-	std::set<Node*> openList;
-	//std::vector<Node*> openList;
-	
-	//openList.push_back(&nodeData[startIndex]);
+	auto NodeComparator = [](const Node* lhs, const Node* rhs) {return lhs->fCost < rhs->fCost; };
+	std::set<Node*, decltype(NodeComparator)> openList(NodeComparator);
 	openList.emplace(&nodeData[startIndex]);
+	//std::vector<Node*> openList;	
+	//openList.push_back(&nodeData[startIndex]);	
 	bool destinationFound = false;
-	/*if (m_logPathFinding)
-	{
-		m_logfile.open(m_logFileName.c_str(), std::fstream::in | std::fstream::out | std::fstream::trunc);
-		m_logfile << "\n";
-	} || true */
 	while (!openList.empty())
 	{
-		Node& checkingNode = (*(*openList.begin()));
-		
-		openList.erase(openList.begin()); //gets next node that is available to be checked
+		Node& checkingNode = (*(*openList.begin())); //gets next node that is available to be checked
+		openList.erase(openList.begin()); 
+
 		closedList[checkingNode.m_IndexOfTile] = true; //sets give node as having been the origin for checks
 		float gNew = 0; 
 		float hNew = 0;
 		float fNew = 0;
-		std::vector<int> NodeNeighborIndexes = getNodeNeighbors(checkingNode.m_IndexOfTile, (_usePreviousPathsInEachItteration ? m_modifableNodes : m_nodes));
+		std::vector<int> NodeNeighborIndexes = getNodeNeighbors(checkingNode.m_IndexOfTile, refToNodeVector);
 		std::vector<Node> neighbors;
 		for (size_t i = 0; i < NodeNeighborIndexes.size(); i++)
 		{			
@@ -135,20 +132,12 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 		for (size_t i = 0; i < neighbors.size(); i++)
 		{
 			Node& cn = nodeData[neighbors[i].m_IndexOfTile]; //current node
-			
-			/*
-			std::string m = "Current node is " + std::to_string(cn.m_IndexOfTile) + " " + cn.GetXY(m_columnCount) + " \n";
-			if (m_logPathFinding)
-				m_logfile << m.c_str();
-			|| true */
-			
-			if (isDestination(*getTileAtIndex(cn.m_IndexOfTile, (_usePreviousPathsInEachItteration ? m_modifableNodes : m_nodes))))
+
+			bool isPass = getTileAtIndex(cn.m_IndexOfTile, refToNodeVector)->IsPassable();
+			if (isDestination(*getTileAtIndex(cn.m_IndexOfTile, refToNodeVector)))
 			{
 				cn.m_Parent = &checkingNode;
 				destinationFound = true;
-				/*if (m_logPathFinding)
-					m_logfile.close();
-					|| true */
 				if (_target.GetPositionInVector() == 542)
 					int foo = 0;
 				std::stack<int> path = findPath(nodeData);
@@ -159,18 +148,19 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 					for (size_t i = 0; i < size; i++)
 					{
 						m_modifableNodes[path2.top()]->SetPassable(true);
-						m_modifableNodes[path2.top()]->m_GCost = 1;
+						m_modifableNodes[path2.top()]->SetCorridor(true);
+						m_modifableNodes[path2.top()]->m_GCost = 1;						
 						path2.pop();
 					}
 					
 				}
 				return path;
 				//return findPath(nodeData);
-			}
-			else if (!closedList[cn.m_IndexOfTile] && getTileAtIndex(cn.m_IndexOfTile, (_usePreviousPathsInEachItteration ? m_modifableNodes : m_nodes))->IsPassable() && (m_allowPathsAlongEdges ? true : !isTileEdge(cn.m_IndexOfTile)))
+			}			
+			else if (!closedList[cn.m_IndexOfTile] && isPass && (m_allowPathsAlongEdges ? true : !isTileEdge(cn.m_IndexOfTile)))
 			{
-				gNew = checkingNode.gCost + getTileAtIndex(cn.m_IndexOfTile, (_usePreviousPathsInEachItteration ? m_modifableNodes : m_nodes))->m_GCost;
-				hNew = calculateHValue(*getTileAtIndex(cn.m_IndexOfTile, (_usePreviousPathsInEachItteration ? m_modifableNodes : m_nodes)));
+				gNew = checkingNode.gCost + getTileAtIndex(cn.m_IndexOfTile, refToNodeVector)->m_GCost;
+				hNew = calculateHValue(*getTileAtIndex(cn.m_IndexOfTile, refToNodeVector));
 				fNew = gNew + hNew;
 				if ((cn.fCost == FLT_MAX || cn.fCost > fNew))
 				{
@@ -186,11 +176,7 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 		
 	}
 	if (destinationFound == false)
-	{
-		
-		/*if (m_logPathFinding)
-			m_logfile.close();
-		|| true */		
+	{	
 		printf("Failed to find the Destination Cell.\n");
 	}
 		
@@ -347,18 +333,19 @@ void AStarSearch::CastTilesToAStarNodes(World& _world)
 	cleanNodes();
 	for (size_t i = 0; i < _world.GetTileCount(); i++)
 	{
+		
 		AStarNode* asn = new AStarNode();
 		Tile* t = _world.GetTileAtIndex(i);
 		asn->Init(i, t->GetPositionInGrid().X, t->GetPositionInGrid().Y);
 		asn->SetPassable(true);
-		asn->m_GCost = t->IsPassable() ? m_DigCost : 1;
+		asn->m_GCost = t->IsPassable() ? m_emptyTileGCost : m_DigCost;
 		m_nodes.push_back(asn);
 
 		asn = new AStarNode();
 		t = _world.GetTileAtIndex(i);
 		asn->Init(i, t->GetPositionInGrid().X, t->GetPositionInGrid().Y);
 		asn->SetPassable(true);
-		asn->m_GCost = t->IsPassable() ? m_DigCost : 1;
+		asn->m_GCost = t->IsPassable() ? m_emptyTileGCost : m_DigCost;
 		m_modifableNodes.push_back(asn);
 	}
 
@@ -368,11 +355,12 @@ void AStarSearch::CastIntVectorToAStarNodes(std::vector<int>& _world, int _width
 	cleanNodes();
 	for (size_t i = 0; i < _world.size(); i++)
 	{
+		
 		AStarNode* asn = new AStarNode();		
 		int x = (i % _width);
 		asn->Init(i, x, (i - x) / _width);
 		asn->SetPassable(true);
-		asn->m_GCost = _world[i] > 0 ? m_DigCost : 1;
+		asn->m_GCost = _world[i] > 0 ? m_DigCost : m_emptyTileGCost;
 		m_nodes.push_back(asn);
 
 		asn = new AStarNode();
