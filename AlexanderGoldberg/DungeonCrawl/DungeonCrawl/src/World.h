@@ -18,6 +18,8 @@ protected:
 	bool m_playerCreated = false;
 	Player* m_player = nullptr;
 	Scene* m_scene = nullptr;
+	int m_pathGenerationType = 0;
+	bool m_cycleGenerationType = false;
 public:
 
 	enum class TileDirection

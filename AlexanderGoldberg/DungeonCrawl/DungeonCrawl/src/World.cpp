@@ -310,23 +310,21 @@ void World::GenerateLevel()
 	clearPreviousLevel();
 	BSP bsp = BSP(m_horizontalTileCount, m_verticalTileCount);
 	//when width = height = x round(log(x / 3) / log(2)) = number of times to split	
-	//bsp.BeginSplit(round(std::log(m_horizontalTileCount / 3) / std::log(2))); //seems to produce a good ratio of rooms as long as the width = height
-	bsp.BeginSplit(4);
+	bsp.BeginSplit(round(std::log(m_horizontalTileCount / 3) / std::log(2)) + 1); //seems to produce a good ratio of rooms as long as the width = height
+	//bsp.BeginSplit(4);
 	
 	AStarSearch AStar = AStarSearch();	
 	AStar.Initialize(GetMapDimentions(), GetTileCount(), false);
 	AStar.SetWallDigCost(200);		
-	BSP::TunnelingType tuntype = (BSP::TunnelingType)(rand() % 6);
-	//BSP::TunnelingType tuntype = BSP::TunnelingType::Sequential;
+	//BSP::TunnelingType tuntype = (BSP::TunnelingType)(rand() % 6);	
+	BSP::TunnelingType tuntype = (BSP::TunnelingType)m_pathGenerationType;
 	printf("Using tunneling algorithm %s.\n", bsp.GetEnumName(tuntype).c_str());
 	bsp.SetTunnelingType(tuntype);
 	std::vector<std::vector<int>> rooms = bsp.GetRoomTileIndexes();
 	AddRooms(rooms);
 	AStar.CastTilesToAStarNodes((*this));
-	std::vector<int> paths = bsp.GeneratePaths(AStar);	
+	std::vector<int> paths = bsp.GeneratePaths(AStar);
 	AddPaths(paths);
-	//bsp.GenerateRoomsAndPaths(AStar, rooms, paths);
-	//AddRoomsAndPaths(rooms, paths);
 	if (!m_playerCreated)
 		m_player = CreatePlayer();
 	int roomPlayerSpawnin;
@@ -358,7 +356,8 @@ void World::AddRooms(std::vector<std::vector<int>>& const _rooms) {
 		for (size_t j = 0; j < _rooms[i].size(); j++)
 		{
 			GetTileAtIndex(_rooms[i][j])->SetPassable(true);
-			GetTileAtIndex(_rooms[i][j])->changeImage("img/blank_tile" + std::to_string(i) + ".bmp");
+			if(i < 8)
+				GetTileAtIndex(_rooms[i][j])->changeImage("img/blank_tile" + std::to_string(i) + ".bmp");
 		}
 	}
 }
@@ -395,7 +394,35 @@ void World::InvokeKeyUp(SDL_Keycode _key)
 	switch (_key)
 	{
 	case SDLK_g:
+		if (m_cycleGenerationType)
+		{
+			srand(1024);
+			m_pathGenerationType++;
+			if (m_pathGenerationType > 5)
+				m_pathGenerationType = 0;
+		}
 		GenerateLevel();
+		break;
+	case SDLK_h:
+		m_cycleGenerationType = !m_cycleGenerationType;
+		break;
+	case SDLK_1:
+		m_pathGenerationType = 0;
+		break;
+	case SDLK_2:
+		m_pathGenerationType = 1;
+		break;
+	case SDLK_3:
+		m_pathGenerationType = 2;
+		break;
+	case SDLK_4:
+		m_pathGenerationType = 3;
+		break;
+	case SDLK_5:
+		m_pathGenerationType = 4;
+		break;
+	case SDLK_6:
+		m_pathGenerationType = 5;
 		break;
 	default:
 		break;
