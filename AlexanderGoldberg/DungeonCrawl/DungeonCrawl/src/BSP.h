@@ -76,10 +76,14 @@ public:
 	//EXIT LOCATION SETTING FUNCTION
 	int GenerateExitLocation(int _startingIndex, int _startingRegion, World& _world); //calls function based on alg used to generate paths
 	void furthestExitAsTheCrowFlies(int& _exitIndex, int _startingRegion, Vector2& const _startingPosition);
+	void spawnExitInRandomRoom(int& _exitIndex, int _startingRegion);
+	void spawnExitWithinRangeFromPlayer(int& _exitIndex, int _startingIndex, int _minDist, int _maxDist);
 	void longestPathToFromStart(int& _exitIndex, int _startingIndex, World& _world);
 
 	//PATH GENERATION FUNCTIONS
 	void SetTunnelingType(TunnelingType _tunnelingType);
+	void SetIgnoreExistingPaths(bool _val);
+	bool GetIgnoreExistingPaths();
 	void TunnelingBase(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
 	int TunnelingHub(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths, bool _randomizeWhichRoomIsOrigin = true, bool _tryToPickCenteralRoom = true, int _centralRoomToSpiralFrom = 0); // returns "hub" room index
 	void TunnelingStringsOfRooms(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);

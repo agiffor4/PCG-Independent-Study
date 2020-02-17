@@ -461,7 +461,7 @@ std::vector<int> BSP::GeneratePaths(AStarSearch& _AStar, bool _overwritePrevious
 		switch (m_tunnelingType)
 		{
 		case BSP::TunnelingType::Base:
-			TunnelingBase(_AStar, indexesOfRoomTiles, false);
+			TunnelingBase(_AStar, indexesOfRoomTiles, !m_usePreviouslyDugPathsInPathGeneration);
 			break;
 		case BSP::TunnelingType::Hub:
 			TunnelingHub(_AStar, indexesOfRoomTiles, m_usePreviouslyDugPathsInPathGeneration, false, true);
@@ -489,7 +489,10 @@ int BSP::GenerateExitLocation(int _startingIndex, int _startingRegion, World& _w
 	Vector2 xyStart = convertIndexToXY(_startingIndex, m_width);
 	
 	int exitIndex = 0;
-	longestPathToFromStart(exitIndex, _startingIndex, _world);
+	//furthestExitAsTheCrowFlies(exitIndex, _startingRegion, xyStart);
+	spawnExitWithinRangeFromPlayer(exitIndex, _startingIndex, _world.GetMapDimentions().X * 0.25f, _world.GetMapDimentions().X * 0.5f);
+	//spawnExitInRandomRoom(exitIndex, _startingRegion);
+	//longestPathToFromStart(exitIndex, _startingIndex, _world);
 	switch (m_tunnelingType)
 	{
 	case BSP::TunnelingType::Base:		
@@ -517,7 +520,6 @@ void BSP::furthestExitAsTheCrowFlies(int& _exitIndex, int _startingRegion, Vecto
 	{
 		if (i != _startingRegion)
 		{
-
 			for (size_t j = 0; j < roomTileIndexes[i].size(); j++)
 			{
 				Vector2 otherXY = convertIndexToXY(roomTileIndexes[i][j], m_width);
@@ -530,55 +532,87 @@ void BSP::furthestExitAsTheCrowFlies(int& _exitIndex, int _startingRegion, Vecto
 		}
 	}
 }
+void BSP::spawnExitInRandomRoom(int& _exitIndex, int _startingRegion)
+{
+	_exitIndex = -1;
+	
+	std::vector<std::vector<int>> rooms = GetRoomTileIndexes();
+	int roomIndexToSpawnIn = rand() % rooms.size();
+	while (roomIndexToSpawnIn == _startingRegion)
+		roomIndexToSpawnIn = rand() % rooms.size();
+	_exitIndex = getRandomTileInRoom(roomIndexToSpawnIn);
+}
+void BSP::spawnExitWithinRangeFromPlayer(int& _exitIndex, int _startingIndex, int _minDist, int _maxDist) 
+{
+	std::vector<std::vector<int>> roomTileIndexes = GetRoomTileIndexes();
+	std::vector<int> possibleTilesToSpawnIn;
+	Vector2 startingPosition = convertIndexToXY(_startingIndex, m_width);
+	for (size_t i = 0; i < roomTileIndexes.size(); i++)
+	{
+		for (size_t j = 0; j < roomTileIndexes[i].size(); j++)
+		{
+			Vector2 otherXY = convertIndexToXY(roomTileIndexes[i][j], m_width);
+			int mag = Vector2::GetMagnitude(startingPosition, otherXY);
+			if (mag >= _minDist && mag < _maxDist)
+			{
+				possibleTilesToSpawnIn.push_back(roomTileIndexes[i][j]);
+			}
+		}
+		
+	}
+	_exitIndex = possibleTilesToSpawnIn[rand() % possibleTilesToSpawnIn.size()];
+}
 void BSP::longestPathToFromStart(int& _exitIndex, int _startingIndex, World& _world)
 {
 	AStarSearch AStar = AStarSearch();
+	AStar.SetWallDigCost(100000);
+	AStar.SetEmptyTileCost(1);
 	AStar.Initialize(_world.GetMapDimentions(), _world.GetTileCount(), false);
-	AStar.SetWallDigCost(200);
 	AStar.CastTilesToAStarNodes(_world);
 	int currentTargetRoomRegion = -1;
 	int currentPathLength = 0;	
 	int targetIndex = -1;
 	std::stack<int> pathToExit;
 	
-
-	for (size_t j = 0; j < m_IndexesOfStartEndPointsForPathSegments.size(); j++)
+	std::vector<std::vector<int>> rooms = GetRoomTileIndexes();
+	//int roomstartingIn = RoomIndexTileIsIn(_startingIndex);
+	for (size_t j = 0; j < rooms.size(); j++)
 	{
-		targetIndex = m_usablePaths[PathStarts[j].X];
+		targetIndex = rooms[j][rooms[j].size() / 2];
 		std::stack<int> pathFromIToJ = AStar.BeginSearch(_startingIndex, targetIndex, false);
 		if (pathFromIToJ.size() > currentPathLength)
 		{
 			currentPathLength = pathFromIToJ.size();
-			currentTargetRoomRegion = j;
 			pathToExit = pathFromIToJ;
-		}
+			currentTargetRoomRegion = j;
 
-		targetIndex = m_usablePaths[PathStarts[j].Y];
-		pathFromIToJ = AStar.BeginSearch(_startingIndex, targetIndex, false);
-		if (pathFromIToJ.size() > currentPathLength)
-		{
-			currentPathLength = pathFromIToJ.size();
-			currentTargetRoomRegion = j;
-			pathToExit = pathFromIToJ;
 		}
-		
 	}
+	int finalPiece = 0;
 	while (!pathToExit.empty())
 	{
+		finalPiece = pathToExit.top();
 		if(_world.GetTileAtIndex(pathToExit.top())->IsPassable())
 			_world.GetTileAtIndex(pathToExit.top())->changeImage("img/corridor_tile.bmp");
 		else
 			_world.GetTileAtIndex(pathToExit.top())->changeImage("img/blockC_tile.bmp");
 		pathToExit.pop();
-	}
-	
-	_exitIndex = getRandomTileInRoom(currentTargetRoomRegion);
+	}	
+	_exitIndex = finalPiece;//getRandomTileInRoom(currentTargetRoomRegion);
 }
 
 //PATH GENERATING FUNCTIONS
 void BSP::SetTunnelingType(TunnelingType _tunnelingType)
 {
 	m_tunnelingType = _tunnelingType;
+}
+void BSP::SetIgnoreExistingPaths(bool _val)
+{
+	m_usePreviouslyDugPathsInPathGeneration = !_val;
+}
+bool BSP::GetIgnoreExistingPaths()
+{
+	return m_usePreviouslyDugPathsInPathGeneration;
 }
 void BSP::TunnelingBase(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths) {
 	int timesToDig = indexesOfRoomTiles.size() / 2;
@@ -793,14 +827,9 @@ int BSP::RoomIndexTileIsIn(int _tileIndex) {
 	std::vector<std::vector<int>> rooms = GetRoomTileIndexes();
 	for (size_t i = 0; i < rooms.size(); i++)
 	{
-		if (_tileIndex < rooms[i][0] || _tileIndex > rooms[i][rooms[i].size() - 1]) //if the tile index is greater that the index of the bottom or right room tile or less than the top left room tile it will go to checking the next room
-			continue;
-		for (size_t j = 0; j < rooms[i].size(); j++)
+		if (IsIndexInRoom(_tileIndex, i))
 		{
-			if (rooms[i][j] == _tileIndex)
-			{
-				return i;
-			}
+			return i;
 		}
 
 	}
@@ -810,7 +839,22 @@ int BSP::RoomIndexTileIsIn(int _tileIndex) {
 bool BSP::IsIndexInRoom(int _tileIndex, int _roomIndex) {
 	
 	std::vector<std::vector<int>> rooms = GetRoomTileIndexes();
+	Vector2 v = convertIndexToXY(_tileIndex, m_width);
+	Vector2 topLeft = convertIndexToXY(rooms[_roomIndex][0], m_width);
+	Vector2 bottomRight = convertIndexToXY(rooms[_roomIndex][rooms[_roomIndex].size()-1], m_width);
+	bool result = v.X > topLeft.X&&
+		v.X < bottomRight.X &&
+		v.Y > topLeft.Y&&
+		v.Y < bottomRight.Y;
+	if (result)
+	{
+		int foo = 0;
+	}
+	return result;
+		
 	
+	/*
+	std::vector<std::vector<int>> rooms = GetRoomTileIndexes();
 	if (_tileIndex < rooms[_roomIndex][0] || _tileIndex > rooms[_roomIndex][rooms[_roomIndex].size() - 1])
 		return false;
 	for (size_t j = 0; j < rooms[_roomIndex].size(); j++)
@@ -821,6 +865,7 @@ bool BSP::IsIndexInRoom(int _tileIndex, int _roomIndex) {
 		}
 	}
 	return false;
+	*/
 	
 }
 

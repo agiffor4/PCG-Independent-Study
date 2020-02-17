@@ -8,6 +8,26 @@
 #include"Player.h"
 #include "Exit.h"
 
+void World::setWindowTitle()
+{
+	if (m_window != nullptr)
+	{
+		BSP bsp = BSP(1, 1);
+		std::string width = "width: " + std::to_string(m_horizontalTileCount) + " ";
+		std::string height = "height: " + std::to_string(m_verticalTileCount) + " ";
+		std::string tunnelT = "path: " + bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType) + " ";
+		std::string seedResult = (m_resetSeed ? "true" : "false");
+		std::string seed = " seed reset: " + seedResult + " ";
+		std::string cycleResult = (m_cycleGenerationType ? "true" : "false");
+		std::string cycle = " cycle:  " + cycleResult + " ";
+		std::string ignoreResult = (m_ignoreExistingPaths ? "true" : "false");
+		std::string ignore = " carve new: " + ignoreResult + " ";
+
+		std::string title = width + height + tunnelT + seed + cycle + ignore;
+		SDL_SetWindowTitle(m_window, title.c_str());
+	}
+}
+
 World::World(int _hTileCount, int _vTileCount, Scene* _scene)
 {
 	m_horizontalTileCount = _hTileCount;
@@ -248,6 +268,11 @@ Vector2 World::GetMapDimentions()
 	return Vector2(m_horizontalTileCount, m_verticalTileCount);
 }
 
+void World::SetWindowRef(SDL_Window* _window)
+{
+	m_window = _window;
+}
+
 std::vector<Tile*> World::GetNeighbors(Tile* _tileToFindNeighborsFor) 
 {
 	return GetNeighbors(_tileToFindNeighborsFor->GetPositionInVector());
@@ -308,11 +333,15 @@ void World::clearPreviousLevel() {
 void World::GenerateLevel()
 {
 	clearPreviousLevel();
+	
+	
 	BSP bsp = BSP(m_horizontalTileCount, m_verticalTileCount);
+	
+	bsp.SetIgnoreExistingPaths(m_ignoreExistingPaths);
 	//when width = height = x round(log(x / 3) / log(2)) = number of times to split	
 	bsp.BeginSplit(round(std::log(m_horizontalTileCount / 3) / std::log(2)) + 1); //seems to produce a good ratio of rooms as long as the width = height
-	//bsp.BeginSplit(4);
-	
+	//bsp.BeginSplit(4);	
+	setWindowTitle();
 	AStarSearch AStar = AStarSearch();	
 	AStar.Initialize(GetMapDimentions(), GetTileCount(), false);
 	AStar.SetWallDigCost(200);		
@@ -334,12 +363,12 @@ void World::GenerateLevel()
 	t->SetContents(m_player);
 	
 	//EXIT generation
-	/*t = GetTileAtIndex(bsp.GenerateExitLocation(playerStart, roomPlayerSpawnin, (*this)));
+	t = GetTileAtIndex(bsp.GenerateExitLocation(playerStart, roomPlayerSpawnin, (*this)));
 	Exit* e = new Exit(this);
 	e->Init("img/Exit.bmp", "Exit", m_scene->GetRenderer());
 	e->SetSize(GetTileSize().X, GetTileSize().Y);
 	e->SetLocation(t);
-	t->AddItem(e);*/
+	t->AddItem(e);
 	
 
 }
@@ -397,6 +426,7 @@ void World::InvokeKeyUp(SDL_Keycode _key)
 	{
 	case SDLK_q:
 		m_resetSeed = !m_resetSeed;
+		setWindowTitle();
 		printf("Reset seed set to %s\n", (m_resetSeed ? "true" : "false"));
 		break;
 	case SDLK_g:
@@ -412,30 +442,36 @@ void World::InvokeKeyUp(SDL_Keycode _key)
 		break;
 	case SDLK_h:
 		m_cycleGenerationType = !m_cycleGenerationType;
+		setWindowTitle();
 		break;
 	case SDLK_1:
 		m_pathGenerationType = 0;
+		setWindowTitle();
 		printf("Path generation type set to %s\n", bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType).c_str());
 		break;
 	case SDLK_2:
 		m_pathGenerationType = 1;
+		setWindowTitle();
 		printf("Path generation type set to %s\n", bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType).c_str());
 		break;
 	case SDLK_3:
 		m_pathGenerationType = 2;
+		setWindowTitle();
 		printf("Path generation type set to %s\n", bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType).c_str());
 		break;
 	case SDLK_4:
 		m_pathGenerationType = 3;
+		setWindowTitle();
 		printf("Path generation type set to %s\n", bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType).c_str());
 		break;
 	case SDLK_5:
 		m_pathGenerationType = 4;
+		setWindowTitle();
 		printf("Path generation type set to %s\n", bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType).c_str());
 		break;
-	case SDLK_6:
-		//m_pathGenerationType = 5;
-		//printf("Path generation type set to %s\n", bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType).c_str());
+	case SDLK_u:
+		m_ignoreExistingPaths = !m_ignoreExistingPaths;
+		setWindowTitle();
 		break;
 	default:
 		break;

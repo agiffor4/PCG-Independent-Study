@@ -55,6 +55,7 @@ void mainLoop()
 	
 	std::unique_ptr<Scene> scene(new Scene(renderer));//create scene
 	World myWorld = World(gridSizeX, gridSizeY, scene.get());
+	myWorld.SetWindowRef(window);
 	myWorld.GenerateTiles(width, height);
 	myWorld.GenerateLevel();
 	InputManager::GetInputManager()->SubscribeToInput(&myWorld, InputManager::KeyPressType::UP);
