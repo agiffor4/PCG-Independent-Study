@@ -16,14 +16,16 @@ void World::setWindowTitle()
 		std::string width = "width: " + std::to_string(m_horizontalTileCount) + " ";
 		std::string height = "height: " + std::to_string(m_verticalTileCount) + " ";
 		std::string tunnelT = "path: " + bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType) + " ";
-		std::string seedResult = (m_resetSeed ? "true" : "false");
+		std::string seedResult = (m_resetSeed ? "T" : "F");
 		std::string seed = " seed reset: " + seedResult + " ";
-		std::string cycleResult = (m_cycleGenerationType ? "true" : "false");
+		std::string cycleResult = (m_cycleGenerationType ? "T" : "F");
 		std::string cycle = " cycle:  " + cycleResult + " ";
-		std::string ignoreResult = (m_ignoreExistingPaths ? "true" : "false");
+		std::string ignoreResult = (m_ignoreExistingPaths ? "T" : "F");
 		std::string ignore = " carve new: " + ignoreResult + " ";
+		std::string incrementalResult = (m_digPathsOneAtATime ? "T" : "F");
+		std::string incremental = " Incremental dig: " + incrementalResult + " ";
 
-		std::string title = width + height + tunnelT + seed + cycle + ignore;
+		std::string title = width + height + tunnelT + seed + cycle + ignore + incremental;
 		SDL_SetWindowTitle(m_window, title.c_str());
 	}
 }
@@ -34,7 +36,13 @@ World::World(int _hTileCount, int _vTileCount, Scene* _scene)
 	m_verticalTileCount = _vTileCount;
 	m_scene = _scene;
 }
-World::~World() {}
+World::~World() 
+{
+	if (m_bsp != nullptr)
+		delete(m_bsp);
+	if (m_AStar != nullptr)
+		delete(m_AStar);
+}
 void World::AddTile(Tile* _tile)
 {
 	m_tiles.push_back(_tile);	
@@ -329,7 +337,13 @@ void World::clearPreviousLevel() {
 		m_tiles[i]->ClearTileContents();
 	}
 }
-
+void World::Generate() 
+{
+	if (m_digPathsOneAtATime)
+		GenerateLevelP1();
+	else
+		GenerateLevel();
+}
 void World::GenerateLevel()
 {
 	clearPreviousLevel();
@@ -338,14 +352,13 @@ void World::GenerateLevel()
 	BSP bsp = BSP(m_horizontalTileCount, m_verticalTileCount);
 	
 	bsp.SetIgnoreExistingPaths(m_ignoreExistingPaths);
-	//when width = height = x round(log(x / 3) / log(2)) = number of times to split	
-	bsp.BeginSplit(round(std::log(m_horizontalTileCount / 3) / std::log(2)) + 1); //seems to produce a good ratio of rooms as long as the width = height
+	//when width = height = x round(log(x / 3) / log(2)) + 1 = number of times to split	
+	 bsp.BeginSplit(round(std::log(m_horizontalTileCount / 3) / std::log(2)) + 1); //seems to produce a good ratio of rooms as long as the width = height
 	//bsp.BeginSplit(4);	
 	setWindowTitle();
 	AStarSearch AStar = AStarSearch();	
 	AStar.Initialize(GetMapDimentions(), GetTileCount(), false);
 	AStar.SetWallDigCost(200);		
-	//BSP::TunnelingType tuntype = (BSP::TunnelingType)(rand() % 6);	
 	BSP::TunnelingType tuntype = (BSP::TunnelingType)m_pathGenerationType;
 	printf("Using tunneling algorithm %s.\n", bsp.GetEnumName(tuntype).c_str());
 	bsp.SetTunnelingType(tuntype);
@@ -355,25 +368,72 @@ void World::GenerateLevel()
 	std::vector<int> paths = bsp.GeneratePaths(AStar);
 	AddPaths(paths);
 	if (!m_playerCreated)
-		m_player = CreatePlayer();
-	int roomPlayerSpawnin;
-	int playerStart = GetPlayerStartLocation(rooms, &roomPlayerSpawnin);
-	Tile* t = GetTileAtIndex(playerStart);
+		m_player = CreatePlayer();	
+	m_playerStart = GetPlayerStartLocation(rooms, &m_roomPlayerSpawnin);
+	Tile* t = GetTileAtIndex(m_playerStart);
 	m_player->SetLocation(t);
-	t->SetContents(m_player);
-	
+	t->SetContents(m_player);	
 	//EXIT generation
-	t = GetTileAtIndex(bsp.GenerateExitLocation(playerStart, roomPlayerSpawnin, (*this)));
+	//CreateExit(&bsp);
+	
+
+}
+void World::GenerateLevelP1() {
+
+
+	m_incrementalPathDigging = 0;
+	if (m_bsp != nullptr)
+		delete(m_bsp);
+	if (m_AStar != nullptr)
+		delete(m_AStar);
+	clearPreviousLevel();
+
+	m_bsp = new BSP(m_horizontalTileCount, m_verticalTileCount);
+
+	m_bsp->SetIgnoreExistingPaths(m_ignoreExistingPaths);
+	m_bsp->BeginSplit(round(std::log(m_horizontalTileCount / 3) / std::log(2)) + 1); //seems to produce a good ratio of rooms as long as the width = height
+	setWindowTitle();
+	m_AStar = new AStarSearch();
+	m_AStar->Initialize(GetMapDimentions(), GetTileCount(), false);
+	m_AStar->SetWallDigCost(200);	
+	
+
+	BSP::TunnelingType tuntype = (BSP::TunnelingType)m_pathGenerationType;
+	m_bsp->SetTunnelingType(tuntype);
+	std::vector<std::vector<int>> rooms = m_bsp->GetRoomTileIndexes();
+	AddRooms(rooms);
+	m_AStar->CastTilesToAStarNodes((*this));
+
+
+	
+}
+
+void World::GenerateLevelP2() 
+{
+	if (m_bsp != nullptr)
+	{
+		std::vector<int> paths = m_bsp->GeneratePathsIncremental((*m_AStar), m_incrementalPathDigging);
+		AddPaths(paths);
+		m_incrementalPathDigging++;
+	}
+	
+}
+
+
+
+void World::CreateExit(BSP* _bspToUse) {
+	Tile* t = nullptr;
+	if (_bspToUse != nullptr)
+		t = GetTileAtIndex(_bspToUse->GenerateExitLocation(m_playerStart > 0 ? m_playerStart : rand() % GetTileCount(), m_roomPlayerSpawnin, (*this)));
+	else
+		t = GetTileAtIndex(m_bsp->GenerateExitLocation(m_playerStart > 0 ? m_playerStart : rand() % GetTileCount(), m_roomPlayerSpawnin, (*this)));
+	
 	Exit* e = new Exit(this);
 	e->Init("img/Exit.bmp", "Exit", m_scene->GetRenderer());
 	e->SetSize(GetTileSize().X, GetTileSize().Y);
 	e->SetLocation(t);
 	t->AddItem(e);
-	
-
 }
-
-
 
 void World::AddRoomsAndPaths(std::vector<std::vector<int>>& const _rooms, std::vector<int>& const _paths) {
 	AddRooms(_rooms);
@@ -438,7 +498,10 @@ void World::InvokeKeyUp(SDL_Keycode _key)
 			if (m_pathGenerationType > 4)
 				m_pathGenerationType = 0;
 		}
-		GenerateLevel();
+		if (m_digPathsOneAtATime)
+			GenerateLevelP1();
+		else
+			GenerateLevel();
 		break;
 	case SDLK_h:
 		m_cycleGenerationType = !m_cycleGenerationType;
@@ -471,6 +534,18 @@ void World::InvokeKeyUp(SDL_Keycode _key)
 		break;
 	case SDLK_u:
 		m_ignoreExistingPaths = !m_ignoreExistingPaths;
+		setWindowTitle();
+		break;
+	case SDLK_p:
+		if (m_digPathsOneAtATime)
+			GenerateLevelP2();
+		break;
+	case SDLK_i:
+		if (m_digPathsOneAtATime)
+			CreateExit();
+		break;
+	case SDLK_y:
+		m_digPathsOneAtATime = !m_digPathsOneAtATime;
 		setWindowTitle();
 		break;
 	default:

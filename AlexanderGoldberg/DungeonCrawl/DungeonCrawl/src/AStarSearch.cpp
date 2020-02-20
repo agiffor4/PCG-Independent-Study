@@ -159,10 +159,6 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 			}			
 			else if (!closedList[cn.m_IndexOfTile] && isPass && (m_allowPathsAlongEdges ? true : !isTileEdge(cn.m_IndexOfTile)))
 			{
-				if (checkingNode.m_IndexOfTile == 1847 && _current.GetPositionInVector() == 2097 && m_targetTile->GetPositionInVector() == 1394)
-				{
-					int foo = 0;
-				}
 				gNew = checkingNode.gCost + getTileAtIndex(cn.m_IndexOfTile, refToNodeVector)->m_GCost;
 				hNew = calculateHValue(*getTileAtIndex(cn.m_IndexOfTile, refToNodeVector));
 				fNew = gNew + hNew;

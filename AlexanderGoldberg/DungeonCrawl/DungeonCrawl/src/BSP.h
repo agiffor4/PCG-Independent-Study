@@ -71,6 +71,8 @@ public:
 	std::vector<RectA> GetRoomRegions(bool _overwritePreviousRooms = false);
 	std::vector<int> GeneratePaths(AStarSearch& _AStar, bool _overwritePreviousPaths = false, std::vector<std::vector<int>>* const _roomTileIndexes = nullptr);
 
+	std::vector<int> GeneratePathsIncremental(AStarSearch& _AStar, int _index, bool _overwritePreviousPaths = false, std::vector<std::vector<int>>* const _roomTileIndexes = nullptr);
+
 
 	
 	//EXIT LOCATION SETTING FUNCTION
@@ -90,6 +92,13 @@ public:
 	void TunnelingRoomToRoom(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _repeatRoomDigs = true, bool _updateMapWithPreviousPaths = true);	
 	void TunnelingRegionToRegion(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
 
+	void TunnelingBaseIncremental(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths, int _index);
+
+	int TunnelingHubIncremental(AStarSearch& _AStar, int _index, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths, bool _randomizeWhichRoomIsOrigin = true, bool _tryToPickCenteralRoom = true, int _centralRoomToSpiralFrom = 0); // returns "hub" room index
+	void TunnelingStringsOfRoomsIncremental(AStarSearch& _AStar, int _index, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
+	void TunnelingRoomToRoomIncremental(AStarSearch& _AStar, int _index, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _repeatRoomDigs = true, bool _updateMapWithPreviousPaths = true);
+	void TunnelingRegionToRegionIncremental(AStarSearch& _AStar, int _index, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
+	
 	std::vector<std::vector<int>> GetCorridorOnlyTiles();
 
 	//UTILITY

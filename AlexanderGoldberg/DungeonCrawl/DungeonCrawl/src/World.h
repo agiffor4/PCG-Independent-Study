@@ -9,6 +9,8 @@ class Tile;
 class Scene;
 class Vector2;
 class Player;
+class BSP;
+class AStarSearch;
 class World : public IInputHandler
 {
 private:
@@ -17,13 +19,21 @@ protected:
 	std::vector<Tile*> m_tiles;
 	int m_horizontalTileCount = 0;
 	int m_verticalTileCount = 0;
+	int m_playerStart = -1;
+	int m_roomPlayerSpawnin = -1;
 	bool m_playerCreated = false;
+	bool m_generateInStages = true;
 	Player* m_player = nullptr;
 	Scene* m_scene = nullptr;
 	int m_pathGenerationType = 0;
 	bool m_cycleGenerationType = false;
 	bool m_resetSeed = false;
 	bool m_ignoreExistingPaths = false;
+	
+	int m_incrementalPathDigging = 0;
+	bool m_digPathsOneAtATime = true;
+	BSP* m_bsp = nullptr;
+	AStarSearch* m_AStar = nullptr;
 	void setWindowTitle();
 public:
 
@@ -48,7 +58,11 @@ public:
 	Vector2 GetTileSize();
 	
 	void GenerateTiles(int _screenWidth, int _screenHeight);
+	void Generate();
 	void GenerateLevel();
+	void GenerateLevelP1();
+	void GenerateLevelP2();
+	void CreateExit(BSP* _bspToUse = nullptr);
 	void clearPreviousLevel();
 	
 

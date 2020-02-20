@@ -44,7 +44,7 @@ void mainLoop()
 	int height = SDL_GetWindowSurface(window)->h;	
 
 	DeltaTime deltaTime = DeltaTime();
-	bool use50 = true;
+	bool use50 = false;
 	int gridSizeX = 25;
 	int gridSizeY = 25;
 	if (use50)
@@ -55,10 +55,11 @@ void mainLoop()
 	
 	std::unique_ptr<Scene> scene(new Scene(renderer));//create scene
 	World myWorld = World(gridSizeX, gridSizeY, scene.get());
+	InputManager::GetInputManager()->SubscribeToInput(&myWorld, InputManager::KeyPressType::UP);
 	myWorld.SetWindowRef(window);
 	myWorld.GenerateTiles(width, height);
-	myWorld.GenerateLevel();
-	InputManager::GetInputManager()->SubscribeToInput(&myWorld, InputManager::KeyPressType::UP);
+	myWorld.Generate();
+	
 
 	Timer timer = Timer(3.0f);
 	while (play)
