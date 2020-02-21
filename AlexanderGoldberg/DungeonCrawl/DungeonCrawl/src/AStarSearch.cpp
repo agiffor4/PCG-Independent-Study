@@ -114,12 +114,17 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 	//std::vector<Node*> openList;	
 	//openList.push_back(&nodeData[startIndex]);	
 	bool destinationFound = false;
+	
 	while (!openList.empty())
 	{
 		Node& checkingNode = (*(*openList.begin())); //gets next node that is available to be checked
 		openList.erase(openList.begin()); 
-
+		if (_target.GetPositionInVector() == 544 && checkingNode.m_IndexOfTile == 266)
+		{
+			int foo = 0;
+		}
 		closedList[checkingNode.m_IndexOfTile] = true; //sets give node as having been the origin for checks
+		
 		float gNew = 0; 
 		float hNew = 0;
 		float fNew = 0;
@@ -138,9 +143,7 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 			{
 				cn.m_Parent = &checkingNode;
 				destinationFound = true;
-				if (_target.GetPositionInVector() == 542)
-					int foo = 0;
-				std::stack<int> path = findPath(nodeData);
+				
 				if (_usePreviousPathsInEachItteration)
 				{
 					std::stack<int> path2 = path;
@@ -168,7 +171,7 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 					cn.gCost = gNew;
 					cn.hCost = hNew; 
 					cn.m_Parent = &checkingNode;
-					openList.emplace(&cn);
+					openList.emplace(&cn);					
 					//openList.push_back(&cn);
 				}
 			}
@@ -333,7 +336,7 @@ bool AStarSearch::isTileEdge(int _index) {
 
 
 
-void AStarSearch::CastTilesToAStarNodes(World& _world)
+void AStarSearch::CastTilesToAStarNodes(World& _world, bool _canGoTroughWalls)
 {
 	cleanNodes();
 	for (size_t i = 0; i < _world.GetTileCount(); i++)
@@ -342,14 +345,13 @@ void AStarSearch::CastTilesToAStarNodes(World& _world)
 		AStarNode* asn = new AStarNode();
 		Tile* t = _world.GetTileAtIndex(i);
 		asn->Init(i, t->GetPositionInGrid().X, t->GetPositionInGrid().Y);
-		asn->SetPassable(true);
+		asn->SetPassable(_canGoTroughWalls ? true : (t->IsPassable() ? true : false));
 		asn->m_GCost = t->IsPassable() ? m_emptyTileGCost : m_DigCost;
 		m_nodes.push_back(asn);
 
 		asn = new AStarNode();
-		t = _world.GetTileAtIndex(i);
 		asn->Init(i, t->GetPositionInGrid().X, t->GetPositionInGrid().Y);
-		asn->SetPassable(true);
+		asn->SetPassable(_canGoTroughWalls ? true : (t->IsPassable() ? true : false));
 		asn->m_GCost = t->IsPassable() ? m_emptyTileGCost : m_DigCost;
 		m_modifableNodes.push_back(asn);
 	}
@@ -405,4 +407,5 @@ void AStarSearch::cleanModifiableNodes() {
 AStarNode* AStarSearch::getTileAtIndex(int _index, std::vector<AStarNode*>& _nodesToUse) {
 	return _index > -1 && _index < _nodesToUse.size() ? _nodesToUse[_index] : nullptr;
 }
+
 

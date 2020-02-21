@@ -72,7 +72,7 @@ public:
     
     void SetWallDigCost(int _newCost);
     void SetEmptyTileCost(int _newCost);
-    void CastTilesToAStarNodes(World& _world);
+    void CastTilesToAStarNodes(World& _world, bool _canGoTroughWalls);
     void CastIntVectorToAStarNodes(std::vector<int>& _world, int _width);
     
     

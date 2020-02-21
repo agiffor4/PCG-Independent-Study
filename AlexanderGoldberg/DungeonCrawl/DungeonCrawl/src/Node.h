@@ -7,13 +7,14 @@ protected:
    
     
 public:
-    Node* m_Parent = nullptr;
+    int m_IndexOfTile = -1; 
     float gCost = FLT_MAX;
     float hCost = FLT_MAX;
     float fCost = FLT_MAX;
+    Node* m_Parent = nullptr;
     Node();
     ~Node();
-    int m_IndexOfTile = -1;
+    
     std::string GetXY(int _width);
     
 };

@@ -598,10 +598,11 @@ void BSP::spawnExitWithinRangeFromPlayer(int& _exitIndex, int _startingIndex, in
 void BSP::longestPathToFromStart(int& _exitIndex, int _startingIndex, World& _world)
 {
 	AStarSearch AStar = AStarSearch();
-	AStar.SetWallDigCost(100000);
+
+	AStar.SetWallDigCost(1000);
 	AStar.SetEmptyTileCost(1);
 	AStar.Initialize(_world.GetMapDimentions(), _world.GetTileCount(), false);
-	AStar.CastTilesToAStarNodes(_world);
+	AStar.CastTilesToAStarNodes(_world, false);
 	int currentTargetRoomRegion = -1;
 	int currentPathLength = 0;	
 	int targetIndex = -1;
@@ -612,6 +613,7 @@ void BSP::longestPathToFromStart(int& _exitIndex, int _startingIndex, World& _wo
 	for (size_t j = 0; j < rooms.size(); j++)
 	{
 		targetIndex = rooms[j][rooms[j].size() / 2];
+		
 		std::stack<int> pathFromIToJ = AStar.BeginSearch(_startingIndex, targetIndex, false);
 		if (pathFromIToJ.size() > currentPathLength)
 		{
@@ -1088,10 +1090,6 @@ bool BSP::IsIndexInRoom(int _tileIndex, int _roomIndex) {
 		v.X < bottomRight.X &&
 		v.Y > topLeft.Y&&
 		v.Y < bottomRight.Y;
-	if (result)
-	{
-		int foo = 0;
-	}
 	return result;
 		
 	

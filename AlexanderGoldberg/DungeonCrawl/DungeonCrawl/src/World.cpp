@@ -364,7 +364,7 @@ void World::GenerateLevel()
 	bsp.SetTunnelingType(tuntype);
 	std::vector<std::vector<int>> rooms = bsp.GetRoomTileIndexes();
 	AddRooms(rooms);
-	AStar.CastTilesToAStarNodes((*this));
+	AStar.CastTilesToAStarNodes((*this), true);
 	std::vector<int> paths = bsp.GeneratePaths(AStar);
 	AddPaths(paths);
 	if (!m_playerCreated)
@@ -374,7 +374,7 @@ void World::GenerateLevel()
 	m_player->SetLocation(t);
 	t->SetContents(m_player);	
 	//EXIT generation
-	//CreateExit(&bsp);
+	CreateExit(&bsp);
 	
 
 }
@@ -402,7 +402,7 @@ void World::GenerateLevelP1() {
 	m_bsp->SetTunnelingType(tuntype);
 	std::vector<std::vector<int>> rooms = m_bsp->GetRoomTileIndexes();
 	AddRooms(rooms);
-	m_AStar->CastTilesToAStarNodes((*this));
+	m_AStar->CastTilesToAStarNodes((*this), true);
 
 
 	
@@ -542,7 +542,16 @@ void World::InvokeKeyUp(SDL_Keycode _key)
 		break;
 	case SDLK_i:
 		if (m_digPathsOneAtATime)
+		{
+			if (!m_playerCreated)
+				m_player = CreatePlayer();
+			m_playerStart = GetPlayerStartLocation(m_bsp->GetRoomTileIndexes(), &m_roomPlayerSpawnin);
+			Tile* t = GetTileAtIndex(m_playerStart);
+			m_player->SetLocation(t);
+			t->SetContents(m_player);
 			CreateExit();
+		}
+			
 		break;
 	case SDLK_y:
 		m_digPathsOneAtATime = !m_digPathsOneAtATime;
