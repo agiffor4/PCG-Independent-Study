@@ -109,7 +109,7 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 	nodeData[startIndex].m_Parent = &nodeData[startIndex];
 
 	auto NodeComparator = [](const Node* lhs, const Node* rhs) {return lhs->fCost < rhs->fCost; };
-	std::set<Node*, decltype(NodeComparator)> openList(NodeComparator);
+	std::multiset<Node*, decltype(NodeComparator)> openList(NodeComparator);
 	openList.emplace(&nodeData[startIndex]);
 	//std::vector<Node*> openList;	
 	//openList.push_back(&nodeData[startIndex]);	
@@ -118,11 +118,13 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 	while (!openList.empty())
 	{
 		Node& checkingNode = (*(*openList.begin())); //gets next node that is available to be checked
+
 		openList.erase(openList.begin()); 
-		if (_target.GetPositionInVector() == 544 && checkingNode.m_IndexOfTile == 266)
+		if (checkingNode.m_IndexOfTile == 338)
 		{
 			int foo = 0;
 		}
+
 		closedList[checkingNode.m_IndexOfTile] = true; //sets give node as having been the origin for checks
 		
 		float gNew = 0; 
@@ -137,12 +139,12 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 		for (size_t i = 0; i < neighbors.size(); i++)
 		{
 			Node& cn = nodeData[neighbors[i].m_IndexOfTile]; //current node
-
 			bool isPass = getTileAtIndex(cn.m_IndexOfTile, refToNodeVector)->IsPassable();
 			if (isDestination(*getTileAtIndex(cn.m_IndexOfTile, refToNodeVector)))
 			{
 				cn.m_Parent = &checkingNode;
 				destinationFound = true;
+				std::stack<int> path = findPath(nodeData);
 				
 				if (_usePreviousPathsInEachItteration)
 				{

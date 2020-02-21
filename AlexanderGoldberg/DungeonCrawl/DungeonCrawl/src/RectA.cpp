@@ -48,3 +48,11 @@ void RectA::GetCenter(double* _x, double* _y)
 	(*_x) = (x2 - x1) / 2;
 	(*_y) = (y2 - y1) / 2;
 }
+
+int RectA::GetWidth() {
+	return x2 - x1;
+}
+
+int RectA::GetHeight() {
+	return y2 - y1;
+}

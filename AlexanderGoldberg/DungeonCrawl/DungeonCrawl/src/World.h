@@ -16,6 +16,14 @@ class World : public IInputHandler
 private:
 	SDL_Window* m_window = nullptr;
 protected:
+	struct RoomStruct {
+		
+		std::vector<int> m_containsTiles;
+		std::vector<int> m_connectedRegions;
+		int m_region;
+		int m_connectedness;
+	};
+	std::vector<RoomStruct> m_rooms;
 	std::vector<Tile*> m_tiles;
 	int m_horizontalTileCount = 0;
 	int m_verticalTileCount = 0;
@@ -35,6 +43,7 @@ protected:
 	BSP* m_bsp = nullptr;
 	AStarSearch* m_AStar = nullptr;
 	void setWindowTitle();
+	
 public:
 
 	enum class TileDirection

@@ -30,6 +30,8 @@ void World::setWindowTitle()
 	}
 }
 
+
+
 World::World(int _hTileCount, int _vTileCount, Scene* _scene)
 {
 	m_horizontalTileCount = _hTileCount;
@@ -441,13 +443,18 @@ void World::AddRoomsAndPaths(std::vector<std::vector<int>>& const _rooms, std::v
 }
 
 void World::AddRooms(std::vector<std::vector<int>>& const _rooms) {
+	m_rooms.erase(m_rooms.begin(), m_rooms.end());
 	for (size_t i = 0; i < _rooms.size(); i++)
 	{
+		m_rooms.push_back(RoomStruct());
 		for (size_t j = 0; j < _rooms[i].size(); j++)
 		{
-			GetTileAtIndex(_rooms[i][j])->SetPassable(true);
+			GetTileAtIndex(_rooms[i][j])->SetPassable(true);			
 			if(i < 8)
 				GetTileAtIndex(_rooms[i][j])->changeImage("img/blank_tile" + std::to_string(i) + ".bmp");
+			//start filling out the room struct
+			m_rooms[i].m_containsTiles.push_back(_rooms[i][j]);
+			m_rooms[i].m_region = i;
 		}
 	}
 }

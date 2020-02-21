@@ -14,5 +14,7 @@ public:
 	bool Contains(int _x, int _y);
 	void GetCenter(int* _x, int* _y);
 	void GetCenter(double* _x, double* _y);
+	int GetWidth();
+	int GetHeight();
 };
 
