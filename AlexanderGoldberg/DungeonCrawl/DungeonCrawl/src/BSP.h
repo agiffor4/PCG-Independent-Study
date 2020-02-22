@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <set>
 #include "RectA.h"
 #include "Vector2.h"
 class BSPNode;
@@ -24,6 +25,7 @@ public:
 
 	};
 private:
+	
 	std::string m_enumNames[7] = { "Base", "Hub", "StringOfRooms", "RoomToRoom", "RegionToRegion", "other", "" };
 	int m_width = 0;//width of rectangle to be divided up
 	int m_height = 0;//height of rectangle to be divided up
@@ -48,7 +50,7 @@ private:
 	void WipeTree();
 	void StartOver();
 
-	int RoomIndexTileIsIn(int _tileIndex);
+	int RoomIndexTileIsIn(int _tileIndex, const std::vector<std::vector<int>>* _roomTileIndexesToUse = nullptr);
 	bool IsIndexInRoom(int _tileIndex, int _roomIndex);
 
 	void print(std::vector<int>& _toPrint, int _width);	
@@ -72,6 +74,7 @@ public:
 	std::vector<int> GeneratePaths(AStarSearch& _AStar, bool _overwritePreviousPaths = false, std::vector<std::vector<int>>* const _roomTileIndexes = nullptr);
 
 	std::vector<int> GeneratePathsIncremental(AStarSearch& _AStar, int _index, bool _overwritePreviousPaths = false, std::vector<std::vector<int>>* const _roomTileIndexes = nullptr);
+
 
 
 	
@@ -100,6 +103,11 @@ public:
 	void TunnelingRegionToRegionIncremental(AStarSearch& _AStar, int _index, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
 	
 	std::vector<std::vector<int>> GetCorridorOnlyTiles();
+	void ExitsFromRoom(int _roomIndex, int& _totalExits, World& _world);
+	std::vector<Vector2> GetPathStartAndEndIndexs();
+
+	//ITEMGENERATION FUNCTIONS
+	void GetDoorKeyPlacement(int& _doorLocation, int& _keyLocation);
 
 	//UTILITY
 	int convertXYToIndex(int _x, int _y, int _width);
@@ -136,4 +144,3 @@ public:
 				lhs.x2 = root.x2
 				lhs.y2 = split point*/
 
-std::vector<std::vector<int>> GetCorridorOnlyTiles();

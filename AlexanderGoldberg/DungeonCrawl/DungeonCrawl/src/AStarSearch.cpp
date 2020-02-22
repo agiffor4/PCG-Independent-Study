@@ -120,10 +120,6 @@ std::stack<int> AStarSearch::BeginSearch(AStarNode& _current, AStarNode& _target
 		Node& checkingNode = (*(*openList.begin())); //gets next node that is available to be checked
 
 		openList.erase(openList.begin()); 
-		if (checkingNode.m_IndexOfTile == 338)
-		{
-			int foo = 0;
-		}
 
 		closedList[checkingNode.m_IndexOfTile] = true; //sets give node as having been the origin for checks
 		

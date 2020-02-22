@@ -38,7 +38,17 @@ bool Tile::IsCorridor()
 }
 void Tile::SetContents(Thing* _newContents)
 {
+	/*
+	if (m_contents != nullptr)
+	{
+		if (m_contents->ShouldDelete())
+			delete(m_contents);
+		else
+			m_contents->SetLocation(nullptr);
+	}*/
+	
 	m_contents = _newContents;
+	
 }
 Thing* Tile::GetContents()
 {
@@ -49,7 +59,16 @@ void Tile::MoveContentsTo(Tile* _newLocation)
 	_newLocation->SetContents(m_contents);
 	SetContents(nullptr);
 }
-bool Tile::IsPassable() { return m_passable && m_contents == nullptr; }
+bool Tile::IsPassable() { return m_passable && blockingInteractable(); }
+
+bool Tile::blockingInteractable() {
+	for (size_t i = 0; i < m_items.size(); i++)
+	{
+		if (m_items[i]->GetBlocksPassage())
+			return false;
+	}
+	return true;
+}
 
 bool Tile::inBounds(int _x, int _y) {
 	if (_x > GetPosition().X && _x < GetPosition().X + GetDestination().w &&
@@ -65,7 +84,7 @@ Interactable* Tile::InteractWithItem()
 	if (!m_items.empty())
 	{
 		Interactable* toReturn = m_items[m_items.size() -1];
-		if (toReturn->Interaction())
+		if (toReturn->InteratctionWrapper()) // if returns true then adds to inventory
 		{
 			m_items.erase(m_items.end() - 1, m_items.end());
 			return toReturn;

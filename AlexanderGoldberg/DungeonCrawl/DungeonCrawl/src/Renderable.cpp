@@ -49,9 +49,8 @@ SDL_Rect Renderable::GetDestination() { return m_destination; }
 
 void Renderable::SetSize(Vector2& _scale) {
 
-	m_scale.X = _scale.X;
-	m_scale.Y = _scale.Y;
-	updateScale();
+	SetSize(_scale.X, _scale.Y);
+
 
 }
 

@@ -455,7 +455,7 @@ std::vector<int> BSP::GeneratePaths(AStarSearch& _AStar, bool _overwritePrevious
 	{
 		std::vector<std::vector<int>> indexesOfRoomTiles = _roomTileIndexes == nullptr ? GetRoomTileIndexes() : (*_roomTileIndexes);
 		m_usablePaths.erase(m_usablePaths.begin(), m_usablePaths.end());
-		m_IndexesOfStartEndPointsForPathSegments.erase(m_IndexesOfStartEndPointsForPathSegments.begin(), m_IndexesOfStartEndPointsForPathSegments.end());
+		PathStarts.erase(PathStarts.begin(), PathStarts.end());
 		_AStar.SetWallDigCost(200);
 		_AStar.SetEmptyTileCost(1);
 		switch (m_tunnelingType)
@@ -667,13 +667,13 @@ void BSP::TunnelingBase(AStarSearch& _AStar, std::vector<std::vector<int>>& cons
 		
 		std::stack<int> path = _AStar.BeginSearch(index1, index2, _updateMapWithPreviousPaths);
 		int timesToPop = path.size();
-		m_IndexesOfStartEndPointsForPathSegments.push_back(Vector2(m_usablePaths.size(), 0));
+		PathStarts.push_back(Vector2(m_usablePaths.size(), 0));
 		for (size_t j = 0; j < timesToPop; j++)
 		{
 			m_usablePaths.push_back(path.top());
 			path.pop();
 		}
-		m_IndexesOfStartEndPointsForPathSegments[m_IndexesOfStartEndPointsForPathSegments.size() - 1].Y = m_usablePaths.size() - 1;
+		PathStarts[PathStarts.size() - 1].Y = m_usablePaths.size() - 1;
 		
 	}
 }
@@ -740,13 +740,13 @@ int BSP::TunnelingHub(AStarSearch& _AStar, std::vector<std::vector<int>>& const 
 
 			std::stack<int> path = _AStar.BeginSearch(index1, index2, _updateMapWithPreviousPaths);
 			int timesToPop = path.size();
-			m_IndexesOfStartEndPointsForPathSegments.push_back(Vector2(m_usablePaths.size(), 0));
+			PathStarts.push_back(Vector2(m_usablePaths.size(), 0));
 			for (size_t j = 0; j < timesToPop; j++)
 			{
 				m_usablePaths.push_back(path.top());
 				path.pop();
 			}
-			m_IndexesOfStartEndPointsForPathSegments[m_IndexesOfStartEndPointsForPathSegments.size() - 1].Y = m_usablePaths.size() - 1;
+			PathStarts[PathStarts.size() - 1].Y = m_usablePaths.size() - 1;
 		}
 	}
 	return originRoom; //returns the room that is used as the origin
@@ -769,13 +769,13 @@ void BSP::TunnelingStringsOfRooms(AStarSearch& _AStar, std::vector<std::vector<i
 		
 		std::stack<int> path = _AStar.BeginSearch(index1, index2, _updateMapWithPreviousPaths);		
 		int timesToPop = path.size();
-		m_IndexesOfStartEndPointsForPathSegments.push_back(Vector2(m_usablePaths.size(), 0));
+		PathStarts.push_back(Vector2(m_usablePaths.size(), 0));
 		for (size_t j = 0; j < timesToPop; j++)
 		{
 			m_usablePaths.push_back(path.top());
 			path.pop();
 		}
-		m_IndexesOfStartEndPointsForPathSegments[m_IndexesOfStartEndPointsForPathSegments.size() - 1].Y = m_usablePaths.size() - 1;
+		PathStarts[PathStarts.size() - 1].Y = m_usablePaths.size() - 1;
 	}
 }
 void BSP::TunnelingRoomToRoom(AStarSearch& _AStar, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _repeatRoomDigs, bool _updateMapWithPreviousPaths) {
@@ -805,13 +805,13 @@ void BSP::TunnelingRoomToRoom(AStarSearch& _AStar, std::vector<std::vector<int>>
 				int index2 = indexesOfRoomTiles[j][endTile];
 				std::stack<int> path = _AStar.BeginSearch(index1, index2, _updateMapWithPreviousPaths);
 				int timesToPop = path.size();
-				m_IndexesOfStartEndPointsForPathSegments.push_back(Vector2(m_usablePaths.size(), 0));
+				PathStarts.push_back(Vector2(m_usablePaths.size(), 0));
 				for (size_t j = 0; j < timesToPop; j++)
 				{
 					m_usablePaths.push_back(path.top());
 					path.pop();
 				}
-				m_IndexesOfStartEndPointsForPathSegments[m_IndexesOfStartEndPointsForPathSegments.size() - 1].Y = m_usablePaths.size() - 1;
+				PathStarts[PathStarts.size() - 1].Y = m_usablePaths.size() - 1;
 			}
 		}
 
@@ -879,19 +879,19 @@ void BSP::TunnelingBaseIncremental(AStarSearch& _AStar, std::vector<std::vector<
 
 		std::stack<int> path = _AStar.BeginSearch(index1, index2, _updateMapWithPreviousPaths);
 		int timesToPop = path.size();
-		m_IndexesOfStartEndPointsForPathSegments.push_back(Vector2(m_usablePaths.size(), 0));
+		PathStarts.push_back(Vector2(m_usablePaths.size(), 0));
 		for (size_t j = 0; j < timesToPop; j++)
 		{
 			m_usablePaths.push_back(path.top());
 			path.pop();
 		}
-		m_IndexesOfStartEndPointsForPathSegments[m_IndexesOfStartEndPointsForPathSegments.size() - 1].Y = m_usablePaths.size() - 1;		
+		PathStarts[PathStarts.size() - 1].Y = m_usablePaths.size() - 1;
 	}
 	else
 	{
 		printf("Final path created\n");
 		m_usablePaths.erase(m_usablePaths.begin(), m_usablePaths.end());
-		m_IndexesOfStartEndPointsForPathSegments.erase(m_IndexesOfStartEndPointsForPathSegments.begin(), m_IndexesOfStartEndPointsForPathSegments.end());
+		PathStarts.erase(PathStarts.begin(), PathStarts.end());
 	}
 }
 int BSP::TunnelingHubIncremental(AStarSearch& _AStar, int _index, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths, bool _randomizeWhichRoomIsOrigin, bool _tryToPickCenteralRoom, int _centralRoomToSpiralFrom) {
@@ -958,13 +958,13 @@ int BSP::TunnelingHubIncremental(AStarSearch& _AStar, int _index, std::vector<st
 
 			std::stack<int> path = _AStar.BeginSearch(index1, index2, _updateMapWithPreviousPaths);
 			int timesToPop = path.size();
-			m_IndexesOfStartEndPointsForPathSegments.push_back(Vector2(m_usablePaths.size(), 0));
+			PathStarts.push_back(Vector2(m_usablePaths.size(), 0));
 			for (size_t j = 0; j < timesToPop; j++)
 			{
 				m_usablePaths.push_back(path.top());
 				path.pop();
 			}
-			m_IndexesOfStartEndPointsForPathSegments[m_IndexesOfStartEndPointsForPathSegments.size() - 1].Y = m_usablePaths.size() - 1;
+			PathStarts[PathStarts.size() - 1].Y = m_usablePaths.size() - 1;
 		}
 	}
 	return originRoom; //returns the room that is used as the origin
@@ -990,13 +990,13 @@ void BSP::TunnelingStringsOfRoomsIncremental(AStarSearch& _AStar, int _index, st
 
 		std::stack<int> path = _AStar.BeginSearch(index1, index2, _updateMapWithPreviousPaths);
 		int timesToPop = path.size();
-		m_IndexesOfStartEndPointsForPathSegments.push_back(Vector2(m_usablePaths.size(), 0));
+		PathStarts.push_back(Vector2(m_usablePaths.size(), 0));
 		for (size_t j = 0; j < timesToPop; j++)
 		{
 			m_usablePaths.push_back(path.top());
 			path.pop();
 		}
-		m_IndexesOfStartEndPointsForPathSegments[m_IndexesOfStartEndPointsForPathSegments.size() - 1].Y = m_usablePaths.size() - 1;
+		PathStarts[PathStarts.size() - 1].Y = m_usablePaths.size() - 1;
 	}
 }
 void BSP::TunnelingRoomToRoomIncremental(AStarSearch& _AStar, int _index, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _repeatRoomDigs, bool _updateMapWithPreviousPaths) {
@@ -1028,13 +1028,13 @@ void BSP::TunnelingRoomToRoomIncremental(AStarSearch& _AStar, int _index, std::v
 				int index2 = indexesOfRoomTiles[j][endTile];
 				std::stack<int> path = _AStar.BeginSearch(index1, index2, _updateMapWithPreviousPaths);
 				int timesToPop = path.size();
-				m_IndexesOfStartEndPointsForPathSegments.push_back(Vector2(m_usablePaths.size(), 0));
+				PathStarts.push_back(Vector2(m_usablePaths.size(), 0));
 				for (size_t j = 0; j < timesToPop; j++)
 				{
 					m_usablePaths.push_back(path.top());
 					path.pop();
 				}
-				m_IndexesOfStartEndPointsForPathSegments[m_IndexesOfStartEndPointsForPathSegments.size() - 1].Y = m_usablePaths.size() - 1;
+				PathStarts[PathStarts.size() - 1].Y = m_usablePaths.size() - 1;
 			}
 		}
 
@@ -1105,9 +1105,84 @@ std::vector<std::vector<int>> BSP::GetCorridorOnlyTiles() {
 	return corridorTiles;
 }
 
-int BSP::RoomIndexTileIsIn(int _tileIndex) {
+void BSP::ExitsFromRoom(int _roomIndex, int& _totalExits,  World& _world)
+{
+	std::vector<std::vector<int>> roomIndexes = GetRoomTileIndexes();
+	std::set<int> corridorPoints;
+	_totalExits = 0;
+	int roomWidth = m_roomRegions[_roomIndex].GetWidth();
+	int brTile = roomIndexes[_roomIndex][roomIndexes[_roomIndex].size() - 1]; //bottom right tile
+	int tlTile = roomIndexes[_roomIndex][0]; //top left tile
+	//checking top row
+	int startIndex = tlTile;
+	int endIndex = tlTile + roomWidth;
+
+	Tile* tile = nullptr;
+	for (size_t j = startIndex; j < endIndex; j++)
+	{
+		tile = _world.GetAdjacentTile(j, World::TileDirection::UP);
+		if (tile->IsCorridor())
+			corridorPoints.emplace(tile->GetPositionInVector());
+	}
+	
+	//checking bottom row
+	startIndex = brTile - roomWidth + 1;
+	endIndex = brTile + 1;
+	for (size_t j = startIndex; j < endIndex; j++)
+	{
+		tile = _world.GetAdjacentTile(j, World::TileDirection::DOWN);
+		if (tile->IsCorridor())
+			corridorPoints.emplace(tile->GetPositionInVector());
+	}
+
+	//checking right column
+	startIndex = tlTile + roomWidth -1;
+	endIndex = brTile + m_width;
+	for (size_t j = startIndex; j < endIndex; j+= m_width)
+	{
+		tile = _world.GetAdjacentTile(j, World::TileDirection::RIGHT);
+		if (tile->IsCorridor())
+			corridorPoints.emplace(tile->GetPositionInVector());
+	}
+
+	startIndex = tlTile;
+	endIndex = brTile - roomWidth + m_width + 1;
+	for (size_t j = startIndex; j < endIndex; j += m_width)
+	{
+		tile = _world.GetAdjacentTile(j, World::TileDirection::LEFT);
+		if (tile->IsCorridor())
+			corridorPoints.emplace(tile->GetPositionInVector());
+	}
+
+	_totalExits = corridorPoints.size();
+}
+
+std::vector<Vector2> BSP::GetPathStartAndEndIndexs()
+{
+	std::vector<Vector2> starEndIndexs;
+	for (size_t i = 0; i < PathStarts.size(); i++)
+	{
+		starEndIndexs.push_back(Vector2());
+		starEndIndexs[i].X = m_usablePaths[PathStarts[i].X];
+		starEndIndexs[i].Y = m_usablePaths[PathStarts[i].Y];
+	}
+	return starEndIndexs;
+}
+
+void BSP::GetDoorKeyPlacement(int& _doorLocation, int& _keyLocation)
+{
+
+}
+
+int BSP::RoomIndexTileIsIn(int _tileIndex, const std::vector<std::vector<int>>* _roomTileIndexesToUse) {
 	//returns -1 if it cannot find an acceptable room
-	std::vector<std::vector<int>> rooms = GetRoomTileIndexes();
+	std::vector<std::vector<int>> rooms;
+	if (_roomTileIndexesToUse == nullptr)
+		rooms = GetRoomTileIndexes();
+	else
+		rooms = (*_roomTileIndexesToUse);
+
+	
 	for (size_t i = 0; i < rooms.size(); i++)
 	{
 		if (IsIndexInRoom(_tileIndex, i))

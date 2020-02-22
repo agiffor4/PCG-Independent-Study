@@ -28,6 +28,9 @@
     <Filter Include="Source Files\Things">
       <UniqueIdentifier>{0685ef2e-9cb7-4fcf-b10d-445ecbb40bd4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Interactables">
+      <UniqueIdentifier>{c474b7db-8d0b-4a36-9642-b0ddba35d352}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -94,9 +97,15 @@
       <Filter>Source Files\Astar</Filter>
     </ClCompile>
     <ClCompile Include="src\Interactable.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Interactables</Filter>
     </ClCompile>
     <ClCompile Include="src\Exit.cpp">
+      <Filter>Source Files\Interactables</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Key.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DoorA.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -414,6 +423,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Exit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Key.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DoorA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

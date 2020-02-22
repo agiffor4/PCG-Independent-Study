@@ -7,6 +7,8 @@
 #include "AStarSearch.h"
 #include"Player.h"
 #include "Exit.h"
+#include "DoorA.h"
+#include "Key.h"
 
 void World::setWindowTitle()
 {
@@ -362,13 +364,15 @@ void World::GenerateLevel()
 	AStar.Initialize(GetMapDimentions(), GetTileCount(), false);
 	AStar.SetWallDigCost(200);		
 	BSP::TunnelingType tuntype = (BSP::TunnelingType)m_pathGenerationType;
-	printf("Using tunneling algorithm %s.\n", bsp.GetEnumName(tuntype).c_str());
+	//printf("Using tunneling algorithm %s.\n", bsp.GetEnumName(tuntype).c_str());
 	bsp.SetTunnelingType(tuntype);
 	std::vector<std::vector<int>> rooms = bsp.GetRoomTileIndexes();
 	AddRooms(rooms);
 	AStar.CastTilesToAStarNodes((*this), true);
 	std::vector<int> paths = bsp.GeneratePaths(AStar);
 	AddPaths(paths);
+	FillRoomDataStructs(&bsp);
+
 	if (!m_playerCreated)
 		m_player = CreatePlayer();	
 	m_playerStart = GetPlayerStartLocation(rooms, &m_roomPlayerSpawnin);
@@ -377,6 +381,7 @@ void World::GenerateLevel()
 	t->SetContents(m_player);	
 	//EXIT generation
 	CreateExit(&bsp);
+	GenerateItems(&bsp);
 	
 
 }
@@ -437,24 +442,81 @@ void World::CreateExit(BSP* _bspToUse) {
 	t->AddItem(e);
 }
 
-void World::AddRoomsAndPaths(std::vector<std::vector<int>>& const _rooms, std::vector<int>& const _paths) {
-	AddRooms(_rooms);
-	AddPaths(_paths);
+void World::GenerateKeyDoorPair(BSP* _bspToUse) {
+	Tile* t = nullptr;
+	int doorTileIndex = m_playerStart - m_horizontalTileCount;
+	int keyTileIndex = m_playerStart + m_horizontalTileCount;
+	
+	if (_bspToUse != nullptr)
+		_bspToUse->GetDoorKeyPlacement(doorTileIndex, keyTileIndex);
+	else
+		m_bsp->GetDoorKeyPlacement(doorTileIndex, keyTileIndex);
+	Vector2 scale = GetTileSize();
+
+	DoorA* d = new DoorA();
+	t = GetTileAtIndex(doorTileIndex);
+	t->AddItem(d);
+	d->SetLocation(t);
+	d->Init("img/Exit.bmp", "Door", m_scene->GetRenderer());
+	d->SetSize(scale);
+
+	Key* k = new Key();	
+	k->SetDoor(d);
+	t = GetTileAtIndex(keyTileIndex);
+	t->AddItem(k);
+	k->SetLocation(t);
+	k->Init("img/KeyCard.bmp", "Key", m_scene->GetRenderer());
+	k->SetSize(scale);
+}
+void World::GenerateItems(BSP* _bspToUse) {	
+	GenerateKeyDoorPair(_bspToUse);
 }
 
+
 void World::AddRooms(std::vector<std::vector<int>>& const _rooms) {
-	m_rooms.erase(m_rooms.begin(), m_rooms.end());
+	m_roomsData.erase(m_roomsData.begin(), m_roomsData.end());
+	
 	for (size_t i = 0; i < _rooms.size(); i++)
 	{
-		m_rooms.push_back(RoomStruct());
+		m_roomsData.emplace_back(RoomStruct());
 		for (size_t j = 0; j < _rooms[i].size(); j++)
 		{
 			GetTileAtIndex(_rooms[i][j])->SetPassable(true);			
 			if(i < 8)
 				GetTileAtIndex(_rooms[i][j])->changeImage("img/blank_tile" + std::to_string(i) + ".bmp");
 			//start filling out the room struct
-			m_rooms[i].m_containsTiles.push_back(_rooms[i][j]);
-			m_rooms[i].m_region = i;
+			m_roomsData[i].sm_containsTiles.push_back(_rooms[i][j]);
+			m_roomsData[i].sm_region = i;
+		}
+				
+	}
+	
+}
+
+void World::FillRoomDataStructs(BSP* _bsp) {
+
+	for (size_t i = 0; i < m_roomsData.size(); i++)
+	{
+		if (_bsp != nullptr)
+		{
+			_bsp->ExitsFromRoom(m_roomsData[i].sm_region, m_roomsData[i].sm_exitCount, (*this));
+		}
+		else
+		{
+			if (m_bsp != nullptr)
+				m_bsp->ExitsFromRoom(m_roomsData[i].sm_region, m_roomsData[i].sm_exitCount, (*this));
+		}
+		for (size_t i = 0; i < m_roomsData.size(); i++)
+		{
+			std::set<int> tempSet = m_roomsData[i].sm_regionsExitingTo;
+			m_roomsData[i].sm_connectedness = m_roomsData[i].sm_exitCount;
+			for (size_t j = 0; j < m_roomsData[i].sm_regionsExitingTo.size(); j++)
+			{
+
+				m_roomsData[i].sm_connectedness += m_roomsData[(*(tempSet.begin()))].sm_exitCount;
+				tempSet.erase(tempSet.begin());
+			}
+
 		}
 	}
 }
@@ -463,8 +525,12 @@ void World::AddPaths(std::vector<int>& const _paths) {
 
 	for (size_t j = 0; j < _paths.size(); j++)
 	{
+		
 		if (!GetTileAtIndex(_paths[j])->IsPassable())
+		{
 			GetTileAtIndex(_paths[j])->SetCorridor(true);
+		}
+			
 		GetTileAtIndex(_paths[j])->SetPassable(true);
 		
 	}
@@ -505,10 +571,7 @@ void World::InvokeKeyUp(SDL_Keycode _key)
 			if (m_pathGenerationType > 4)
 				m_pathGenerationType = 0;
 		}
-		if (m_digPathsOneAtATime)
-			GenerateLevelP1();
-		else
-			GenerateLevel();
+		Generate();
 		break;
 	case SDLK_h:
 		m_cycleGenerationType = !m_cycleGenerationType;
@@ -564,8 +627,46 @@ void World::InvokeKeyUp(SDL_Keycode _key)
 		m_digPathsOneAtATime = !m_digPathsOneAtATime;
 		setWindowTitle();
 		break;
+	case SDLK_l:
+		printRoomData();
+		break;
 	default:
 		break;
+	}
+}
+
+void World::printRoomData()
+{
+	printf("\n");
+	for (size_t i = 0; i < m_roomsData.size(); i++)
+	{
+
+		printf("Room region is %d.\n", m_roomsData[i].sm_region);
+		printf("Containts tiles: ");
+		auto it = m_roomsData[i].sm_containsTiles.begin();
+		auto itEnd = m_roomsData[i].sm_containsTiles.end();
+		while(it != itEnd)
+		{
+			if(it < itEnd -1)
+				printf("%d, ", (*it));
+			else
+				printf("%d\n", (*it));
+			it++;
+		}
+		printf("Exit count is %d\n", m_roomsData[i].sm_exitCount);
+		/*printf("Connects to rooms: ");
+
+		auto it2 = m_roomsData[i].sm_regionsExitingTo.begin();
+		auto itEnd2 = m_roomsData[i].sm_regionsExitingTo.end();
+		while (it2 != itEnd2)
+		{
+			printf("%d, ", (*it2));
+			it2++;
+		}
+		printf("\n");
+		*/
+		printf("Connectedness value is %d\n", m_roomsData[i].sm_connectedness);
+		printf("\n\n");
 	}
 }
 	
