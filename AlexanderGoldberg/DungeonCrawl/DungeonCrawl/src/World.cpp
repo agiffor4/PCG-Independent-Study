@@ -365,7 +365,6 @@ void World::GenerateLevel()
 	AStar.Initialize(GetMapDimentions(), GetTileCount(), false);
 	AStar.SetWallDigCost(200);		
 	BSP::TunnelingType tuntype = (BSP::TunnelingType)m_pathGenerationType;
-	//printf("Using tunneling algorithm %s.\n", bsp.GetEnumName(tuntype).c_str());
 	bsp.SetTunnelingType(tuntype);
 	std::vector<std::vector<int>> rooms = bsp.GetRoomTileIndexes();
 	AddRooms(rooms);
@@ -468,7 +467,7 @@ void World::GenerateKeyDoorPair(int _exitLocation, BSP* _bspToUse) {
 	bool validKeyLocation = false;
 	//_exitLocation
 		
-	int exitRoomIndex = _bspToUse->GetRandomTileInRoom(_bspToUse->RoomIndexTileIsIn(_exitLocation));
+	int exitRoomIndex = _bspToUse->RoomIndexTileIsIn(_exitLocation);
 	AStarSearch Astr = AStarSearch();
 	Astr.Initialize(GetMapDimentions(), GetTileCount(), false);
 	Astr.CastTilesToAStarNodes((*this), false);
