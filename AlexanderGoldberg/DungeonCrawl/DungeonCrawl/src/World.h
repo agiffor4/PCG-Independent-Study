@@ -43,7 +43,7 @@ protected:
 	int m_playerStart = -1;
 	int m_roomPlayerSpawnin = -1;
 	bool m_playerCreated = false;
-	bool m_generateInStages = true;
+	bool m_generateInStages = false;
 	Player* m_player = nullptr;
 	Scene* m_scene = nullptr;
 	int m_pathGenerationType = 0;
@@ -52,7 +52,7 @@ protected:
 	bool m_ignoreExistingPaths = false;
 	
 	int m_incrementalPathDigging = 0;
-	bool m_digPathsOneAtATime = true;
+	bool m_digPathsOneAtATime = false;
 	BSP* m_bsp = nullptr;
 	AStarSearch* m_AStar = nullptr;
 	void setWindowTitle();
@@ -72,8 +72,8 @@ public:
 	Tile* GetTile(Tile& _tile);
 	Vector2 GetMapDimentions();
 	void SetWindowRef(SDL_Window* _window);
-	std::vector<Tile*> GetNeighbors(Tile* _tileToFindNeighborsFor);
-	std::vector<Tile*> GetNeighbors(int _tileToFindNeighborsFor);
+	std::vector<Tile*> GetNeighbors(Tile* _tileToFindNeighborsFor, bool _getDiagonals = true);
+	std::vector<Tile*> GetNeighbors(int _tileToFindNeighborsFor, bool _getDiagonals = true);
 	std::vector<Tile*> GetTiles();
 	void AddTile(Tile* _renderable);
 	int GetTileCount();	

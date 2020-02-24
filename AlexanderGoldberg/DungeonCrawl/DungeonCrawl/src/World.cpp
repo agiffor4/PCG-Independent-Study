@@ -285,15 +285,15 @@ void World::SetWindowRef(SDL_Window* _window)
 	m_window = _window;
 }
 
-std::vector<Tile*> World::GetNeighbors(Tile* _tileToFindNeighborsFor) 
+std::vector<Tile*> World::GetNeighbors(Tile* _tileToFindNeighborsFor, bool _getDiagonals)
 {
 	return GetNeighbors(_tileToFindNeighborsFor->GetPositionInVector());
 }
 
-std::vector<Tile*> World::GetNeighbors(int _tileToFindNeighborsFor)
+std::vector<Tile*> World::GetNeighbors(int _tileToFindNeighborsFor, bool _getDiagonals)
 {
 	std::vector<Tile*> neighbors;
-	for (size_t i = 0; i < 8; i++)
+	for (size_t i = 0; i < (_getDiagonals ? 8 : 4); i++)
 	{
 		Tile* currentCheck = GetAdjacentTile(_tileToFindNeighborsFor, (TileDirection)i);
 		if (currentCheck != nullptr)
@@ -499,25 +499,28 @@ void World::FillRoomDataStructs(BSP* _bsp) {
 	{
 		if (_bsp != nullptr)
 		{
-			_bsp->ExitsFromRoom(m_roomsData[i].sm_region, m_roomsData[i].sm_exitCount, (*this));
+			_bsp->ExitsFromRoom(m_roomsData[i].sm_region, m_roomsData[i].sm_exitCount, m_roomsData[i].sm_regionsExitingTo, (*this));
 		}
 		else
 		{
 			if (m_bsp != nullptr)
-				m_bsp->ExitsFromRoom(m_roomsData[i].sm_region, m_roomsData[i].sm_exitCount, (*this));
+				m_bsp->ExitsFromRoom(m_roomsData[i].sm_region, m_roomsData[i].sm_exitCount, m_roomsData[i].sm_regionsExitingTo, (*this));
 		}
-		for (size_t i = 0; i < m_roomsData.size(); i++)
+				
+	}
+
+	for (size_t i = 0; i < m_roomsData.size(); i++)
+	{
+		auto itt = m_roomsData[i].sm_regionsExitingTo.begin();
+		auto ittEnd = m_roomsData[i].sm_regionsExitingTo.end();
+		while (itt != ittEnd)
 		{
-			std::set<int> tempSet = m_roomsData[i].sm_regionsExitingTo;
-			m_roomsData[i].sm_connectedness = m_roomsData[i].sm_exitCount;
-			for (size_t j = 0; j < m_roomsData[i].sm_regionsExitingTo.size(); j++)
-			{
-
-				m_roomsData[i].sm_connectedness += m_roomsData[(*(tempSet.begin()))].sm_exitCount;
-				tempSet.erase(tempSet.begin());
-			}
-
+			int index = (*itt);
+			int exitCountForGivenRoom = m_roomsData[index].sm_exitCount;
+			m_roomsData[i].sm_connectedness += exitCountForGivenRoom;
+			itt++;
 		}
+
 	}
 }
 
@@ -654,7 +657,7 @@ void World::printRoomData()
 			it++;
 		}
 		printf("Exit count is %d\n", m_roomsData[i].sm_exitCount);
-		/*printf("Connects to rooms: ");
+		printf("Connects to rooms: ");
 
 		auto it2 = m_roomsData[i].sm_regionsExitingTo.begin();
 		auto itEnd2 = m_roomsData[i].sm_regionsExitingTo.end();
@@ -664,7 +667,7 @@ void World::printRoomData()
 			it2++;
 		}
 		printf("\n");
-		*/
+		
 		printf("Connectedness value is %d\n", m_roomsData[i].sm_connectedness);
 		printf("\n\n");
 	}

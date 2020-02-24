@@ -59,7 +59,7 @@ void Tile::MoveContentsTo(Tile* _newLocation)
 	_newLocation->SetContents(m_contents);
 	SetContents(nullptr);
 }
-bool Tile::IsPassable() { return m_passable && blockingInteractable(); }
+bool Tile::IsPassable(bool _ignoreInteractables) { return m_passable && (_ignoreInteractables ? true : blockingInteractable()); }
 
 bool Tile::blockingInteractable() {
 	for (size_t i = 0; i < m_items.size(); i++)

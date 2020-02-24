@@ -23,7 +23,7 @@ public:
 	Tile();
 	~Tile();
 	void Init(const std::string _path, const std::string _name, int _currentIndex, int _xIndex, int _yIndex, Vector2 _startPos, SDL_Renderer* _renderer, Uint32 _transparentColor = -999);
-	bool IsPassable();
+	bool IsPassable(bool _ignoreInteractables = false);
 	bool blockingInteractable();
 	bool inBounds(int _x, int _y);
 	void SetPassable(bool _val);

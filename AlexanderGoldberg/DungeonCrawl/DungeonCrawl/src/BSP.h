@@ -103,7 +103,8 @@ public:
 	void TunnelingRegionToRegionIncremental(AStarSearch& _AStar, int _index, std::vector<std::vector<int>>& const indexesOfRoomTiles, bool _updateMapWithPreviousPaths);
 	
 	std::vector<std::vector<int>> GetCorridorOnlyTiles();
-	void ExitsFromRoom(int _roomIndex, int& _totalExits, World& _world);
+	std::set<int> GetRoomsCorridorConnectsTo(int _tileInCorridorSegment, World& _world);
+	void ExitsFromRoom(int _roomIndex, int& _totalExits, std::set<int>& _connectedRooms, World& _world);
 	std::vector<Vector2> GetPathStartAndEndIndexs();
 
 	//ITEMGENERATION FUNCTIONS

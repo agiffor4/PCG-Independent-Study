@@ -1105,7 +1105,42 @@ std::vector<std::vector<int>> BSP::GetCorridorOnlyTiles() {
 	return corridorTiles;
 }
 
-void BSP::ExitsFromRoom(int _roomIndex, int& _totalExits,  World& _world)
+std::set<int> BSP::GetRoomsCorridorConnectsTo(int _tileInCorridorSegment, World& _world)
+{
+	std::vector<std::vector<int>> rooms = GetRoomTileIndexes();
+	std::set<int> uniqueRooms;
+	std::set<int> openList;
+	std::set<int> closedList;
+	openList.emplace(_tileInCorridorSegment);
+	while (!openList.empty())
+	{
+		int currentIndex = (*openList.begin());
+		closedList.emplace(currentIndex);		
+		openList.erase(openList.begin());
+		std::vector<Tile*> neighbors  = _world.GetNeighbors(currentIndex, false);
+		for (size_t i = 0; i < neighbors.size(); i++)
+		{
+			Tile* t = neighbors[i];
+			bool inClosedList = closedList.find(t->GetPositionInVector()) != closedList.end();
+			if (t->IsPassable(true) && !inClosedList)
+			{
+				if (t->IsCorridor())
+				{
+					openList.emplace(t->GetPositionInVector());
+				}
+				else
+				{
+					uniqueRooms.emplace(RoomIndexTileIsIn(t->GetPositionInVector(), &rooms));
+				}
+			}
+		}
+	}
+	
+	
+	return uniqueRooms;
+
+}
+void BSP::ExitsFromRoom(int _roomIndex, int& _totalExits, std::set<int>& _connectedRooms, World& _world)
 {
 	std::vector<std::vector<int>> roomIndexes = GetRoomTileIndexes();
 	std::set<int> corridorPoints;
@@ -1118,11 +1153,14 @@ void BSP::ExitsFromRoom(int _roomIndex, int& _totalExits,  World& _world)
 	int endIndex = tlTile + roomWidth;
 
 	Tile* tile = nullptr;
+	//check Top row
 	for (size_t j = startIndex; j < endIndex; j++)
 	{
 		tile = _world.GetAdjacentTile(j, World::TileDirection::UP);
 		if (tile->IsCorridor())
+		{
 			corridorPoints.emplace(tile->GetPositionInVector());
+		}
 	}
 	
 	//checking bottom row
@@ -1132,7 +1170,9 @@ void BSP::ExitsFromRoom(int _roomIndex, int& _totalExits,  World& _world)
 	{
 		tile = _world.GetAdjacentTile(j, World::TileDirection::DOWN);
 		if (tile->IsCorridor())
+		{
 			corridorPoints.emplace(tile->GetPositionInVector());
+		}
 	}
 
 	//checking right column
@@ -1142,7 +1182,9 @@ void BSP::ExitsFromRoom(int _roomIndex, int& _totalExits,  World& _world)
 	{
 		tile = _world.GetAdjacentTile(j, World::TileDirection::RIGHT);
 		if (tile->IsCorridor())
+		{
 			corridorPoints.emplace(tile->GetPositionInVector());
+		}
 	}
 
 	startIndex = tlTile;
@@ -1151,9 +1193,19 @@ void BSP::ExitsFromRoom(int _roomIndex, int& _totalExits,  World& _world)
 	{
 		tile = _world.GetAdjacentTile(j, World::TileDirection::LEFT);
 		if (tile->IsCorridor())
+		{
 			corridorPoints.emplace(tile->GetPositionInVector());
+		}
 	}
 
+	std::set<int> connections;
+	for (auto i = corridorPoints.cbegin(); i != corridorPoints.cend(); i++)
+	{		
+		std::set<int> con = GetRoomsCorridorConnectsTo((*i), _world);
+		for (auto j = con.cbegin(); j != con.cend(); j++)
+			connections.emplace((*j));
+	}
+	_connectedRooms = connections;
 	_totalExits = corridorPoints.size();
 }
 
@@ -1200,10 +1252,10 @@ bool BSP::IsIndexInRoom(int _tileIndex, int _roomIndex) {
 	Vector2 v = convertIndexToXY(_tileIndex, m_width);
 	Vector2 topLeft = convertIndexToXY(rooms[_roomIndex][0], m_width);
 	Vector2 bottomRight = convertIndexToXY(rooms[_roomIndex][rooms[_roomIndex].size()-1], m_width);
-	bool result = v.X > topLeft.X&&
-		v.X < bottomRight.X &&
-		v.Y > topLeft.Y&&
-		v.Y < bottomRight.Y;
+	bool result = v.X >= topLeft.X&&
+		v.X <= bottomRight.X &&
+		v.Y >= topLeft.Y&&
+		v.Y <= bottomRight.Y;
 	return result;
 		
 	
