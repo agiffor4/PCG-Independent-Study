@@ -337,9 +337,10 @@ void World::GenerateTiles(int _screenWidth, int _screenHeight) {
 void World::clearPreviousLevel() {
 	for (size_t i = 0; i < m_tiles.size(); i++)
 	{
-		
 		m_tiles[i]->ClearTileContents();
+		m_tiles[i]->SetCorridor(false);
 	}
+	m_roomsData.erase(m_roomsData.begin(), m_roomsData.end());
 }
 void World::Generate() 
 {
@@ -380,8 +381,8 @@ void World::GenerateLevel()
 	m_player->SetLocation(t);
 	t->SetContents(m_player);	
 	//EXIT generation
-	CreateExit(&bsp);
-	GenerateItems(&bsp);
+	int exitIndex = CreateExit(&bsp);
+	GenerateItems(exitIndex, &bsp);
 	
 
 }
@@ -428,7 +429,7 @@ void World::GenerateLevelP2()
 
 
 
-void World::CreateExit(BSP* _bspToUse) {
+int World::CreateExit(BSP* _bspToUse) {
 	Tile* t = nullptr;
 	if (_bspToUse != nullptr)
 		t = GetTileAtIndex(_bspToUse->GenerateExitLocation(m_playerStart > 0 ? m_playerStart : rand() % GetTileCount(), m_roomPlayerSpawnin, (*this)));
@@ -440,36 +441,61 @@ void World::CreateExit(BSP* _bspToUse) {
 	e->SetSize(GetTileSize().X, GetTileSize().Y);
 	e->SetLocation(t);
 	t->AddItem(e);
+	return t->GetPositionInVector();
 }
 
-void World::GenerateKeyDoorPair(BSP* _bspToUse) {
+void World::GenerateKeyDoorPair(int _exitLocation, BSP* _bspToUse) {
 	Tile* t = nullptr;
-	int doorTileIndex = m_playerStart - m_horizontalTileCount;
-	int keyTileIndex = m_playerStart + m_horizontalTileCount;
-	
-	if (_bspToUse != nullptr)
-		_bspToUse->GetDoorKeyPlacement(doorTileIndex, keyTileIndex);
-	else
-		m_bsp->GetDoorKeyPlacement(doorTileIndex, keyTileIndex);
+	std::vector<int> doorTileIndex;
+	int keyTileIndex;
 	Vector2 scale = GetTileSize();
 
-	DoorA* d = new DoorA();
-	t = GetTileAtIndex(doorTileIndex);
-	t->AddItem(d);
-	d->SetLocation(t);
-	d->Init("img/Exit.bmp", "Door", m_scene->GetRenderer());
-	d->SetSize(scale);
+	if (_bspToUse == nullptr)
+		_bspToUse = m_bsp;	
+	_bspToUse->GetDoorPlacement(doorTileIndex, m_roomsData, m_playerStart, _exitLocation);
+	Key* k = new Key();
+	for (size_t i = 0; i < doorTileIndex.size(); i++)
+	{
+		DoorA* d = new DoorA();
+		t = GetTileAtIndex(doorTileIndex[i]);
+		t->AddItem(d);
+		d->SetLocation(t);
+		d->Init("img/Exit.bmp", "Door", m_scene->GetRenderer());
+		d->SetSize(scale);
+		k->SetDoor(d);
+	}
 
-	Key* k = new Key();	
-	k->SetDoor(d);
+	bool validKeyLocation = false;
+	//_exitLocation
+		
+	int exitRoomIndex = _bspToUse->GetRandomTileInRoom(_bspToUse->RoomIndexTileIsIn(_exitLocation));
+	AStarSearch Astr = AStarSearch();
+	Astr.Initialize(GetMapDimentions(), GetTileCount(), false);
+	Astr.CastTilesToAStarNodes((*this), false);
+
+	do
+	{
+		int randomRoom = rand() % m_roomsData.size();
+		if (randomRoom != exitRoomIndex)
+		{
+			keyTileIndex = _bspToUse->GetRandomTileInRoom(randomRoom);
+			if (Astr.BeginSearch(m_playerStart, keyTileIndex, false).size() > 0)
+				validKeyLocation = true;			
+				validKeyLocation = true;			
+		}
+
+	} while (!validKeyLocation);
+
+
 	t = GetTileAtIndex(keyTileIndex);
 	t->AddItem(k);
 	k->SetLocation(t);
 	k->Init("img/KeyCard.bmp", "Key", m_scene->GetRenderer());
 	k->SetSize(scale);
+	
 }
-void World::GenerateItems(BSP* _bspToUse) {	
-	GenerateKeyDoorPair(_bspToUse);
+void World::GenerateItems(int _exitLocation, BSP* _bspToUse) {	
+	GenerateKeyDoorPair(_exitLocation, _bspToUse);
 }
 
 
@@ -478,7 +504,7 @@ void World::AddRooms(std::vector<std::vector<int>>& const _rooms) {
 	
 	for (size_t i = 0; i < _rooms.size(); i++)
 	{
-		m_roomsData.emplace_back(RoomStruct());
+		m_roomsData.emplace_back(RoomData());
 		for (size_t j = 0; j < _rooms[i].size(); j++)
 		{
 			GetTileAtIndex(_rooms[i][j])->SetPassable(true);			
@@ -494,19 +520,12 @@ void World::AddRooms(std::vector<std::vector<int>>& const _rooms) {
 }
 
 void World::FillRoomDataStructs(BSP* _bsp) {
-
+	if (_bsp == nullptr)
+		_bsp = m_bsp;
 	for (size_t i = 0; i < m_roomsData.size(); i++)
 	{
 		if (_bsp != nullptr)
-		{
-			_bsp->ExitsFromRoom(m_roomsData[i].sm_region, m_roomsData[i].sm_exitCount, m_roomsData[i].sm_regionsExitingTo, (*this));
-		}
-		else
-		{
-			if (m_bsp != nullptr)
-				m_bsp->ExitsFromRoom(m_roomsData[i].sm_region, m_roomsData[i].sm_exitCount, m_roomsData[i].sm_regionsExitingTo, (*this));
-		}
-				
+			_bsp->ExitsFromRoom(m_roomsData[i].sm_region, m_roomsData[i].sm_exitCount, m_roomsData[i].sm_regionsExitingTo, m_roomsData[i].sm_CorridorExits, (*this));
 	}
 
 	for (size_t i = 0; i < m_roomsData.size(); i++)
@@ -658,13 +677,22 @@ void World::printRoomData()
 		}
 		printf("Exit count is %d\n", m_roomsData[i].sm_exitCount);
 		printf("Connects to rooms: ");
-
 		auto it2 = m_roomsData[i].sm_regionsExitingTo.begin();
 		auto itEnd2 = m_roomsData[i].sm_regionsExitingTo.end();
 		while (it2 != itEnd2)
 		{
 			printf("%d, ", (*it2));
 			it2++;
+		}
+		printf("\n");
+
+		auto it3 = m_roomsData[i].sm_CorridorExits.begin();
+		auto itEnd3 = m_roomsData[i].sm_CorridorExits.end();
+		printf("Corridor exit points(as indexes): ");
+		while (it3 != itEnd3)
+		{
+			printf("%d, ", (*it3));
+			it3++;
 		}
 		printf("\n");
 		

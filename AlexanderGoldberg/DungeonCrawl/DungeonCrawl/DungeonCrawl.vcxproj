@@ -150,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\RoomData.cpp" />
     <ClCompile Include="src\DoorA.cpp" />
     <ClCompile Include="src\Key.cpp" />
     <ClCompile Include="src\Exit.cpp" />
@@ -177,6 +178,7 @@
     <ClCompile Include="src\TreeNode.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\RoomData.h" />
     <ClInclude Include="src\DoorA.h" />
     <ClInclude Include="src\Key.h" />
     <ClInclude Include="src\Exit.h" />

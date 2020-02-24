@@ -43,7 +43,7 @@ const std::string& BSP::GetEnumName(TunnelingType _enumValueToGetNameOf)
 	return m_enumNames[(int)_enumValueToGetNameOf];
 }
 
-int BSP::getRandomTileInRoom(int _roomRegion)
+int BSP::GetRandomTileInRoom(int _roomRegion)
 {
 	std::vector<std::vector<int>> roomtiles = GetRoomTileIndexes();
 	return roomtiles[_roomRegion][rand() % roomtiles[_roomRegion].size()];
@@ -573,7 +573,7 @@ void BSP::spawnExitInRandomRoom(int& _exitIndex, int _startingRegion)
 	int roomIndexToSpawnIn = rand() % rooms.size();
 	while (roomIndexToSpawnIn == _startingRegion)
 		roomIndexToSpawnIn = rand() % rooms.size();
-	_exitIndex = getRandomTileInRoom(roomIndexToSpawnIn);
+	_exitIndex = GetRandomTileInRoom(roomIndexToSpawnIn);
 }
 void BSP::spawnExitWithinRangeFromPlayer(int& _exitIndex, int _startingIndex, int _minDist, int _maxDist) 
 {
@@ -633,7 +633,7 @@ void BSP::longestPathToFromStart(int& _exitIndex, int _startingIndex, World& _wo
 			_world.GetTileAtIndex(pathToExit.top())->changeImage("img/blockC_tile.bmp");
 		pathToExit.pop();
 	}	
-	_exitIndex = finalPiece;//getRandomTileInRoom(currentTargetRoomRegion);
+	_exitIndex = finalPiece;//GetRandomTileInRoom(currentTargetRoomRegion);
 }
 
 //PATH GENERATING FUNCTIONS
@@ -1140,7 +1140,7 @@ std::set<int> BSP::GetRoomsCorridorConnectsTo(int _tileInCorridorSegment, World&
 	return uniqueRooms;
 
 }
-void BSP::ExitsFromRoom(int _roomIndex, int& _totalExits, std::set<int>& _connectedRooms, World& _world)
+void BSP::ExitsFromRoom(int _roomIndex, int& _totalExits, std::set<int>& _connectedRooms, std::set<int>& _corridorIndexes, World& _world)
 {
 	std::vector<std::vector<int>> roomIndexes = GetRoomTileIndexes();
 	std::set<int> corridorPoints;
@@ -1205,6 +1205,7 @@ void BSP::ExitsFromRoom(int _roomIndex, int& _totalExits, std::set<int>& _connec
 		for (auto j = con.cbegin(); j != con.cend(); j++)
 			connections.emplace((*j));
 	}
+	_corridorIndexes = corridorPoints;
 	_connectedRooms = connections;
 	_totalExits = corridorPoints.size();
 }
@@ -1221,8 +1222,19 @@ std::vector<Vector2> BSP::GetPathStartAndEndIndexs()
 	return starEndIndexs;
 }
 
-void BSP::GetDoorKeyPlacement(int& _doorLocation, int& _keyLocation)
+void BSP::GetDoorPlacement(std::vector<int>& _doorLocation, std::vector<RoomData>& _roomData, int _playerStart, int _exitIndex)
 {
+	std::vector<std::vector<int>> rooms = GetRoomTileIndexes();
+	int exitRoomIndex = RoomIndexTileIsIn(_exitIndex, &rooms);
+	auto itt = _roomData[exitRoomIndex].sm_CorridorExits.cbegin();
+	auto ittEnd = _roomData[exitRoomIndex].sm_CorridorExits.cend();
+	while (itt != ittEnd)
+	{
+		_doorLocation.push_back((*itt));
+		itt++;
+	}
+	
+	
 
 }
 

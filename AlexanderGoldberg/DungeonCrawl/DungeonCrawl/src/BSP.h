@@ -3,6 +3,7 @@
 #include <set>
 #include "RectA.h"
 #include "Vector2.h"
+#include "RoomData.h"
 class BSPNode;
 class World;
 class AStarSearch;
@@ -50,8 +51,7 @@ private:
 	void WipeTree();
 	void StartOver();
 
-	int RoomIndexTileIsIn(int _tileIndex, const std::vector<std::vector<int>>* _roomTileIndexesToUse = nullptr);
-	bool IsIndexInRoom(int _tileIndex, int _roomIndex);
+
 
 	void print(std::vector<int>& _toPrint, int _width);	
 	void printLeafResults();
@@ -104,17 +104,19 @@ public:
 	
 	std::vector<std::vector<int>> GetCorridorOnlyTiles();
 	std::set<int> GetRoomsCorridorConnectsTo(int _tileInCorridorSegment, World& _world);
-	void ExitsFromRoom(int _roomIndex, int& _totalExits, std::set<int>& _connectedRooms, World& _world);
+	void ExitsFromRoom(int _roomIndex, int& _totalExits, std::set<int>& _connectedRooms, std::set<int>& _corridorIndexes, World& _world);
 	std::vector<Vector2> GetPathStartAndEndIndexs();
 
 	//ITEMGENERATION FUNCTIONS
-	void GetDoorKeyPlacement(int& _doorLocation, int& _keyLocation);
+	void GetDoorPlacement(std::vector<int>& _doorLocation, std::vector<RoomData>& _roomData, int _playerStart, int _exitIndex);
 
 	//UTILITY
 	int convertXYToIndex(int _x, int _y, int _width);
 	const Vector2 convertIndexToXY(int _index, int _width);
 	const std::string& GetEnumName(TunnelingType _enumValueToGetNameOf);
-	int getRandomTileInRoom(int _roomRegion);
+	int GetRandomTileInRoom(int _roomRegion);
+	int RoomIndexTileIsIn(int _tileIndex, const std::vector<std::vector<int>>* _roomTileIndexesToUse = nullptr);
+	bool IsIndexInRoom(int _tileIndex, int _roomIndex);
 	int Size();
 
 	

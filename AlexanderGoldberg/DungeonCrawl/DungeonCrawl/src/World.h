@@ -6,6 +6,7 @@
 #include <string>
 #include "Vector2.h"
 #include "IInputHandler.h"
+#include "RoomData.h"
 class Tile;
 class Scene;
 class Vector2;
@@ -17,26 +18,8 @@ class World : public IInputHandler
 private:
 	SDL_Window* m_window = nullptr;
 protected:
-	struct RoomStruct {
-		
-		std::vector<int> sm_containsTiles;
-		int sm_connectedness = 0;
-		int sm_exitCount = 0;
-		std::set<int> sm_regionsExitingTo;
-		int sm_region = -1;
-
-		bool Contains(int _index) {
-			if (_index < sm_containsTiles[0] || _index > sm_containsTiles[sm_containsTiles.size()-1])
-				return false;
-			for (size_t i = 0; i < sm_containsTiles.size(); i++)
-			{
-				if (_index == sm_containsTiles[i])
-					return true;
-			}
-			return false;
-		}
-	};
-	std::vector<RoomStruct> m_roomsData;
+	
+	std::vector<RoomData> m_roomsData;
 	std::vector<Tile*> m_tiles;
 	int m_horizontalTileCount = 0;
 	int m_verticalTileCount = 0;
@@ -84,9 +67,9 @@ public:
 	void GenerateLevel();
 	void GenerateLevelP1();
 	void GenerateLevelP2();
-	void CreateExit(BSP* _bspToUse = nullptr);
-	void GenerateKeyDoorPair(BSP* _bspToUse = nullptr);
-	void GenerateItems(BSP* _bspToUse = nullptr);
+	int CreateExit(BSP* _bspToUse = nullptr);
+	void GenerateKeyDoorPair(int _exitLocation, BSP* _bspToUse = nullptr);
+	void GenerateItems(int _exitLocation, BSP* _bspToUse = nullptr);
 	void clearPreviousLevel();
 	
 
