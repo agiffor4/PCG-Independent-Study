@@ -47,9 +47,12 @@ private:
 	TunnelingType m_tunnelingType = TunnelingType::Base;
 	
 
-	void split();
+	RectA m_rect1 = RectA();
+	RectA m_rect2 = RectA();
+	RectA m_parent = RectA();
+	bool split();
 	void WipeTree();
-	void StartOver();
+	bool StartOver();
 
 
 
@@ -66,7 +69,7 @@ public:
 	BSPNode* GetRandomLeaf();
 	
 	//AREA DIVSION
-	void BeginSplit(int _timesToSplit);
+	bool BeginSplit(int _timesToSplit);
 	void GenerateRoomsAndPaths(AStarSearch& _AStar, std::vector<std::vector<int>>& _generatedRooms, std::vector<int>& _generatedPaths);
 	std::vector<std::vector<int>> GetPartions();
 	std::vector<std::vector<int>> GetRoomTileIndexes();

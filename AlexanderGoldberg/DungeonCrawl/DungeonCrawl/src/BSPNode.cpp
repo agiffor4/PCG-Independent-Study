@@ -24,7 +24,7 @@ BSPNode::~BSPNode()
 {
 }
 
-RectA BSPNode::GetRect()
+const RectA& BSPNode::GetRect()
 {
 	return m_myRect;
 }

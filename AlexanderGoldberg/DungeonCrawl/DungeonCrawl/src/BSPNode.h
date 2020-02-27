@@ -6,7 +6,7 @@ public:
 	BSPNode(int x1, int y1, int x2, int y2, int _parentIndex, int _selfIndex);
 	BSPNode(RectA _rect, int _parentIndex, int _selfIndex);
 	~BSPNode();
-	RectA GetRect();
+	const RectA& GetRect();
 	int GetIndex();
 	int GetSelfIndex();
 protected:

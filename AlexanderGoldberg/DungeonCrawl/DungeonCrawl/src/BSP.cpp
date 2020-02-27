@@ -20,12 +20,12 @@ BSP::~BSP()
 }
 
 
-void BSP::BeginSplit(int _timesToSplit) {
+bool BSP::BeginSplit(int _timesToSplit) {
 	WipeTree();
 	m_targetNumOfSplits = _timesToSplit;
 	m_numberOfSplits = 0;
 	m_tree.push_back(new BSPNode(0, 0, m_width, m_height, -1, 0));
-	split();	
+	bool result = split();
 	m_previousRotations.erase(m_previousRotations.begin(), m_previousRotations.end());	
 	if (!printedOnce)
 	{
@@ -34,7 +34,7 @@ void BSP::BeginSplit(int _timesToSplit) {
 		printf("For a target number of splits %d the total size is %d and leaf count is %d\n", m_targetNumOfSplits, m_tree.size(), GetLeaves().size());
 		printf("Total number of generation attempts is %d\n", m_generationAttempt);
 	}
-	
+	return result;
 }
 
 
@@ -49,7 +49,7 @@ int BSP::GetRandomTileInRoom(int _roomRegion)
 	return roomtiles[_roomRegion][rand() % roomtiles[_roomRegion].size()];
 }
 
-void BSP::split()
+bool BSP::split()
 {
 	
 	m_numberOfSplits++;
@@ -63,7 +63,7 @@ void BSP::split()
 			bool isNextIndexEven = (m_tree.size() + 1) % 2 == 0;
 			int nextSize = m_tree.size() + 1;
 			int parentIndex = (isNextIndexEven) ? nextSize / 2 : (nextSize-1) / 2;
-			RectA parent = m_tree[parentIndex -1]->GetRect();
+			m_parent = m_tree[parentIndex -1]->GetRect();
 			if (m_previousRotations.size() > 2)
 			{
 				if (m_previousRotations[m_previousRotations.size() -1] == direction &&
@@ -79,55 +79,51 @@ void BSP::split()
 			m_previousRotations.push_back(direction);
 			
 
-			RectA rect1 = RectA();
-			RectA rect2 = RectA();
-			
-
 			int mhps = m_ensureRoomSeperation ? 5 : 3;//Minimum Horizontal Partion Size
 			int mvps = m_ensureRoomSeperation ? 5 : 3;//Minimum Vertical Partion Size
 				
 
 			if (direction == DTS::VERTICAL)
 			{
-				int width = parent.x2 - parent.x1;	
+				int width = m_parent.x2 - m_parent.x1;
 				int timesRound = 99;
 				do
 				{
-					int splitPoint = (parent.x1 + (int)(width * 0.25f)) + rand() % (width - (int)(width * 0.25f) + 1);
-					rect1.Set(parent.x1, parent.y1, splitPoint, parent.y2);
-					rect2.Set(splitPoint, parent.y1, parent.x2, parent.y2);
+					int splitPoint = (m_parent.x1 + (int)(width * 0.25f)) + rand() % (width - (int)(width * 0.25f) + 1);
+					m_rect1.Set(m_parent.x1, m_parent.y1, splitPoint, m_parent.y2);
+					m_rect2.Set(splitPoint, m_parent.y1, m_parent.x2, m_parent.y2);
 					if (timesRound-- < 0)
 					{
 						success = false;
-						//printf("Unable to break out of do while loop for ensuring minimum room size. Splitting parent at index %d\n", parentIndex);
+						printf("Unable to break out of do while loop for ensuring minimum room size. Splitting parent at index %d\n", parentIndex);
 						break;
 					}
-				} while (!rect1.CheckIfMeetsOrExceedsMin(mhps, mvps) || !rect2.CheckIfMeetsOrExceedsMin(mhps, mvps));
+				} while (!m_rect1.CheckIfMeetsOrExceedsMin(mhps, mvps) || !m_rect2.CheckIfMeetsOrExceedsMin(mhps, mvps));
 
 			}
 			if (direction == DTS::HORIZONTAL)
 			{
-				int height = parent.y2 - parent.y1;				
+				int height = m_parent.y2 - m_parent.y1;
 				int timesRound = 99;
 				do
 				{
-					int splitPoint = (parent.y1 + (int)(height * 0.25f)) + std::rand() % (height - (int)(height * 0.25f) + 1);
+					int splitPoint = (m_parent.y1 + (int)(height * 0.25f)) + std::rand() % (height - (int)(height * 0.25f) + 1);
 					
-					rect1.Set(parent.x1, parent.y1, parent.x2, splitPoint);
-					rect2.Set(parent.x1, splitPoint, parent.x2, parent.y2);
+					m_rect1.Set(m_parent.x1, m_parent.y1, m_parent.x2, splitPoint);
+					m_rect2.Set(m_parent.x1, splitPoint, m_parent.x2, m_parent.y2);
 
 					if (timesRound-- < 0)
 					{
 						success = false;
-						//printf("Unable to break out of do while loop for ensuring minimum room size. Splitting parent at index %d\n", parentIndex);
+						printf("Unable to break out of do while loop for ensuring minimum room size. Splitting parent at index %d\n", parentIndex);
 						break;
 					}
-				} while (!rect1.CheckIfMeetsOrExceedsMin(mhps, mvps) || !rect2.CheckIfMeetsOrExceedsMin(mhps, mvps));
+				} while (!m_rect1.CheckIfMeetsOrExceedsMin(mhps, mvps) || !m_rect2.CheckIfMeetsOrExceedsMin(mhps, mvps));
 			}
 			if (success)
 			{
-				m_tree.push_back(new BSPNode(rect1, parentIndex - 1, m_tree.size() - 1));
-				m_tree.push_back(new BSPNode(rect2, parentIndex - 1, m_tree.size() - 1));
+				m_tree.push_back(new BSPNode(m_rect1, parentIndex - 1, m_tree.size() - 1));
+				m_tree.push_back(new BSPNode(m_rect2, parentIndex - 1, m_tree.size() - 1));
 			}
 			
 		}
@@ -137,11 +133,10 @@ void BSP::split()
 		}
 		else
 		{
-			StartOver();
-			return;
+			return StartOver();
 		}
 	}
-
+	return true;
 }
 void BSP::WipeTree() {
 	for (size_t i = 0; i < m_tree.size(); i++)
@@ -155,11 +150,16 @@ void BSP::WipeTree() {
 	m_tree.erase(m_tree.begin(), m_tree.end());
 }
 
-void BSP::StartOver() 
+bool BSP::StartOver() 
 {
 	WipeTree();
 	m_generationAttempt++;
+	m_previousRotations.erase(m_previousRotations.begin(), m_previousRotations.end());
+	printf("generation attempt %d\n", m_generationAttempt);
+	if (m_generationAttempt > 90)
+		return false;
 	BeginSplit(m_targetNumOfSplits);
+	return true;
 }
 
 

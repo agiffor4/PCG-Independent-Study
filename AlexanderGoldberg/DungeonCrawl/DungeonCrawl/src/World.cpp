@@ -358,7 +358,7 @@ void World::GenerateLevel()
 	
 	bsp.SetIgnoreExistingPaths(m_ignoreExistingPaths);
 	//when width = height = x round(log(x / 3) / log(2)) + 1 = number of times to split	
-	 bsp.BeginSplit(round(std::log(m_horizontalTileCount / 3) / std::log(2)) + 1); //seems to produce a good ratio of rooms as long as the width = height
+	bsp.BeginSplit(round(std::log(m_horizontalTileCount / 3) / std::log(2)) + 1);//seems to produce a good ratio of rooms as long as the width = height
 	//bsp.BeginSplit(4);	
 	setWindowTitle();
 	AStarSearch AStar = AStarSearch();	
