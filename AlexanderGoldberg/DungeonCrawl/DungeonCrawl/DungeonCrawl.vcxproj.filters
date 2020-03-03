@@ -102,14 +102,23 @@
     <ClCompile Include="src\Exit.cpp">
       <Filter>Source Files\Interactables</Filter>
     </ClCompile>
-    <ClCompile Include="src\Key.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\DoorA.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\RoomData.cpp">
       <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DoorA.cpp">
+      <Filter>Source Files\Interactables</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Key.cpp">
+      <Filter>Source Files\Interactables</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Ammo.cpp">
+      <Filter>Source Files\Interactables</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HealthPickUp.cpp">
+      <Filter>Source Files\Interactables</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Treasure.cpp">
+      <Filter>Source Files\Interactables</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -435,6 +444,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RoomData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Ammo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HealthPickUp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Treasure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

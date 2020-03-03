@@ -118,6 +118,10 @@ void Renderable::Render(SDL_Renderer* renderer)
 
 }
 
+void Renderable::Update(float _dt)
+{
+}
+
 void Renderable::CleanUp(){
 	SDL_DestroyTexture(m_texture);
 	printf("Clean up called for renderable %s\n", m_name.c_str());

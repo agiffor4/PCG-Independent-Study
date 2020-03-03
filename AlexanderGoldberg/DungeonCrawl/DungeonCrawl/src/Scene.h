@@ -25,6 +25,7 @@ public:
 	//AudioFileA* GetLastSoundObject();
 	//AudioFileA* GetSoundAtObject(int _index);
 	void Render();
+	void Update(float _dt);
 	void PlayAudio();
 	SDL_Renderer* GetRenderer();
 	

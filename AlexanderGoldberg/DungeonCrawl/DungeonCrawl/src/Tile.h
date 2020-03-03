@@ -39,6 +39,6 @@ public:
 	void InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y) override;
 	void ClearTileContents();
 	void Render(SDL_Renderer* _renderer) override;
-	
+	void Update(float _dt) override;
 };
 

@@ -12,7 +12,6 @@ public:
 	~Thing();
 	void SetLocation(Tile* _newLocation);
 	Tile* GetLocation();
-
 	bool ShouldDelete();
 
 };

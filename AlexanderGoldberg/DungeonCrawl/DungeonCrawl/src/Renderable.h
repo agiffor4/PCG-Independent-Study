@@ -31,6 +31,7 @@ public:
 	virtual ~Renderable();
 	virtual void Init(const std::string _path, const std::string _name, SDL_Renderer* _renderer, Uint32 _transparentColor = -999);
 	virtual void Render(SDL_Renderer* renderer);
+	virtual void Update(float _dt);
 	void SetPosition(float x, float y);
 	void SetPosition(Vector2& pos);
 	const Vector2& GetPosition();

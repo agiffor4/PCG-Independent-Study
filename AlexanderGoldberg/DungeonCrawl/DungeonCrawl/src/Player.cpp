@@ -9,6 +9,7 @@ Player::Player()
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::UP);
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::DOWN);
 	m_shouldDelete = false;
+	m_moveRate.SetTimer(0.2f);
 }
 
 
@@ -17,8 +18,41 @@ Player::~Player()
 {
 }
 
+void Player::Update(float _dt)
+{
+
+	
+
+	m_moveRate.CountDownAutoCheckBool(_dt);
+	if (!m_moveRate.GetShouldCountDown())
+	{
+		setDirectionFromFlagValues(m_directionKeyDownFlag);
+		move(m_direction);
+		m_moveRate.SetShouldCountDown(true);
+	}
+}
+
 void Player::InvokeKeyDown(SDL_Keycode _key)
 {
+	
+		switch (_key)
+		{
+		case SDLK_w:
+			m_directionKeyDownFlag |= (Uint8)MovementDirection::UP;
+			break;
+		case SDLK_a:
+			m_directionKeyDownFlag |= (Uint8)MovementDirection::LEFT;
+			break;
+		case SDLK_s:
+			m_directionKeyDownFlag |= (Uint8)MovementDirection::DOWN;
+			break;
+		case SDLK_d:
+			m_directionKeyDownFlag |= (Uint8)MovementDirection::RIGHT;
+			break;
+		default:
+			break;
+		}
+	
 }
 
 void Player::InvokeKeyUp(SDL_Keycode _key)
@@ -26,16 +60,16 @@ void Player::InvokeKeyUp(SDL_Keycode _key)
 	switch (_key)
 	{
 	case SDLK_w:
-		move(Vector2(0, 1));
-		break;
-	case SDLK_a:
-		move(Vector2(-1, 0));
-		break;
-	case SDLK_s:
-		move(Vector2(0, -1));
-		break;
-	case SDLK_d:
-		move(Vector2(1, 0));
+		m_directionKeyDownFlag ^= (Uint8)MovementDirection::UP;
+		break;				   
+	case SDLK_a:			   
+		m_directionKeyDownFlag ^= (Uint8)MovementDirection::LEFT;
+		break;				   
+	case SDLK_s:			   
+		m_directionKeyDownFlag ^= (Uint8)MovementDirection::DOWN;
+		break;				   
+	case SDLK_d:			   
+		m_directionKeyDownFlag ^= (Uint8)MovementDirection::RIGHT;
 		break;
 	case SDLK_e:
 		InteractWithThingInSpace();
@@ -72,12 +106,15 @@ void Player::move(Vector2 _direction)
 {
 	
 
-	Tile* toMoveTo = m_world->GetAdjacentTile(GetLocation()->GetPositionInVector(), convertVectorToDirection(_direction));
-	if (toMoveTo != nullptr && toMoveTo->IsPassable())
+	if (!(_direction.X == 0 && _direction.Y == 0))
 	{
-		GetLocation()->MoveContentsTo(toMoveTo);
-		SetLocation(toMoveTo);
-	} 
+		Tile* toMoveTo = m_world->GetAdjacentTile(GetLocation()->GetPositionInVector(), convertVectorToDirection(_direction));
+		if (toMoveTo != nullptr && toMoveTo->IsPassable())
+		{
+			GetLocation()->MoveContentsTo(toMoveTo);
+			SetLocation(toMoveTo);
+		}
+	}
 	
 	
 }
@@ -104,3 +141,24 @@ World::TileDirection Player::convertVectorToDirection(Vector2& const _toConvert)
 
 	return direction;
 }
+
+void Player::setDirectionFromFlagValues(Uint8 _flag)
+{
+	m_direction.X = 0;
+	m_direction.Y = 0;
+	if (_flag & (Uint8)MovementDirection::RIGHT)
+		m_direction.X = 1;
+	if (_flag & (Uint8)MovementDirection::LEFT)
+		m_direction.X = -1;
+	if (_flag & (Uint8)MovementDirection::LEFT && _flag & (Uint8)MovementDirection::RIGHT)
+		m_direction.X = 0;
+	
+	if (_flag & (Uint8)MovementDirection::UP)
+		m_direction.Y = 1;
+	if (_flag & (Uint8)MovementDirection::DOWN)
+		m_direction.Y = -1;
+	if (_flag & (Uint8)MovementDirection::DOWN && _flag & (Uint8)MovementDirection::UP)
+		m_direction.Y = 0;
+		
+}
+

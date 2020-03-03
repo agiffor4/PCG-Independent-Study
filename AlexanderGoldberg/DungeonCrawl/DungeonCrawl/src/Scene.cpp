@@ -78,4 +78,12 @@ void Scene::Render()
 	SDL_RenderPresent(m_rendererRef);
 }
 
+void Scene::Update(float _dt)
+{
+	for (int i = 0; i < m_renderables.size(); i++)
+	{
+		m_renderables[i]->Update(_dt);
+	}
+}
+
 SDL_Renderer* Scene::GetRenderer() { return m_rendererRef; }

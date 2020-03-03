@@ -66,7 +66,8 @@ void mainLoop()
 	{
 		float dt = deltaTime.GetCurrentDeltaTime();
 		InputManager::GetInputManager()->CheckInput();
-		scene->PlayAudio();
+		scene->Update(dt);
+		scene->PlayAudio();		
 		scene->Render();
 
 	}

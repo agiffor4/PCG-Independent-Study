@@ -180,3 +180,20 @@ void Tile::Render(SDL_Renderer* _renderer)
 	
 	
 }
+
+void Tile::Update(float _dt)
+{
+	for (size_t i = 0; i < m_items.size(); i++)
+	{
+		if (m_items[i] != nullptr)
+		{			
+			m_items[i]->Update(_dt);
+		}
+
+	}
+	if (m_contents != nullptr)
+	{		
+		m_contents->Update(_dt);
+	}
+
+}
