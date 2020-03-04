@@ -627,10 +627,10 @@ void BSP::longestPathToFromStart(int& _exitIndex, int _startingIndex, World& _wo
 	while (!pathToExit.empty())
 	{
 		finalPiece = pathToExit.top();
-		if(_world.GetTileAtIndex(pathToExit.top())->IsPassable())
+		/*if(_world.GetTileAtIndex(pathToExit.top())->IsPassable())
 			_world.GetTileAtIndex(pathToExit.top())->changeImage("img/corridor_tile.bmp");
 		else
-			_world.GetTileAtIndex(pathToExit.top())->changeImage("img/blockC_tile.bmp");
+			_world.GetTileAtIndex(pathToExit.top())->changeImage("img/blockC_tile.bmp");*/
 		pathToExit.pop();
 	}	
 	_exitIndex = finalPiece;//GetRandomTileInRoom(currentTargetRoomRegion);
@@ -1222,12 +1222,12 @@ std::vector<Vector2> BSP::GetPathStartAndEndIndexs()
 	return starEndIndexs;
 }
 
-void BSP::GetDoorPlacement(std::vector<int>& _doorLocation, std::vector<RoomData>& _roomData, int _playerStart, int _exitIndex)
+void BSP::GetDoorPlacement(std::vector<int>& _doorLocation, std::vector<RoomData>& _roomData, int _playerStart, int _roomToGenerateDoorsIn)
 {
-	std::vector<std::vector<int>> rooms = GetRoomTileIndexes();
-	int exitRoomIndex = RoomIndexTileIsIn(_exitIndex, &rooms);
-	auto itt = _roomData[exitRoomIndex].sm_CorridorExits.cbegin();
-	auto ittEnd = _roomData[exitRoomIndex].sm_CorridorExits.cend();
+	std::vector<std::vector<int>> rooms = GetRoomTileIndexes();	
+	_roomData[_roomToGenerateDoorsIn].sm_Locked = true;
+	auto itt = _roomData[_roomToGenerateDoorsIn].sm_CorridorExits.cbegin();
+	auto ittEnd = _roomData[_roomToGenerateDoorsIn].sm_CorridorExits.cend();
 	while (itt != ittEnd)
 	{
 		_doorLocation.push_back((*itt));

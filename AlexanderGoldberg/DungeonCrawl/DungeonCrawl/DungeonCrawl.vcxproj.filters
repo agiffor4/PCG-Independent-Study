@@ -31,6 +31,9 @@
     <Filter Include="Source Files\Interactables">
       <UniqueIdentifier>{c474b7db-8d0b-4a36-9642-b0ddba35d352}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Tree">
+      <UniqueIdentifier>{a820dd1a-753e-48c0-a06d-e7f52b7fe996}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -51,9 +54,6 @@
     <ClCompile Include="src\BSPNode.cpp">
       <Filter>Source Files\BSP</Filter>
     </ClCompile>
-    <ClCompile Include="src\BinaryTree.cpp">
-      <Filter>Source Files\BSP</Filter>
-    </ClCompile>
     <ClCompile Include="src\BSP.cpp">
       <Filter>Source Files\BSP</Filter>
     </ClCompile>
@@ -62,9 +62,6 @@
     </ClCompile>
     <ClCompile Include="src\Timer.cpp">
       <Filter>Source Files\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TreeNode.cpp">
-      <Filter>Source Files\BSP</Filter>
     </ClCompile>
     <ClCompile Include="src\Vector2.cpp">
       <Filter>Source Files\Utility</Filter>
@@ -119,6 +116,12 @@
     </ClCompile>
     <ClCompile Include="src\Treasure.cpp">
       <Filter>Source Files\Interactables</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RoomTree.cpp">
+      <Filter>Source Files\Tree</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RoomTreeNode.cpp">
+      <Filter>Source Files\Tree</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -410,12 +413,6 @@
     <ClInclude Include="src\Node.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\TreeNode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\BinaryTree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\BSP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -453,6 +450,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Treasure.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoomTreeNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RoomTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

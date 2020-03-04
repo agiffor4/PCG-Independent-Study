@@ -111,7 +111,7 @@ public:
 	std::vector<Vector2> GetPathStartAndEndIndexs();
 
 	//ITEMGENERATION FUNCTIONS
-	void GetDoorPlacement(std::vector<int>& _doorLocation, std::vector<RoomData>& _roomData, int _playerStart, int _exitIndex);
+	void GetDoorPlacement(std::vector<int>& _doorLocation, std::vector<RoomData>& _roomData, int _playerStart, int _roomToGenerateDoorsIn);
 
 	//UTILITY
 	int convertXYToIndex(int _x, int _y, int _width);

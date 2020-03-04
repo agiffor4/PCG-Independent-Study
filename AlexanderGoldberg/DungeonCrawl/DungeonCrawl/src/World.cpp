@@ -9,7 +9,7 @@
 #include "Exit.h"
 #include "DoorA.h"
 #include "Key.h"
-
+#include "RoomTree.h"
 void World::setWindowTitle()
 {
 	if (m_window != nullptr)
@@ -381,8 +381,10 @@ void World::GenerateLevel()
 	t->SetContents(m_player);	
 	//EXIT generation
 	int exitIndex = CreateExit(&bsp);
-	GenerateItems(exitIndex, &bsp);
-	
+	GenerateDoors(exitIndex, 0, true, &bsp);
+	//GenerateItems(exitIndex, &bsp);
+	RoomTree roomTree = RoomTree();
+	roomTree.GenerateRoomTree(m_roomsData, bsp.RoomIndexTileIsIn(m_playerStart));
 
 }
 void World::GenerateLevelP1() {
@@ -443,7 +445,7 @@ int World::CreateExit(BSP* _bspToUse) {
 	return t->GetPositionInVector();
 }
 
-void World::GenerateKeyDoorPair(int _exitLocation, BSP* _bspToUse) {
+void World::GenerateKeyDoorPair(int _roomToGenerateDoorsIn, BSP* _bspToUse) {
 	Tile* t = nullptr;
 	std::vector<int> doorTileIndex;
 	int keyTileIndex;
@@ -451,7 +453,9 @@ void World::GenerateKeyDoorPair(int _exitLocation, BSP* _bspToUse) {
 
 	if (_bspToUse == nullptr)
 		_bspToUse = m_bsp;	
-	_bspToUse->GetDoorPlacement(doorTileIndex, m_roomsData, m_playerStart, _exitLocation);
+
+	_bspToUse->GetDoorPlacement(doorTileIndex, m_roomsData, m_playerStart, _roomToGenerateDoorsIn);
+
 	Key* k = new Key();
 	for (size_t i = 0; i < doorTileIndex.size(); i++)
 	{
@@ -465,17 +469,13 @@ void World::GenerateKeyDoorPair(int _exitLocation, BSP* _bspToUse) {
 	}
 
 	bool validKeyLocation = false;
-	//_exitLocation
-		
-	int exitRoomIndex = _bspToUse->RoomIndexTileIsIn(_exitLocation);
 	AStarSearch Astr = AStarSearch();
 	Astr.Initialize(GetMapDimentions(), GetTileCount(), false);
 	Astr.CastTilesToAStarNodes((*this), false);
-
 	do
 	{
 		int randomRoom = rand() % m_roomsData.size();
-		if (randomRoom != exitRoomIndex)
+		if (randomRoom != _roomToGenerateDoorsIn)
 		{
 			keyTileIndex = _bspToUse->GetRandomTileInRoom(randomRoom);
 			if (Astr.BeginSearch(m_playerStart, keyTileIndex, false).size() > 0)
@@ -493,8 +493,23 @@ void World::GenerateKeyDoorPair(int _exitLocation, BSP* _bspToUse) {
 	k->SetSize(scale);
 	
 }
-void World::GenerateItems(int _exitLocation, BSP* _bspToUse) {	
-	GenerateKeyDoorPair(_exitLocation, _bspToUse);
+void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bool _ensureDoorToExit, BSP* _bspToUse)
+{
+	
+	std::vector<std::vector<int>> rooms;
+	for (size_t i = 0; i < m_roomsData.size(); i++)
+		rooms.push_back(m_roomsData[i].sm_containsTiles);
+
+	int exitRoomIndex = _bspToUse->RoomIndexTileIsIn(_exitLocation, &rooms);
+	if (_ensureDoorToExit)
+		GenerateKeyDoorPair(exitRoomIndex, _bspToUse);
+	for (size_t i = 0; i < _keyDoorPairCountToGenerate; i++)
+	{
+		GenerateKeyDoorPair(exitRoomIndex, _bspToUse);
+	}
+}
+void World::GenerateItems(int _exitLocation, int _keyDoorPairCountToGenerate, BSP* _bspToUse) {
+	
 }
 
 

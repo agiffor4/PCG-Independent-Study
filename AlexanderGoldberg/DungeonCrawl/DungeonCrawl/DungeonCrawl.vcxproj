@@ -161,7 +161,7 @@
     <ClCompile Include="src\Player.cpp" />
     <ClCompile Include="src\RectA.cpp" />
     <ClCompile Include="src\BSPNode.cpp" />
-    <ClCompile Include="src\BinaryTree.cpp" />
+    <ClCompile Include="src\RoomTree.cpp" />
     <ClCompile Include="src\AStarSearch.cpp" />
     <ClCompile Include="src\BSP.cpp" />
     <ClCompile Include="src\DeltaTime.cpp" />
@@ -177,7 +177,7 @@
     <ClCompile Include="src\Tile.cpp" />
     <ClCompile Include="src\Thing.cpp" />
     <ClCompile Include="src\World.cpp" />
-    <ClCompile Include="src\TreeNode.cpp" />
+    <ClCompile Include="src\RoomTreeNode.cpp" />
     <ClCompile Include="src\Treasure.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -193,7 +193,7 @@
     <ClInclude Include="src\RectA.h" />
     <ClInclude Include="src\BSPNode.h" />
     <ClInclude Include="src\BSP.h" />
-    <ClInclude Include="src\BinaryTree.h" />
+    <ClInclude Include="src\RoomTree.h" />
     <ClInclude Include="SDL\include\begin_code.h" />
     <ClInclude Include="SDL\include\close_code.h" />
     <ClInclude Include="SDL\include\SDL.h" />
@@ -286,7 +286,7 @@
     <ClInclude Include="src\Renderable.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Timer.h" />
-    <ClInclude Include="src\TreeNode.h" />
+    <ClInclude Include="src\RoomTreeNode.h" />
     <ClInclude Include="src\Vector2.h" />
     <ClInclude Include="src\Tile.h" />
     <ClInclude Include="src\Thing.h" />
