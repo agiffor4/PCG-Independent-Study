@@ -13,6 +13,7 @@ class Vector2;
 class Player;
 class BSP;
 class AStarSearch;
+class RoomTree;
 class World : public IInputHandler
 {
 private:
@@ -68,7 +69,7 @@ public:
 	void GenerateLevelP1();
 	void GenerateLevelP2();
 	int CreateExit(BSP* _bspToUse = nullptr);
-	void GenerateKeyDoorPair(int _roomToGenerateDoorsIn, BSP* _bspToUse = nullptr);
+	void GenerateKeyDoorPair(int _roomToGenerateDoorsIn, RoomTree& _roomTree, BSP* _bspToUse = nullptr);
 	void GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bool _ensureDoorToExit, BSP* _bspToUse = nullptr);
 	void GenerateItems(int _exitLocation, int _keyDoorPairCountToGenerate, BSP* _bspToUse = nullptr);
 	void clearPreviousLevel();
