@@ -1225,7 +1225,6 @@ std::vector<Vector2> BSP::GetPathStartAndEndIndexs()
 void BSP::GetDoorPlacement(std::vector<int>& _doorLocation, std::vector<RoomData>& _roomData, int _playerStart, int _roomToGenerateDoorsIn)
 {
 	std::vector<std::vector<int>> rooms = GetRoomTileIndexes();	
-	_roomData[_roomToGenerateDoorsIn].sm_Locked = true;
 	auto itt = _roomData[_roomToGenerateDoorsIn].sm_CorridorExits.cbegin();
 	auto ittEnd = _roomData[_roomToGenerateDoorsIn].sm_CorridorExits.cend();
 	while (itt != ittEnd)

@@ -7,5 +7,6 @@ public:
 	DoorA();
 	~DoorA();
 	bool Interaction() override;
+	void Update(float dt) override;
 };
 

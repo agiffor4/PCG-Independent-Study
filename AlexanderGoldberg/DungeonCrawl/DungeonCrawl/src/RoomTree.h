@@ -14,7 +14,9 @@ public:
 	RoomTree();
 	~RoomTree();
 	
-	void GenerateRoomTree(const std::vector<RoomData>& _roomData, int _playerStartRoom);	
+	void Clear();
+
+	void GenerateRoomTree(const std::vector<RoomData>& _roomData, int _playerStartRoom);
 	std::vector<int> StartLockRooms(int _roomToLock);
 
 	

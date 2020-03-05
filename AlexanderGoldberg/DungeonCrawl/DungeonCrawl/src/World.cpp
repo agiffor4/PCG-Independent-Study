@@ -10,6 +10,8 @@
 #include "DoorA.h"
 #include "Key.h"
 #include "RoomTree.h"
+
+std::string numToColor[] = { "Red", "Blue", "Yellow"};
 void World::setWindowTitle()
 {
 	if (m_window != nullptr)
@@ -381,7 +383,7 @@ void World::GenerateLevel()
 	t->SetContents(m_player);	
 	//EXIT generation
 	int exitIndex = CreateExit(&bsp);
-	GenerateDoors(exitIndex, 1, true, &bsp);
+	GenerateDoors(exitIndex, 2, true, &bsp);
 	//GenerateItems(exitIndex, &bsp);
 	
 
@@ -444,7 +446,7 @@ int World::CreateExit(BSP* _bspToUse) {
 	return t->GetPositionInVector();
 }
 
-void World::GenerateKeyDoorPair(int _roomToGenerateDoorsIn, RoomTree& _roomTree, BSP* _bspToUse) {
+void World::GenerateKeyDoorPair(int _roomToGenerateDoorsIn, RoomTree& _roomTree, std::string& _doorImage, std::string& _keyImage, BSP* _bspToUse) {
 	Tile* t = nullptr;
 	std::vector<int> doorTileIndex;
 	int keyTileIndex;
@@ -455,10 +457,11 @@ void World::GenerateKeyDoorPair(int _roomToGenerateDoorsIn, RoomTree& _roomTree,
 		_bspToUse = m_bsp;	
 
 	_bspToUse->GetDoorPlacement(doorTileIndex, m_roomsData, m_playerStart, _roomToGenerateDoorsIn);
+	_roomTree.GenerateRoomTree(m_roomsData, _bspToUse->RoomIndexTileIsIn(m_playerStart));
 	std::vector<int> roomsBlockedOff = _roomTree.StartLockRooms(_roomToGenerateDoorsIn);// find which other rooms are no longer accesable
 	for (size_t i = 0; i < roomsBlockedOff.size(); i++)
 		m_roomsData[roomsBlockedOff[i]].sm_Locked = true; //mark those rooms as locked
-	
+
 	Key* k = new Key();
 	for (size_t i = 0; i < doorTileIndex.size(); i++)
 	{
@@ -466,23 +469,29 @@ void World::GenerateKeyDoorPair(int _roomToGenerateDoorsIn, RoomTree& _roomTree,
 		t = GetTileAtIndex(doorTileIndex[i]);
 		t->AddItem(d);
 		d->SetLocation(t);
-		d->Init("img/Exit.bmp", "Door", m_scene->GetRenderer());
+		d->Init(_doorImage, "Door", m_scene->GetRenderer());
 		d->SetSize(scale);
 		k->SetDoor(d);
 	}
 
 	bool validKeyLocation = false;
-	AStarSearch Astr = AStarSearch();
+	/*AStarSearch Astr = AStarSearch();
 	Astr.Initialize(GetMapDimentions(), GetTileCount(), false);
-	Astr.CastTilesToAStarNodes((*this), false);
+	Astr.CastTilesToAStarNodes((*this), false);*/
+
 	do
 	{
 		int randomRoom = rand() % m_roomsData.size();
 		if (randomRoom != _roomToGenerateDoorsIn)
 		{
-			keyTileIndex = _bspToUse->GetRandomTileInRoom(randomRoom);
+			/*keyTileIndex = _bspToUse->GetRandomTileInRoom(randomRoom);
 			if (Astr.BeginSearch(m_playerStart, keyTileIndex, false).size() > 0)
+				validKeyLocation = true;*/
+			if (!m_roomsData[randomRoom].sm_Locked)
+			{
+				keyTileIndex = _bspToUse->GetRandomTileInRoom(randomRoom);
 				validKeyLocation = true;
+			}
 		}
 	} while (!validKeyLocation);
 
@@ -490,7 +499,7 @@ void World::GenerateKeyDoorPair(int _roomToGenerateDoorsIn, RoomTree& _roomTree,
 	t = GetTileAtIndex(keyTileIndex);
 	t->AddItem(k);
 	k->SetLocation(t);
-	k->Init("img/KeyCard.bmp", "Key", m_scene->GetRenderer());
+	k->Init(_keyImage, "Key", m_scene->GetRenderer());
 	k->SetSize(scale);
 	
 }
@@ -503,9 +512,10 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 	int exitRoomIndex = _bspToUse->RoomIndexTileIsIn(_exitLocation, &rooms);
 	int playerStartRoomIndex = _bspToUse->RoomIndexTileIsIn(m_playerStart);
 	RoomTree roomTree = RoomTree();
-	roomTree.GenerateRoomTree(m_roomsData, playerStartRoomIndex);
+	std::string doorPath = "img/Exit.bmp";
+	std::string keyPath = "img/Keycard.bmp";
 	if (_ensureDoorToExit)
-		GenerateKeyDoorPair(exitRoomIndex, roomTree, _bspToUse);
+		GenerateKeyDoorPair(exitRoomIndex, roomTree, doorPath, keyPath, _bspToUse);
 	for (size_t i = 0; i < _keyDoorPairCountToGenerate; i++)
 	{
 		int roomToLock = 0;
@@ -516,8 +526,9 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 				roomToLock = rand() % m_roomsData.size();
 			} while (roomToLock == exitRoomIndex || roomToLock == playerStartRoomIndex);
 		}
-		
-		GenerateKeyDoorPair(roomToLock, roomTree, _bspToUse);
+		doorPath = "img/" + numToColor[i] + "Door.bmp";
+		keyPath = "img/" + numToColor[i] + "KeyCard.bmp";
+		GenerateKeyDoorPair(roomToLock, roomTree, doorPath, keyPath, _bspToUse);
 	}
 }
 void World::GenerateItems(int _exitLocation, int _keyDoorPairCountToGenerate, BSP* _bspToUse) {
@@ -723,6 +734,7 @@ void World::printRoomData()
 		printf("\n");
 		
 		printf("Connectedness value is %d\n", m_roomsData[i].sm_connectedness);
+		printf("Room is %s\n", (m_roomsData[i].sm_Locked ? "inaccessible" : "accessible"));
 		printf("\n\n");
 	}
 }
