@@ -28,6 +28,7 @@ protected:
 	int m_roomPlayerSpawnin = -1;
 	bool m_playerCreated = false;
 	bool m_generateInStages = false;
+	bool m_markRooms = false;
 	Player* m_player = nullptr;
 	Scene* m_scene = nullptr;
 	int m_pathGenerationType = 0;
@@ -40,7 +41,8 @@ protected:
 	BSP* m_bsp = nullptr;
 	AStarSearch* m_AStar = nullptr;
 	void setWindowTitle();
-	
+	void generateTreasure();
+	void createTreasureInRoom(int _roomToCreateTreasureIn);
 public:
 
 	enum class TileDirection
@@ -71,7 +73,8 @@ public:
 	int CreateExit(BSP* _bspToUse = nullptr);
 	void GenerateKeyDoorPair(int _roomToGenerateDoorsIn, RoomTree& _roomTree, std::string& _doorImage, std::string&  _keyImage, BSP* _bspToUse = nullptr);
 	void GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bool _ensureDoorToExit, BSP* _bspToUse = nullptr);
-	void GenerateItems(int _exitLocation, int _keyDoorPairCountToGenerate, BSP* _bspToUse = nullptr);
+	void GenerateItems(int _exitLocation, BSP* _bspToUse = nullptr);
+
 	void clearPreviousLevel();
 	
 

@@ -44,6 +44,13 @@ void Renderable::SetPosition(Vector2& _pos) {
 	
 }
 
+void Renderable::SetPosition(const Vector2& _pos) {
+	m_position.X = _pos.X;
+	m_position.Y = _pos.Y;
+	updateDestination();
+
+}
+
 const Vector2& Renderable::GetPosition() { return m_position;}
 SDL_Rect Renderable::GetDestination() { return m_destination; }
 

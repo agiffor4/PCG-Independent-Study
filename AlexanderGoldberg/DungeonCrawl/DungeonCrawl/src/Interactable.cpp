@@ -17,3 +17,8 @@ bool Interactable::GetBlocksPassage()
 {
 	return m_blocksPassage;
 }
+
+bool Interactable::IsflaggedForDeletion()
+{
+	return m_flagForDelation;
+}

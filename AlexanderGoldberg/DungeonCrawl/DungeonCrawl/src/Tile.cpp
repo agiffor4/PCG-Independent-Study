@@ -2,6 +2,7 @@
 #include "Thing.h"
 #include "World.h"
 #include "Interactable.h"
+#include "TextA.h"
 Tile::Tile() {
 
 }
@@ -97,7 +98,38 @@ void Tile::AddItem(Interactable* _newItem)
 {
 	m_items.push_back(_newItem);
 }
+
+Interactable* Tile::RemoveItem(Interactable* _toRemove, bool _deleteOnRemoval)
+{
+	Interactable* toReturn = nullptr;
+	auto itt = m_items.begin();
+	while (itt != m_items.end())
+	{
+		if ((*itt) == _toRemove)
+		{
+			m_items.erase(itt);
+			if (_deleteOnRemoval)
+				delete(_toRemove);
+			else
+				toReturn = _toRemove;
+			break;
+		}
+		itt++;
+	}
+	return toReturn;
+}
 const Vector2& Tile::GetPositionInGrid() { return m_posInGrid; }
+
+void Tile::AddRoomNumber(int _roomTileIsIn, SDL_Renderer* _renderer)
+{
+	if (m_text == nullptr)
+	{
+		m_text = new TextA();
+		m_text->InitializeFont("fonts/FreeSans.ttf", 12, _renderer, {0,0,0, 255});
+		m_text->SetPosition(GetPosition() + Vector2(2, 0));
+	}
+	m_text->SetText(std::to_string(_roomTileIsIn));
+}
 
 
 
@@ -158,6 +190,8 @@ void Tile::ClearTileContents() {
 		}
 	}
 	m_items.erase(m_items.begin(), m_items.end());
+	if(m_text != nullptr)
+		m_text->CleanUp();
 }
 
 void Tile::Render(SDL_Renderer* _renderer)
@@ -177,7 +211,11 @@ void Tile::Render(SDL_Renderer* _renderer)
 		m_contents->SetPosition(GetPosition().X, GetPosition().Y);
 		m_contents->Render(_renderer);
 	}
-	
+	if (m_text != nullptr)
+	{
+		m_text->Render(_renderer);
+
+	}
 	
 }
 
@@ -196,4 +234,12 @@ void Tile::Update(float _dt)
 		m_contents->Update(_dt);
 	}
 
+	for (auto i = m_items.rbegin(); i != m_items.rend(); i++)
+	{
+		if ((*i) != nullptr && (*i)->IsflaggedForDeletion())
+		{			
+			RemoveItem((*i), true);
+		}
+
+	}
 }

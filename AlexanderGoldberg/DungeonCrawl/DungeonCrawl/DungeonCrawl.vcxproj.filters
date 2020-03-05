@@ -123,6 +123,12 @@
     <ClCompile Include="src\RoomTreeNode.cpp">
       <Filter>Source Files\Tree</Filter>
     </ClCompile>
+    <ClCompile Include="src\TextA.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SDL_FontCache.c">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\DeltaTime.h">
@@ -456,6 +462,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RoomTree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SDL_FontCache.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

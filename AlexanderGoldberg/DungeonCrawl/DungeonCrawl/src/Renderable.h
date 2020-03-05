@@ -34,12 +34,13 @@ public:
 	virtual void Update(float _dt);
 	void SetPosition(float x, float y);
 	void SetPosition(Vector2& pos);
+	void SetPosition(const Vector2& pos);
 	const Vector2& GetPosition();
 	SDL_Rect GetDestination();
 	void SetSize(Vector2& _scale);
 	void SetSize(float _x, float _y);
 	Vector2 GetCurrentSize();
 	const std::string& GetName();
-	void CleanUp();
+	virtual void CleanUp();
 };
 

@@ -10,6 +10,7 @@
 #include "DoorA.h"
 #include "Key.h"
 #include "RoomTree.h"
+#include "Treasure.h"
 
 std::string numToColor[] = { "Red", "Blue", "Yellow"};
 void World::setWindowTitle()
@@ -28,8 +29,8 @@ void World::setWindowTitle()
 		std::string ignore = " carve new: " + ignoreResult + " ";
 		std::string incrementalResult = (m_digPathsOneAtATime ? "T" : "F");
 		std::string incremental = " Incremental dig: " + incrementalResult + " ";
-
-		std::string title = width + height + tunnelT + seed + cycle + ignore + incremental;
+		std::string markRooms = "Tile Marks: " + std::string(m_markRooms ? "T" : "F");
+		std::string title = width + height + tunnelT + seed + cycle + ignore + incremental + markRooms;
 		SDL_SetWindowTitle(m_window, title.c_str());
 	}
 }
@@ -384,7 +385,7 @@ void World::GenerateLevel()
 	//EXIT generation
 	int exitIndex = CreateExit(&bsp);
 	GenerateDoors(exitIndex, 2, true, &bsp);
-	//GenerateItems(exitIndex, &bsp);
+	GenerateItems(exitIndex, &bsp);
 	
 
 }
@@ -512,7 +513,7 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 	int exitRoomIndex = _bspToUse->RoomIndexTileIsIn(_exitLocation, &rooms);
 	int playerStartRoomIndex = _bspToUse->RoomIndexTileIsIn(m_playerStart);
 	RoomTree roomTree = RoomTree();
-	std::string doorPath = "img/Exit.bmp";
+	std::string doorPath = "img/ExitDoor.bmp";
 	std::string keyPath = "img/Keycard.bmp";
 	if (_ensureDoorToExit)
 		GenerateKeyDoorPair(exitRoomIndex, roomTree, doorPath, keyPath, _bspToUse);
@@ -531,10 +532,35 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 		GenerateKeyDoorPair(roomToLock, roomTree, doorPath, keyPath, _bspToUse);
 	}
 }
-void World::GenerateItems(int _exitLocation, int _keyDoorPairCountToGenerate, BSP* _bspToUse) {
+void World::GenerateItems(int _exitLocation, BSP* _bspToUse) {
 	
+	generateTreasure();
 }
 
+void World::generateTreasure() {	
+	for (size_t i = 0; i < m_roomsData.size(); i++)
+	{
+		if (m_roomsData[i].sm_connectedness < 4)
+		{			
+			if (rand() % 2 == 0)
+			{
+				createTreasureInRoom(m_roomsData[i].sm_region);
+			}
+		}
+	}
+}
+
+void World::createTreasureInRoom(int _roomToCreateTreasureIn) 
+{
+	#define containedTiles m_roomsData[_roomToCreateTreasureIn].sm_containsTiles
+	int randomTile = containedTiles[rand() % containedTiles.size()];
+	Treasure* t = new Treasure();
+	t->SetLocation(m_tiles[randomTile]);
+	t->Init("img/Treasure.bmp", "Treasue", m_scene->GetRenderer());	
+	Vector2 scale = GetTileSize();
+	t->SetSize(scale);
+	m_tiles[randomTile]->AddItem(t);
+}
 
 void World::AddRooms(std::vector<std::vector<int>>& const _rooms) {
 	m_roomsData.erase(m_roomsData.begin(), m_roomsData.end());
@@ -544,9 +570,11 @@ void World::AddRooms(std::vector<std::vector<int>>& const _rooms) {
 		m_roomsData.emplace_back(RoomData());
 		for (size_t j = 0; j < _rooms[i].size(); j++)
 		{
-			GetTileAtIndex(_rooms[i][j])->SetPassable(true);			
-			if(i < 8)
-				GetTileAtIndex(_rooms[i][j])->changeImage("img/blank_tile" + std::to_string(i) + ".bmp");
+			GetTileAtIndex(_rooms[i][j])->SetPassable(true);	
+			if (m_markRooms)
+			{
+				GetTileAtIndex(_rooms[i][j])->AddRoomNumber(i, m_scene->GetRenderer());
+			}
 			//start filling out the room struct
 			m_roomsData[i].sm_containsTiles.push_back(_rooms[i][j]);
 			m_roomsData[i].sm_region = i;
@@ -689,6 +717,11 @@ void World::InvokeKeyUp(SDL_Keycode _key)
 	case SDLK_l:
 		printRoomData();
 		break;
+	case SDLK_t:
+		m_markRooms = !m_markRooms;
+		setWindowTitle();
+		break;
+		
 	default:
 		break;
 	}
