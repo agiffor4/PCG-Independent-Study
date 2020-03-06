@@ -21,7 +21,11 @@ public:
 	void GenerateRoomTree(const std::vector<RoomData>& _roomData, int _playerStartRoom);
 	std::vector<int> StartLockRooms(int _roomToLock);
 	int GetDeepestDepth();
-	bool IsRoomDepthGreater(int _roomToCheck, int _depthToCheck);	
+	bool IsRoomDepthGreater(int _roomToCheck, int _depthToCheck);
+	bool IsRoomDepthGreaterOrEqual(int _roomToCheck, int _depthToCheck);
+	bool IsRoomDepthInRange(int _roomToCheck, int _depthToCheckMin, int _depthToCheckMax);
+	int GetRandomParentWithinRange(int _maxNumberOfparents, int _startingRoomIndex);
+
 	int GetRoomDepth(int _room);
 };
 

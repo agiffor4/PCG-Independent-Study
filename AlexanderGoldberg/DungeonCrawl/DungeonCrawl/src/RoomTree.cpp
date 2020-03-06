@@ -76,6 +76,30 @@ bool RoomTree::IsRoomDepthGreater(int _roomToCheck, int _depthToCheck)
 {
 	return m_nodesInTree[_roomToCheck]->GetDepth() > _depthToCheck;
 }
+bool RoomTree::IsRoomDepthGreaterOrEqual(int _roomToCheck, int _depthToCheck)
+{
+	return m_nodesInTree[_roomToCheck]->GetDepth() >= _depthToCheck;
+}
+bool RoomTree::IsRoomDepthInRange(int _roomToCheck, int _depthToCheckMin, int _depthToCheckMax)
+{
+	return m_nodesInTree[_roomToCheck]->GetDepth() >= _depthToCheckMin && m_nodesInTree[_roomToCheck]->GetDepth() < _depthToCheckMax;
+}
+int RoomTree::GetRandomParentWithinRange(int _maxNumberOfparents, int _startingRoomIndex)
+{
+	int parentsUp = -1;
+	while (parentsUp > m_nodesInTree.size() -1 || parentsUp < 0)
+	{
+		parentsUp = _maxNumberOfparents == 0 ? 1 : (rand() % _maxNumberOfparents) + 1;
+		if (parentsUp < 0)
+			parentsUp = 0;
+	}
+	int toReturn = _startingRoomIndex;
+	for (size_t i = 0; i < parentsUp; i++)
+	{
+		toReturn = m_nodesInTree[toReturn]->m_Index;
+	}
+	return toReturn;
+}
 int RoomTree::GetRoomDepth(int _room)
 {
 	return m_nodesInTree[_room]->GetDepth();

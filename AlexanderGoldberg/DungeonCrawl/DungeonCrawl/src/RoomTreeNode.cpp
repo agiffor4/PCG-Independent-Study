@@ -71,12 +71,6 @@ bool RoomTreeNode::ShouldStopLocking()
 	
 	if (m_ChildAndParent)
 		return true;
-	/*for (size_t i = 0; i < m_branches.size(); i++)
-	{
-		if (m_branches[i]->m_ChildAndParent)
-			return true;
-	}*/
-
 	return false;
 }
 

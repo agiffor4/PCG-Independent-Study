@@ -516,6 +516,11 @@ void World::GenerateKeyDoorPair(int _roomToGenerateDoorsIn, RoomTree& _roomTree,
 			int randomRoom = rand() % m_roomsData.size();
 			if (randomRoom != _roomToGenerateDoorsIn)
 			{
+				if (m_generationNumber == 3)
+				{
+					int foo = 0;
+				}
+				
 				int depthToCheckFor = m_lastKeyDepth >= _roomTree.GetDeepestDepth()-1 ? m_lastKeyDepth - 3 : (m_lastKeyDepth > 2 ? m_lastKeyDepth - 2 : m_lastKeyDepth);
 				if (!m_roomsData[randomRoom].sm_Locked 
 					&& _roomTree.IsRoomDepthGreaterOrEqual(randomRoom, depthToCheckFor))
