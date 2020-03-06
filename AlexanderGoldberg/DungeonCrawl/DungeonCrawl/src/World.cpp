@@ -11,6 +11,7 @@
 #include "Key.h"
 #include "RoomTree.h"
 #include "Treasure.h"
+#define Debug = 1;
 
 std::string numToColor[] = { "Red", "Blue", "Yellow"};
 void World::setWindowTitle()
@@ -353,20 +354,32 @@ void World::Generate()
 void World::GenerateLevel()
 {
 	clearPreviousLevel();
-	
 	BSP bsp = BSP(m_horizontalTileCount, m_verticalTileCount);
-	
 	bsp.SetIgnoreExistingPaths(m_ignoreExistingPaths);
-	//when width = height = x round(log(x / 3) / log(2)) + 1 = number of times to split	
-	bsp.BeginSplit(round(std::log(m_horizontalTileCount / 3) / std::log(2)) + 1);//seems to produce a good ratio of rooms as long as the width = height
-	//bsp.BeginSplit(4);	
 	setWindowTitle();
 	AStarSearch AStar = AStarSearch();	
 	AStar.Initialize(GetMapDimentions(), GetTileCount(), false);
 	AStar.SetWallDigCost(200);		
 	BSP::TunnelingType tuntype = (BSP::TunnelingType)m_pathGenerationType;
-	bsp.SetTunnelingType(tuntype);
-	std::vector<std::vector<int>> rooms = bsp.GetRoomTileIndexes();
+	bsp.SetTunnelingType(tuntype);	
+	std::vector<std::vector<int>> rooms;
+
+#ifdef Debug
+	int timesRound = 100;
+#endif
+	do
+	{	
+		//when width = height = x round(log(x / 3) / log(2)) + 1 = number of times to split	
+		bsp.BeginSplit(round(std::log(m_horizontalTileCount / 3) / std::log(2)) + 1);//seems to produce a good ratio of rooms as long as the width = height	
+		rooms = bsp.GetRoomTileIndexes();
+#ifdef Debug
+		timesRound--;
+		if (timesRound < 0)
+		{
+			break;
+		}
+#endif
+	} while (rooms.size() < 1);
 	AddRooms(rooms);
 	AStar.CastTilesToAStarNodes((*this), true);
 	std::vector<int> paths = bsp.GeneratePaths(AStar);
@@ -517,7 +530,7 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 
 	if (_ensureDoorToExit)
 		GenerateKeyDoorPair(exitRoomIndex, roomTree, doorPath, keyPath, _bspToUse);
-	
+	int lastDepth = roomTree.GetDeepestDepth();
 	for (size_t i = 0; i < _keyDoorPairCountToGenerate; i++)
 	{
 		int roomToLock = 0;
@@ -526,18 +539,21 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 			do
 			{
 				roomToLock = rand() % m_roomsData.size();
-			} while (roomToLock == exitRoomIndex || roomToLock == playerStartRoomIndex);
+			} while (roomToLock == exitRoomIndex || roomToLock == playerStartRoomIndex || roomTree.IsRoomDepthGreater(roomToLock, lastDepth));
 		}
+		lastDepth = roomTree.GetRoomDepth(roomToLock);
 		doorPath = "img/" + numToColor[i] + "Door.bmp";
 		keyPath = "img/" + numToColor[i] + "KeyCard.bmp";
+		if (m_generationNumber == 3)
+		{
+			int foo = 0;
+		}
 		GenerateKeyDoorPair(roomToLock, roomTree, doorPath, keyPath, _bspToUse);
 	}
 }
 void World::GenerateItems(int _exitLocation, BSP* _bspToUse) {
 	
 	generateTreasure();
-	
-	createTreasureInRoom(_bspToUse->RoomIndexTileIsIn(m_playerStart));
 }
 
 void World::generateTreasure() {	
@@ -663,7 +679,10 @@ void World::InvokeKeyUp(SDL_Keycode _key)
 		break;
 	case SDLK_g:
 		if (m_resetSeed)
+		{
 			srand(1024);
+			m_generationNumber = 0;
+		}
 		if (m_cycleGenerationType)
 		{
 			m_pathGenerationType++;

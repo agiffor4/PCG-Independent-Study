@@ -27,7 +27,12 @@ void RoomTree::GenerateRoomTree(const std::vector<RoomData>& _roomData, int _pla
 		m_nodesInTree[i]->m_Index = i;
 	}	
 	generateConnections(m_nodesInTree[_playerStartRoom], _roomData);
-
+	m_deepestDepth = -1;
+	for (size_t i = 0; i < m_nodesInTree.size(); i++)
+	{
+		if (m_nodesInTree[i]->GetDepth() > m_deepestDepth)
+			m_deepestDepth = m_nodesInTree[i]->GetDepth();		
+	}
 }
 
 std::vector<int> RoomTree::StartLockRooms(int _roomToLock)
@@ -37,8 +42,6 @@ std::vector<int> RoomTree::StartLockRooms(int _roomToLock)
 		m_nodesInTree[_roomToLock]->Lock(true);
 	else
 		lockRooms(_roomToLock);
-	for (size_t i = 0; i < m_nodesInTree.size(); i++)
-		m_nodesInTree[i]->m_Checked = false;
 	for (size_t i = 0; i < m_childParentNodes.size(); i++)
 	{
 		bool loopHasLowerDepth = m_nodesInTree[i]->GetDepth() > m_nodesInTree[_roomToLock]->GetDepth() && m_nodesInTree[i]->GetParent()->GetDepth() > m_nodesInTree[_roomToLock]->GetDepth();
@@ -63,6 +66,19 @@ std::vector<int> RoomTree::StartLockRooms(int _roomToLock)
 	}
 	return indexesOfInaccessibleRooms;
 	
+}
+int RoomTree::GetDeepestDepth()
+{
+	return m_deepestDepth;
+}
+
+bool RoomTree::IsRoomDepthGreater(int _roomToCheck, int _depthToCheck) 
+{
+	return m_nodesInTree[_roomToCheck]->GetDepth() > _depthToCheck;
+}
+int RoomTree::GetRoomDepth(int _room)
+{
+	return m_nodesInTree[_room]->GetDepth();
 }
 void RoomTree::unlockRooms(int _roomToUnlock, int _originLockRoom)
 {	
