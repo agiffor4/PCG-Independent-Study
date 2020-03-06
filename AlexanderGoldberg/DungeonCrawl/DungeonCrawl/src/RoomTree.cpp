@@ -25,7 +25,7 @@ void RoomTree::GenerateRoomTree(const std::vector<RoomData>& _roomData, int _pla
 	{
 		m_nodesInTree.push_back(new RoomTreeNode(nullptr));
 		m_nodesInTree[i]->m_Index = i;
-	}
+	}	
 	generateConnections(m_nodesInTree[_playerStartRoom], _roomData);
 
 }
@@ -33,10 +33,27 @@ void RoomTree::GenerateRoomTree(const std::vector<RoomData>& _roomData, int _pla
 std::vector<int> RoomTree::StartLockRooms(int _roomToLock)
 {
 	m_childParentNodes.clear();
-	lockRooms(_roomToLock);
+	if (m_nodesInTree[_roomToLock]->m_ChildAndParent)
+		m_nodesInTree[_roomToLock]->Lock(true);
+	else
+		lockRooms(_roomToLock);
+	for (size_t i = 0; i < m_nodesInTree.size(); i++)
+		m_nodesInTree[i]->m_Checked = false;
 	for (size_t i = 0; i < m_childParentNodes.size(); i++)
 	{
-		unlockRooms(m_childParentNodes[i]->GetParent()->m_Index, _roomToLock);
+		bool loopHasLowerDepth = m_nodesInTree[i]->GetDepth() > m_nodesInTree[_roomToLock]->GetDepth() && m_nodesInTree[i]->GetParent()->GetDepth() > m_nodesInTree[_roomToLock]->GetDepth();
+		if (!loopHasLowerDepth)
+		{
+			int index = m_childParentNodes[i]->GetParent()->m_Index;
+			while (m_nodesInTree[index]->m_Index != _roomToLock)
+			{
+				if (m_nodesInTree[index]->GetParent() == nullptr)
+					break;
+				index = m_nodesInTree[index]->GetParent()->m_Index;
+			}
+
+			unlockRooms(index, _roomToLock);
+		}
 	}
 	std::vector<int> indexesOfInaccessibleRooms;
 	for (size_t i = 0; i < m_nodesInTree.size(); i++)
@@ -49,14 +66,17 @@ std::vector<int> RoomTree::StartLockRooms(int _roomToLock)
 }
 void RoomTree::unlockRooms(int _roomToUnlock, int _originLockRoom)
 {	
-	for (size_t i = 0; i < m_nodesInTree[_roomToUnlock]->ChildCount(); i++)
-	{
-		m_nodesInTree[_roomToUnlock]->GetChild(i)->Lock(false);
-		unlockRooms(m_nodesInTree[_roomToUnlock]->GetChild(i)->m_Index, _originLockRoom);
-	}
+		for (size_t i = 0; i < m_nodesInTree[_roomToUnlock]->ChildCount(); i++)
+		{
+				m_nodesInTree[_roomToUnlock]->GetChild(i)->Lock(false);
+				m_nodesInTree[_roomToUnlock]->Lock(true);
+				for (size_t i = 0; i < m_nodesInTree[_roomToUnlock]->ChildCount(); i++) {
 
-	if (m_nodesInTree[_roomToUnlock]->GetParent()->m_Index != _originLockRoom)
-		unlockRooms(m_nodesInTree[_roomToUnlock]->GetParent()->m_Index, _originLockRoom);
+					unlockRooms(m_nodesInTree[_roomToUnlock]->GetChild(i)->m_Index, _originLockRoom);
+				}
+		}
+	
+	
 	
 }
 
@@ -107,6 +127,7 @@ void RoomTree::generateConnections(RoomTreeNode* _parent, const std::vector<Room
 				}
 				else
 				{
+					m_nodesInTree[currentIndex]->AddChild(m_nodesInTree[roomIndex]);
 					m_nodesInTree[roomIndex]->m_ChildAndParent = true;
 				}
 			}

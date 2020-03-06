@@ -1,0 +1,9 @@
+r = seed rese
+g = generate new level
+l = print room data to console
+I = toggle incremental dig
+n = ignore existing paths in path generation
+o = increment paths dug by 1
+m = render room marks in next generation
+1-5 = set path generation type
+

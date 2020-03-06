@@ -22,6 +22,7 @@ RoomTreeNode* RoomTreeNode::GetParent()
 
 void RoomTreeNode::AddChild(RoomTreeNode* _child)
 {
+	_child->SetDepth(m_depth + 1);
 	m_branches.push_back(_child);
 }
 
@@ -37,7 +38,12 @@ int RoomTreeNode::ChildCount()
 
 RoomTreeNode* RoomTreeNode::GetChild(int _index)
 {
-	return m_branches[_index];
+	if (m_branches.size() > 0 && _index > -1 && _index < m_branches.size())
+	{
+		return m_branches[_index];
+	}
+	return nullptr;
+	
 }
 
 void RoomTreeNode::Lock(bool _val)
@@ -48,6 +54,16 @@ void RoomTreeNode::Lock(bool _val)
 bool RoomTreeNode::IsLocked()
 {
 	return m_locked;
+}
+
+void RoomTreeNode::SetDepth(int _depth)
+{
+	m_depth = _depth;
+}
+
+int RoomTreeNode::GetDepth()
+{
+	return m_depth;
 }
 
 bool RoomTreeNode::ShouldStopLocking()

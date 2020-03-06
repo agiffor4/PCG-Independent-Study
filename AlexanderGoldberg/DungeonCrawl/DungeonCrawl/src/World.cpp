@@ -18,19 +18,16 @@ void World::setWindowTitle()
 	if (m_window != nullptr)
 	{
 		BSP bsp = BSP(1, 1);
-		std::string width = "width: " + std::to_string(m_horizontalTileCount) + " ";
-		std::string height = "height: " + std::to_string(m_verticalTileCount) + " ";
-		std::string tunnelT = "path: " + bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType) + " ";
-		std::string seedResult = (m_resetSeed ? "T" : "F");
-		std::string seed = " seed reset: " + seedResult + " ";
-		std::string cycleResult = (m_cycleGenerationType ? "T" : "F");
-		std::string cycle = " cycle:  " + cycleResult + " ";
-		std::string ignoreResult = (m_ignoreExistingPaths ? "T" : "F");
-		std::string ignore = " carve new: " + ignoreResult + " ";
-		std::string incrementalResult = (m_digPathsOneAtATime ? "T" : "F");
-		std::string incremental = " Incremental dig: " + incrementalResult + " ";
-		std::string markRooms = "Tile Marks: " + std::string(m_markRooms ? "T" : "F");
-		std::string title = width + height + tunnelT + seed + cycle + ignore + incremental + markRooms;
+		std::string width = "w: " + std::to_string(m_horizontalTileCount) + " ";
+		std::string height = "h: " + std::to_string(m_verticalTileCount) + " ";
+		std::string tunnelT = "Path: " + bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType) + " ";		
+		std::string seed = " seed Reset: " + std::string(m_resetSeed ? "T" : "F") + " ";
+		std::string cycle = " Cycle:  " + std::string(m_cycleGenerationType ? "T" : "F") + " ";
+		std::string ignore = " carve New: " + std::string(m_ignoreExistingPaths ? "T" : "F") + " ";		
+		std::string incremental = " Increment dig: " + std::string(m_digPathsOneAtATime ? "T" : "F") + " ";
+		std::string markRooms = " Marks: " + std::string(m_markRooms ? "T" : "F");
+		std::string level = std::to_string(m_generationNumber);
+		std::string title = width + height + tunnelT + seed + cycle + ignore + incremental + markRooms + " L: " + level;
 		SDL_SetWindowTitle(m_window, title.c_str());
 	}
 }
@@ -347,6 +344,7 @@ void World::clearPreviousLevel() {
 }
 void World::Generate() 
 {
+	m_generationNumber++;
 	if (m_digPathsOneAtATime)
 		GenerateLevelP1();
 	else
@@ -355,7 +353,6 @@ void World::Generate()
 void World::GenerateLevel()
 {
 	clearPreviousLevel();
-	
 	
 	BSP bsp = BSP(m_horizontalTileCount, m_verticalTileCount);
 	
@@ -419,15 +416,16 @@ void World::GenerateLevelP1() {
 	
 }
 
-void World::GenerateLevelP2() 
+bool World::GenerateLevelP2() 
 {
+	bool result = false;
 	if (m_bsp != nullptr)
 	{
-		std::vector<int> paths = m_bsp->GeneratePathsIncremental((*m_AStar), m_incrementalPathDigging);
+		std::vector<int> paths = m_bsp->GeneratePathsIncremental((*m_AStar), m_incrementalPathDigging, result);
 		AddPaths(paths);
 		m_incrementalPathDigging++;
 	}
-	
+	return result;
 }
 
 
@@ -459,6 +457,7 @@ void World::GenerateKeyDoorPair(int _roomToGenerateDoorsIn, RoomTree& _roomTree,
 
 	_bspToUse->GetDoorPlacement(doorTileIndex, m_roomsData, m_playerStart, _roomToGenerateDoorsIn);
 	_roomTree.GenerateRoomTree(m_roomsData, _bspToUse->RoomIndexTileIsIn(m_playerStart));
+
 	std::vector<int> roomsBlockedOff = _roomTree.StartLockRooms(_roomToGenerateDoorsIn);// find which other rooms are no longer accesable
 	for (size_t i = 0; i < roomsBlockedOff.size(); i++)
 		m_roomsData[roomsBlockedOff[i]].sm_Locked = true; //mark those rooms as locked
@@ -515,8 +514,10 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 	RoomTree roomTree = RoomTree();
 	std::string doorPath = "img/ExitDoor.bmp";
 	std::string keyPath = "img/Keycard.bmp";
+
 	if (_ensureDoorToExit)
 		GenerateKeyDoorPair(exitRoomIndex, roomTree, doorPath, keyPath, _bspToUse);
+	
 	for (size_t i = 0; i < _keyDoorPairCountToGenerate; i++)
 	{
 		int roomToLock = 0;
@@ -571,10 +572,7 @@ void World::AddRooms(std::vector<std::vector<int>>& const _rooms) {
 		for (size_t j = 0; j < _rooms[i].size(); j++)
 		{
 			GetTileAtIndex(_rooms[i][j])->SetPassable(true);	
-			if (m_markRooms)
-			{
-				GetTileAtIndex(_rooms[i][j])->AddRoomNumber(i, m_scene->GetRenderer());
-			}
+			GetTileAtIndex(_rooms[i][j])->AddRoomNumber(i, m_markRooms, m_scene->GetRenderer());
 			//start filling out the room struct
 			m_roomsData[i].sm_containsTiles.push_back(_rooms[i][j]);
 			m_roomsData[i].sm_region = i;
@@ -623,6 +621,18 @@ void World::AddPaths(std::vector<int>& const _paths) {
 	}
 }
 
+int World::GetIndexOfRoomTileIsIn(int _index)
+{
+	for (size_t i = 0; i < m_roomsData.size(); i++)
+	{
+		if (m_roomsData[i].Contains(_index))
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
 int World::GetPlayerStartLocation(const std::vector<std::vector<int>>& _rooms, int* roomSpawnedIn) {
 	int roomToSpawnIn = rand() % _rooms.size();
 	int tileInRoom = rand() % _rooms[roomToSpawnIn].size();
@@ -644,7 +654,7 @@ void World::InvokeKeyUp(SDL_Keycode _key)
 	BSP bsp = BSP(1,1);
 	switch (_key)
 	{
-	case SDLK_q:
+	case SDLK_r:
 		m_resetSeed = !m_resetSeed;
 		setWindowTitle();
 		printf("Reset seed set to %s\n", (m_resetSeed ? "true" : "false"));
@@ -660,7 +670,10 @@ void World::InvokeKeyUp(SDL_Keycode _key)
 		}
 		Generate();
 		break;
-	case SDLK_h:
+	case SDLK_l:
+		printRoomData();
+		break;
+	case SDLK_c:
 		m_cycleGenerationType = !m_cycleGenerationType;
 		setWindowTitle();
 		break;
@@ -689,35 +702,32 @@ void World::InvokeKeyUp(SDL_Keycode _key)
 		setWindowTitle();
 		printf("Path generation type set to %s\n", bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType).c_str());
 		break;
-	case SDLK_u:
-		m_ignoreExistingPaths = !m_ignoreExistingPaths;
-		setWindowTitle();
-		break;
-	case SDLK_p:
-		if (m_digPathsOneAtATime)
-			GenerateLevelP2();
-		break;
-	case SDLK_i:
+	case SDLK_o:
 		if (m_digPathsOneAtATime)
 		{
-			if (!m_playerCreated)
-				m_player = CreatePlayer();
-			m_playerStart = GetPlayerStartLocation(m_bsp->GetRoomTileIndexes(), &m_roomPlayerSpawnin);
-			Tile* t = GetTileAtIndex(m_playerStart);
-			m_player->SetLocation(t);
-			t->SetContents(m_player);
-			CreateExit();
+			if (GenerateLevelP2())
+			{
+				if (!m_playerCreated)
+					m_player = CreatePlayer();
+				m_playerStart = GetPlayerStartLocation(m_bsp->GetRoomTileIndexes(), &m_roomPlayerSpawnin);
+				Tile* t = GetTileAtIndex(m_playerStart);
+				m_player->SetLocation(t);
+				t->SetContents(m_player);
+				CreateExit();
+			}
 		}
 			
 		break;
-	case SDLK_y:
+
+	case SDLK_i:
 		m_digPathsOneAtATime = !m_digPathsOneAtATime;
 		setWindowTitle();
 		break;
-	case SDLK_l:
-		printRoomData();
+	case SDLK_n:
+		m_ignoreExistingPaths = !m_ignoreExistingPaths;
+		setWindowTitle();
 		break;
-	case SDLK_t:
+	case SDLK_m:
 		m_markRooms = !m_markRooms;
 		setWindowTitle();
 		break;

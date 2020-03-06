@@ -120,15 +120,19 @@ Interactable* Tile::RemoveItem(Interactable* _toRemove, bool _deleteOnRemoval)
 }
 const Vector2& Tile::GetPositionInGrid() { return m_posInGrid; }
 
-void Tile::AddRoomNumber(int _roomTileIsIn, SDL_Renderer* _renderer)
+void Tile::AddRoomNumber(int _roomTileIsIn, bool _renderNumbers, SDL_Renderer* _renderer)
 {
-	if (m_text == nullptr)
+	m_roomIn = _roomTileIsIn;
+	if (_renderNumbers) 
 	{
-		m_text = new TextA();
-		m_text->InitializeFont("fonts/FreeSans.ttf", 12, _renderer, {0,0,0, 255});
-		m_text->SetPosition(GetPosition() + Vector2(2, 0));
+		if (m_text == nullptr)
+		{
+			m_text = new TextA();
+			m_text->InitializeFont("fonts/FreeSans.ttf", 12, _renderer, { 0,0,0, 255 });
+			m_text->SetPosition(GetPosition() + Vector2(2, 0));
+		}
+		m_text->SetText(std::to_string(_roomTileIsIn));
 	}
-	m_text->SetText(std::to_string(_roomTileIsIn));
 }
 
 
@@ -148,7 +152,7 @@ void Tile::InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y)
 	case IInputHandler::MouseButton::RIGHT:
 		if (inBounds(_x, _y))
 		{
-			printf("clicked on tile %s (index %d), \n", m_name.c_str(), GetPositionInVector());
+			printf("clicked on tile %s (index %d) in room with index %d, \n", m_name.c_str(), GetPositionInVector(), m_roomIn);
 			printf("Passable = %s\n", (IsPassable() ? "true." : "false."));
 			printf("Corridor = %s\n", (IsCorridor() ? "true." : "false."));
 			printf("Contains %s, \n", (m_contents != nullptr ? m_contents->GetName().c_str() : "Nothing"));
@@ -192,6 +196,7 @@ void Tile::ClearTileContents() {
 	m_items.erase(m_items.begin(), m_items.end());
 	if(m_text != nullptr)
 		m_text->CleanUp();
+	m_roomIn = -1;
 }
 
 void Tile::Render(SDL_Renderer* _renderer)

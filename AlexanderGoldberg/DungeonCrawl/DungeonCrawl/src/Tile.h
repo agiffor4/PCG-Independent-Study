@@ -17,6 +17,7 @@ private:
 	int m_posInVector = -1;
 	bool m_passable = true;
 	bool m_corridor = false;
+	int m_roomIn = -1;
 	TextA* m_text = nullptr;
 public:
 
@@ -38,7 +39,7 @@ public:
 	void AddItem(Interactable* _newItem);
 	Interactable* RemoveItem(Interactable* _toRemove, bool _deleteOnRemoval);
 	const Vector2& GetPositionInGrid();
-	void AddRoomNumber(int _roomTileIsIn, SDL_Renderer* _renderer);
+	void AddRoomNumber(int _roomTileIsIn, bool _renderNumbers, SDL_Renderer* _renderer);
 	void InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y) override;
 	void ClearTileContents();
 	void Render(SDL_Renderer* _renderer) override;

@@ -44,9 +44,9 @@ void mainLoop()
 	int height = SDL_GetWindowSurface(window)->h;	
 
 	DeltaTime deltaTime = DeltaTime();
-	bool use50 = false;
-	int gridSizeX = 25;
-	int gridSizeY = 25;
+	bool use50 = true;
+	int gridSizeX = 30;
+	int gridSizeY = 30;
 	if (use50)
 	{
 		gridSizeX = 50;

@@ -18,8 +18,10 @@ class World : public IInputHandler
 {
 private:
 	SDL_Window* m_window = nullptr;
+	int m_generationNumber = 0;
 protected:
 	
+
 	std::vector<RoomData> m_roomsData;
 	std::vector<Tile*> m_tiles;
 	int m_horizontalTileCount = 0;
@@ -32,17 +34,20 @@ protected:
 	Player* m_player = nullptr;
 	Scene* m_scene = nullptr;
 	int m_pathGenerationType = 0;
+	
 	bool m_cycleGenerationType = false;
 	bool m_resetSeed = false;
 	bool m_ignoreExistingPaths = false;
 	
 	int m_incrementalPathDigging = 0;
 	bool m_digPathsOneAtATime = false;
+	
 	BSP* m_bsp = nullptr;
 	AStarSearch* m_AStar = nullptr;
 	void setWindowTitle();
 	void generateTreasure();
 	void createTreasureInRoom(int _roomToCreateTreasureIn);
+	
 public:
 
 	enum class TileDirection
@@ -69,7 +74,7 @@ public:
 	void Generate();
 	void GenerateLevel();
 	void GenerateLevelP1();
-	void GenerateLevelP2();
+	bool GenerateLevelP2();
 	int CreateExit(BSP* _bspToUse = nullptr);
 	void GenerateKeyDoorPair(int _roomToGenerateDoorsIn, RoomTree& _roomTree, std::string& _doorImage, std::string&  _keyImage, BSP* _bspToUse = nullptr);
 	void GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bool _ensureDoorToExit, BSP* _bspToUse = nullptr);
@@ -81,7 +86,7 @@ public:
 	void AddRooms(std::vector<std::vector<int>>& const _rooms);
 	void FillRoomDataStructs(BSP* _bsp = nullptr);
 	void AddPaths(std::vector<int>& const _paths);
-
+	int GetIndexOfRoomTileIsIn(int _index);
 	int GetPlayerStartLocation(const std::vector<std::vector<int>>& _rooms, int* roomSpawnedIn);
 	Player* CreatePlayer();
 	void InvokeKeyUp(SDL_Keycode _key) override;
