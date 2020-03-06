@@ -536,6 +536,8 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 void World::GenerateItems(int _exitLocation, BSP* _bspToUse) {
 	
 	generateTreasure();
+	
+	createTreasureInRoom(_bspToUse->RoomIndexTileIsIn(m_playerStart));
 }
 
 void World::generateTreasure() {	

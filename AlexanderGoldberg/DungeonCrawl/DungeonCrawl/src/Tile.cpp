@@ -239,11 +239,11 @@ void Tile::Update(float _dt)
 		m_contents->Update(_dt);
 	}
 
-	for (auto i = m_items.rbegin(); i != m_items.rend(); i++)
+	for (int i = m_items.size() -1; i > -1; i--)
 	{
-		if ((*i) != nullptr && (*i)->IsflaggedForDeletion())
+		if (m_items[i] != nullptr && m_items[i]->IsflaggedForDeletion())
 		{			
-			RemoveItem((*i), true);
+			RemoveItem(m_items[i], true);
 		}
 
 	}
