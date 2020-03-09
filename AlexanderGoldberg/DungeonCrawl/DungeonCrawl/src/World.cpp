@@ -11,6 +11,7 @@
 #include "Key.h"
 #include "RoomTree.h"
 #include "Treasure.h"
+#include "Camera.h"
 #define Debug = 1;
 
 std::string numToColor[] = { "Red", "Blue", "Yellow"};
@@ -316,8 +317,12 @@ Vector2 World::GetTileSize(){
 }
 
 void World::GenerateTiles(int _screenWidth, int _screenHeight) {
-	Vector2 targetSize = Vector2(_screenWidth / m_horizontalTileCount, _screenHeight / m_verticalTileCount);
 	
+#if UseCamera == 1
+	Vector2 targetSize = Vector2(32, 32);
+#else
+	Vector2 targetSize = Vector2(_screenWidth / m_horizontalTileCount, _screenHeight / m_verticalTileCount);
+#endif
 	for (size_t i = 0; i < m_verticalTileCount; i++)
 	{
 		for (size_t j = 0; j < m_horizontalTileCount; j++)
@@ -331,6 +336,7 @@ void World::GenerateTiles(int _screenWidth, int _screenHeight) {
 			AddTile(t);
 			InputManager::GetInputManager()->SubscribeToInput(t, InputManager::KeyPressType::MOUSEUP);
 			m_scene->AddRenderable(t);
+
 		}
 	}
 }
@@ -392,12 +398,20 @@ void World::GenerateLevel()
 	Tile* t = GetTileAtIndex(m_playerStart);
 	m_player->SetLocation(t);
 	t->SetContents(m_player);	
+#if UseCamera == 1
+	Vector2 offset = t->GetPosition();	
+	offset.X *= 0.5f;
+	offset.Y *= 0.5f;
+	Camera::SetOffset(offset);
+	Vector2 center = Vector2(320, 240);
+	Camera::SetCenter(center);
+#endif
 	//EXIT generation
 	int exitIndex = CreateExit(&bsp);
 	GenerateDoors(exitIndex, 2, true, &bsp);
 	GenerateItems(exitIndex, &bsp);
 	
-
+	
 }
 void World::GenerateLevelP1() {
 
@@ -800,6 +814,61 @@ void World::InvokeKeyUp(SDL_Keycode _key)
 	default:
 		break;
 	}
+}
+
+Vector2 World::CheckIfCameraShouldMove(Vector2 _cameraMoveDirection)
+{
+	Vector2 tileSize = m_tiles[0]->GetCurrentSize();
+#define lastT m_tiles[m_tiles.size() - 1]
+#define startT m_tiles[0]
+	
+	if (_cameraMoveDirection.Y == 1)
+	{
+		
+		if (startT->GetDestination().y - Camera::Offset().Y == 0 ||
+			m_player->GetLocation()->GetDestination().y - Camera::Offset().Y > Camera::GetCenter().Y - tileSize.Y
+			)
+		{
+			_cameraMoveDirection.Y = 0;
+		}
+	}
+		
+
+	if (_cameraMoveDirection.Y == -1)
+	{
+		
+		if (lastT->GetDestination().y - Camera::Offset().Y == Camera::GetScreenSize().Y - tileSize.Y || 
+			m_player->GetLocation()->GetDestination().y < Camera::GetCenter().Y
+			)
+		{
+			_cameraMoveDirection.Y = 0;
+		}
+	}
+		
+	//left
+	if (_cameraMoveDirection.X == -1)
+	{				
+		if (startT->GetDestination().x - Camera::Offset().X == 0 ||
+			m_player->GetLocation()->GetDestination().x > lastT->GetDestination().x - Camera::GetCenter().X
+			)
+		{
+			_cameraMoveDirection.X = 0;
+		}
+	}
+		
+	//right
+	if (_cameraMoveDirection.X == 1)
+	{
+		if (lastT->GetDestination().x - Camera::Offset().X == Camera::GetScreenSize().X - 32 ||
+			m_player->GetLocation()->GetDestination().x < Camera::GetCenter().X
+			)
+		{
+			_cameraMoveDirection.X = 0;
+		}
+	}
+		
+
+	return _cameraMoveDirection;
 }
 
 void World::printRoomData()

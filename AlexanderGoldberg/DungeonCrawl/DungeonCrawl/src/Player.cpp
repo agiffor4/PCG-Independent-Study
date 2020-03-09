@@ -4,6 +4,7 @@
 #include "InputManager.h"
 #include "Scene.h"
 #include "Interactable.h"
+#include "Camera.h"
 Player::Player()
 {
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::UP);
@@ -112,7 +113,16 @@ void Player::move(Vector2 _direction)
 		if (toMoveTo != nullptr && toMoveTo->IsPassable())
 		{
 			GetLocation()->MoveContentsTo(toMoveTo);
-			SetLocation(toMoveTo);
+			SetLocation(toMoveTo);			
+			
+#if UseCamera == 1
+Vector2 adjustedDirection = Camera::ClampMovement(_direction);
+adjustedDirection.Y *= -1;
+Camera::SetOffset(Camera::Offset() + (adjustedDirection * m_location->GetCurrentSize().X));
+#endif
+			
+			
+			
 		}
 	}
 	

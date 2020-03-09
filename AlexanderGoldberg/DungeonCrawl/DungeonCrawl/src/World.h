@@ -93,6 +93,7 @@ public:
 	Player* CreatePlayer();
 	void InvokeKeyUp(SDL_Keycode _key) override;
 	
+	Vector2 CheckIfCameraShouldMove(Vector2 _cameraMoveDirection);
 	//DEBUGGINg
 	void printRoomData();
 

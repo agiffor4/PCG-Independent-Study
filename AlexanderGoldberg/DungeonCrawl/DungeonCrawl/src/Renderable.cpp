@@ -1,5 +1,5 @@
 #include "Renderable.h"
-
+#include "Camera.h"
 Renderable::Renderable()
 {
 
@@ -38,16 +38,11 @@ void Renderable::SetPosition(float _x, float _y) {
 	updateDestination();
 }
 void Renderable::SetPosition(Vector2& _pos) {
-	m_position.X = _pos.X;
-	m_position.Y = _pos.Y;
-	updateDestination();
-	
+	SetPosition(_pos.X, _pos.Y);
 }
 
 void Renderable::SetPosition(const Vector2& _pos) {
-	m_position.X = _pos.X;
-	m_position.Y = _pos.Y;
-	updateDestination();
+	SetPosition(_pos.X, _pos.Y);
 
 }
 
@@ -115,7 +110,10 @@ void Renderable::Render(SDL_Renderer* renderer)
 	{
 		if (renderer != nullptr)
 		{
-			SDL_RenderCopyEx(renderer, m_texture, NULL, &m_destination, ((int)m_currentAngle), NULL, SDL_FLIP_NONE);
+			SDL_Rect cameraAdjustedDestination = m_destination;			
+			cameraAdjustedDestination.x -= Camera::Offset().X;
+			cameraAdjustedDestination.y -= Camera::Offset().Y;
+			SDL_RenderCopyEx(renderer, m_texture, NULL, &cameraAdjustedDestination, ((int)m_currentAngle), NULL, SDL_FLIP_NONE);
 		}
 		else
 		{

@@ -3,6 +3,7 @@
 #include "World.h"
 #include "Interactable.h"
 #include "TextA.h"
+#include "Camera.h"
 Tile::Tile() {
 
 }
@@ -72,8 +73,8 @@ bool Tile::blockingInteractable() {
 }
 
 bool Tile::inBounds(int _x, int _y) {
-	if (_x > GetPosition().X && _x < GetPosition().X + GetDestination().w &&
-		_y > GetPosition().Y && _y < GetPosition().Y + GetDestination().h)
+	if (_x > GetPosition().X && _x < GetPosition().X + GetDestination().w  - Camera::Offset().X&&
+		_y > GetPosition().Y && _y < GetPosition().Y + GetDestination().h - Camera::Offset().Y)
 	{
 		return true;
 	}

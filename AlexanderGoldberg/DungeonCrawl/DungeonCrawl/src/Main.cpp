@@ -12,12 +12,13 @@
 #include "AStarSearch.h"
 
 #include"Player.h"
+#include "Camera.h"
 
 #include <vector>
 #include <stack>
 #include<memory>
 #include <iostream>
-
+#define UseHigherGrid 0
 void CleanUpSDL(SDL_Window* _window, SDL_Renderer* _renderer);
 
 
@@ -43,19 +44,22 @@ void mainLoop()
 	int width = SDL_GetWindowSurface(window)->w;
 	int height = SDL_GetWindowSurface(window)->h;	
 
-	DeltaTime deltaTime = DeltaTime();
-	bool use50 = true;
+	DeltaTime deltaTime = DeltaTime();	
+	
+
+#if UseHigherGrid == 0
 	int gridSizeX = 30;
 	int gridSizeY = 30;
-	if (use50)
-	{
-		gridSizeX = 50;
-		gridSizeY = 50;
-	}
+#else
+	int gridSizeX = 50;
+	int gridSizeY = 50;
+#endif
 	
 	std::unique_ptr<Scene> scene(new Scene(renderer));//create scene
 	World myWorld = World(gridSizeX, gridSizeY, scene.get());
 	InputManager::GetInputManager()->SubscribeToInput(&myWorld, InputManager::KeyPressType::UP);
+	Camera::SetDimensions(width, height);
+	Camera::SetWorld(&myWorld);
 	myWorld.SetWindowRef(window);
 	myWorld.GenerateTiles(width, height);
 	myWorld.Generate();
