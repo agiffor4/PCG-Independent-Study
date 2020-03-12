@@ -148,6 +148,8 @@ void Renderable::Render(SDL_Renderer* renderer)
 			SDL_Rect cameraAdjustedDestination = m_destination;			
 			cameraAdjustedDestination.x -= Camera::Offset().X;
 			cameraAdjustedDestination.y -= Camera::Offset().Y;
+			cameraAdjustedDestination.x += m_renderOffset.X;
+			cameraAdjustedDestination.y += m_renderOffset.Y;
 			SDL_RenderCopyEx(renderer, m_texture, NULL, &cameraAdjustedDestination, ((int)m_currentAngle), NULL, SDL_FLIP_NONE);
 		}
 		else
@@ -165,4 +167,14 @@ void Renderable::Update(float _dt)
 void Renderable::CleanUp(){
 	SDL_DestroyTexture(m_texture);
 	printf("Clean up called for renderable %s\n", m_name.c_str());
+}
+
+
+void Renderable::SetRenderableOffset(Vector2 _renderOffset)
+{
+	m_renderOffset = _renderOffset;
+}
+const Vector2& Renderable::GetRenderableOffSet()
+{
+	return m_renderOffset;
 }

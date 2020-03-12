@@ -282,7 +282,13 @@ void Tile::Update(float _dt)
 
 void Tile::DetermineTileType(World* _world)
 {
-	SetRenderLayer(0);
+
+	/*if (IsPassable(true))
+		//_world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::DOWN) == nullptr && 
+	{
+		m_shouldRender = false;
+	}*/
+
 	Uint8 flag = 0;
 	Tile* t = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::UP);
 	if(t == nullptr || !t->IsPassable(true))
@@ -339,8 +345,6 @@ void Tile::DetermineTileType(World* _world)
 		break;
 	}
 	
-	if (!(GetPositionInVector() > _world->GetTileCount() - _world->GetMapDimentions().X))
-	{
 		Tile* adj = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::UP);
 		if (adj != nullptr)
 		{
@@ -363,8 +367,6 @@ void Tile::DetermineTileType(World* _world)
 			
 			}
 		}
-		
-
-	}
+	
 	
 }

@@ -10,6 +10,7 @@ private:
 	//basic funcationality
 	Vector2 m_position = Vector2();	
 	Vector2 m_currentSize = Vector2();
+	Vector2 m_renderOffset = Vector2();
 	float m_scale = 1;
 	Vector2 m_defaultSize = Vector2();
 	int m_renderLayer = 0;
@@ -48,6 +49,8 @@ public:
 	void SetSize(float _x, float _y);
 	Vector2 GetCurrentSize();
 	const Vector2& GetDefaultSize();
+	void SetRenderableOffset(Vector2 _renderOffset);
+	const Vector2& GetRenderableOffSet();
 	const std::string& GetName();
 	virtual void CleanUp();
 };

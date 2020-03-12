@@ -407,7 +407,7 @@ void World::GenerateLevel()
 	int doorPairsToGenerate = rooms.size() / 4;
 	GenerateDoors(exitIndex, doorPairsToGenerate, doorPairsToGenerate > 0 ? true : false, &bsp);
 	GenerateItems(exitIndex, &bsp);
-	
+	Vector2 CameraOffset = Camera::Offset();
 	tileRenderingSetUp();
 }
 void World::GenerateLevelP1() {
