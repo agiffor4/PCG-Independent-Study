@@ -33,7 +33,7 @@ void mainLoop()
 	bool play = true;
 	Quit quit = Quit(&play);
 	InputManager::GetInputManager()->SubscribeToInput(&quit, InputManager::KeyPressType::DOWN);
-	
+	Renderable::renderOrderChanged() = false;
 	//Init SDL
 	SDL_Window* window = SDL_CreateWindow("test", 
 		SDL_WINDOWPOS_CENTERED,

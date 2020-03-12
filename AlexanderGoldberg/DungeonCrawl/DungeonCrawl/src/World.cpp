@@ -380,6 +380,7 @@ void World::GenerateLevel()
 	{	
 		//when width = height = x round(log(x / 3) / log(2)) + 1 = number of times to split	
 		bsp.BeginSplit(round(std::log(m_horizontalTileCount / 3) / std::log(2)) + 1);//seems to produce a good ratio of rooms as long as the width = height	
+		//bsp.BeginSplit(2);
 		rooms = bsp.GetRoomTileIndexes();
 #ifdef Debug
 		timesRound--;
@@ -403,7 +404,8 @@ void World::GenerateLevel()
 
 	//EXIT generation
 	int exitIndex = CreateExit(&bsp);
-	GenerateDoors(exitIndex, 2, true, &bsp);
+	int doorPairsToGenerate = rooms.size() / 4;
+	GenerateDoors(exitIndex, doorPairsToGenerate, doorPairsToGenerate > 0 ? true : false, &bsp);
 	GenerateItems(exitIndex, &bsp);
 	
 	tileRenderingSetUp();
@@ -644,6 +646,15 @@ void World::tileRenderingSetUp()
 	{
 		m_tiles[i]->DetermineTileType(this);
 	}
+
+#if UseCamera == 1	
+	Vector2 offset = GetTileAtIndex(m_playerStart)->GetPosition();
+	offset.X -= Camera::GetScreenSize().X * 0.5f;
+	offset.Y -= Camera::GetScreenSize().Y * 0.5f;
+	Camera::SetOffset(offset);
+	Vector2 center = Vector2(Camera::GetScreenSize().X * 0.5f, Camera::GetScreenSize().Y * 0.5f);
+	Camera::SetCenter(center);
+#endif
 }
 
 void World::AddRooms(std::vector<std::vector<int>>& const _rooms) {

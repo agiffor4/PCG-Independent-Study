@@ -8,6 +8,13 @@ bool Interactable::InteratctionWrapper()
 	}
 	return false;
 }
+Interactable::Interactable()
+{
+	SetRenderLayer(1);
+}
+Interactable::~Interactable()
+{
+}
 void Interactable::SetBlocksPassage(bool _val)
 {
 	m_blocksPassage = _val;

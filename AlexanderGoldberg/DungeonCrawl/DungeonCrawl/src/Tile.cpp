@@ -282,25 +282,7 @@ void Tile::Update(float _dt)
 
 void Tile::DetermineTileType(World* _world)
 {
-	/*
-				case Tile::TileRenderType::empty:
-					return "empty";
-				case Tile::TileRenderType::wall4Side:
-					return "wall";
-				case Tile::TileRenderType::wall3Sidetop:
-					return "TC3";
-				case Tile::TileRenderType::wall3SideBottom:
-					return "BC3";
-				case Tile::TileRenderType::wall2SideTopL:
-					return "TLC";
-				case Tile::TileRenderType::wall2SideTopR:
-					return "TRC";
-				case Tile::TileRenderType::wall2SideBottomL:
-					return "BLC";
-				case Tile::TileRenderType::wall2SideBottomR:
-					return "BRC";
-	*/
-
+	SetRenderLayer(0);
 	Uint8 flag = 0;
 	Tile* t = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::UP);
 	if(t == nullptr || !t->IsPassable(true))
@@ -334,6 +316,7 @@ void Tile::DetermineTileType(World* _world)
 	if (flag & (Uint8)WallNeigbors::below && flag & (Uint8)WallNeigbors::right && flag & (Uint8)WallNeigbors::above)
 		m_tilerRenderType = TileRenderType::wall3SideRight;
 
+
 	switch (m_tilerRenderType)
 	{
 	case Tile::TileRenderType::empty:
@@ -355,4 +338,33 @@ void Tile::DetermineTileType(World* _world)
 	default:
 		break;
 	}
+	
+	if (!(GetPositionInVector() > _world->GetTileCount() - _world->GetMapDimentions().X))
+	{
+		Tile* adj = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::UP);
+		if (adj != nullptr)
+		{
+			if (IsPassable(true) == adj->IsPassable(true))// if tile above has the same passailty as this one
+			{
+				
+				SetPosition(Vector2(adj->GetPosition().X, adj->GetPosition().Y + GetDestination().w));
+			}
+			else
+			{ 
+				
+				if (IsPassable(true))// if not a wall
+				{
+					SetPosition(Vector2(adj->GetPosition().X, adj->GetPosition().Y + GetDestination().w + 12));
+				}
+				else
+				{
+					SetPosition(Vector2(adj->GetPosition().X, adj->GetPosition().Y + GetDestination().w - 12));
+				}
+			
+			}
+		}
+		
+
+	}
+	
 }

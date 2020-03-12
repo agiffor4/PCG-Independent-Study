@@ -1,5 +1,8 @@
 #include "Renderable.h"
 #include "Camera.h"
+
+
+
 Renderable::Renderable()
 {
 
@@ -57,6 +60,11 @@ void Renderable::SetScale(float _newScale)
 	updateScale();
 }
 
+float Renderable::GetScale()
+{
+	return m_scale;
+}
+
 void Renderable::SetSize(Vector2& _scale) {
 
 	SetSize(_scale.X, _scale.Y);
@@ -93,6 +101,10 @@ void Renderable::updateScale()
 	m_destination.w = m_currentSize.X;
 	m_destination.h = m_currentSize.Y;
 }
+bool& Renderable::renderOrderChanged(){
+	static bool s_renderOrderChanged;
+	return s_renderOrderChanged;
+}
 void Renderable::changeImage(std::string _imagePath, Uint32 _transparentColor)
 {
 	SDL_Surface* surface = SDL_LoadBMP(_imagePath.c_str());
@@ -114,6 +126,17 @@ void Renderable::changeImage(std::string _imagePath, Uint32 _transparentColor)
 		printf("Unable to load file at \"%s\"\n", _imagePath.c_str());
 	}
 	SDL_FreeSurface(surface);
+}
+
+void Renderable::SetRenderLayer(int _renderLayer)
+{
+	m_renderLayer = _renderLayer;
+	renderOrderChanged() = true;
+}
+
+int Renderable::GetRenderLayer()
+{
+	return m_renderLayer;
 }
 
 void Renderable::Render(SDL_Renderer* renderer)

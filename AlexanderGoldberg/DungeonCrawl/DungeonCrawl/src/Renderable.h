@@ -6,12 +6,13 @@
 class Renderable
 {
 private:
+	
 	//basic funcationality
 	Vector2 m_position = Vector2();	
 	Vector2 m_currentSize = Vector2();
 	float m_scale = 1;
 	Vector2 m_defaultSize = Vector2();
-
+	int m_renderLayer = 0;
 	//SDL
 	SDL_Texture* m_texture = nullptr;
 	SDL_Rect m_destination = SDL_Rect();
@@ -27,7 +28,10 @@ protected:
 	void updateScale();
 	//void changeImage(std::string _imagePath, Uint32 _transparentColor = -999);
 public:
+	static bool& renderOrderChanged();
 	void changeImage(std::string _imagePath, Uint32 _transparentColor = -999);
+	void SetRenderLayer(int _renderLayer);
+	int GetRenderLayer();
 	Renderable();
 	virtual ~Renderable();
 	virtual void Init(const std::string _path, const std::string _name, SDL_Renderer* _renderer, Uint32 _transparentColor = -999);
@@ -39,6 +43,7 @@ public:
 	const Vector2& GetPosition();
 	SDL_Rect GetDestination();
 	void SetScale(float _newScale);
+	float GetScale();
 	void SetSize(Vector2& _scale);
 	void SetSize(float _x, float _y);
 	Vector2 GetCurrentSize();

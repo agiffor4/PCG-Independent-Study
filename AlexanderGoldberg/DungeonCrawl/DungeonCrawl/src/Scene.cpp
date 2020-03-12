@@ -1,13 +1,14 @@
 #include "Scene.h"
 #include "Renderable.h"
 #include "Tile.h"
-Scene::Scene(SDL_Renderer* _renderer) 
+#include <algorithm>
+Scene::Scene(SDL_Renderer* _renderer)
 {
 	m_rendererRef = _renderer;
 }
 Scene::~Scene() {}
 
-void Scene::AddRenderable(const std::string _path, const std::string _name, float _x, float _y)
+void Scene::AddRenderable(const std::string _path, const std::string _name, float _x, float _y, float _renderDist)
 {
 	m_renderables.push_back(std::unique_ptr<Renderable>(new Renderable()));
 	m_renderables[m_renderables.size() - 1]->Init(_path, _name, m_rendererRef);
@@ -15,18 +16,16 @@ void Scene::AddRenderable(const std::string _path, const std::string _name, floa
 }
 
 
-void Scene::AddRenderable(Renderable* _renderable)
+void Scene::AddRenderable(Renderable* _renderable, float _renderDist)
 {
 	m_renderables.push_back(std::unique_ptr<Renderable>(_renderable));
 }
 
 
 
-void Scene::AddRenderable(const std::string _path, const std::string _name, Vector2 _position)
+void Scene::AddRenderable(const std::string _path, const std::string _name, Vector2 _position, float _renderDist)
 {
-	m_renderables.push_back(std::unique_ptr<Renderable>(new Renderable()));
-	m_renderables[m_renderables.size() - 1]->Init(_path, _name, m_rendererRef);
-	m_renderables[m_renderables.size() - 1]->SetPosition((float)_position.X, (float)_position.Y);
+	AddRenderable(_path, _name, (float)_position.X, (float)_position.Y, _renderDist);
 }
 /*
 int Scene::AddSound(AudioFileA& _sound, bool _playOnCreate)
@@ -69,6 +68,11 @@ void Scene::PlayAudio() {
 
 void Scene::Render()
 {
+	if (Renderable::renderOrderChanged())
+	{
+		std::sort(m_renderables.begin(), m_renderables.end(), [](std::unique_ptr<Renderable>& _lhs, std::unique_ptr<Renderable>& _rhs) { return _lhs.get()->GetRenderLayer() < _rhs.get()->GetRenderLayer(); });
+		Renderable::renderOrderChanged() = false;
+	}
 	SDL_RenderClear(m_rendererRef);
 	for (int i = 0; i < m_renderables.size(); i++)
 	{
