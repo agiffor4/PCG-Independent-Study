@@ -50,6 +50,7 @@ protected:
 	int m_keyDoorGenerationType = 1;
 	int m_lastKeyRoom = -1;
 	int m_lastKeyDepth = -1;
+	void tileRenderingSetUp();
 public:
 
 	enum class TileDirection
@@ -91,6 +92,7 @@ public:
 	int GetIndexOfRoomTileIsIn(int _index);
 	int GetPlayerStartLocation(const std::vector<std::vector<int>>& _rooms, int* roomSpawnedIn);
 	Player* CreatePlayer();
+	void PlacePlayer(std::vector<std::vector<int>>* _rooms = nullptr);
 	void InvokeKeyUp(SDL_Keycode _key) override;
 	
 	Vector2 CheckIfCameraShouldMove(Vector2 _cameraMoveDirection);

@@ -323,11 +323,11 @@ void World::GenerateTiles(int _screenWidth, int _screenHeight) {
 #else
 	Vector2 targetSize = Vector2(_screenWidth / m_horizontalTileCount, _screenHeight / m_verticalTileCount);
 #endif
+	float scale = 21 / 64;
 	for (size_t i = 0; i < m_verticalTileCount; i++)
 	{
 		for (size_t j = 0; j < m_horizontalTileCount; j++)
 		{
-
 			std::string name = "Tile (" + std::to_string(j) + ", " + std::to_string(i) + ")";
 			Tile* t = new Tile();
 			t->Init("img/blank_tile.bmp", name, GetTileCount(), j, i, Vector2(j * targetSize.X, i * targetSize.Y), m_scene->GetRenderer());
@@ -393,11 +393,10 @@ void World::GenerateLevel()
 	FillRoomDataStructs(&bsp);
 
 	if (!m_playerCreated)
-		m_player = CreatePlayer();	
-	m_playerStart = GetPlayerStartLocation(rooms, &m_roomPlayerSpawnin);
-	Tile* t = GetTileAtIndex(m_playerStart);
-	m_player->SetLocation(t);
-	t->SetContents(m_player);	
+		m_player = CreatePlayer();
+	PlacePlayer(&rooms);
+	
+	
 #if UseCamera == 1
 	Vector2 offset = t->GetPosition();	
 	offset.X *= 0.5f;
@@ -411,7 +410,7 @@ void World::GenerateLevel()
 	GenerateDoors(exitIndex, 2, true, &bsp);
 	GenerateItems(exitIndex, &bsp);
 	
-	
+	tileRenderingSetUp();
 }
 void World::GenerateLevelP1() {
 
@@ -639,6 +638,14 @@ void World::createTreasureInRoom(int _roomToCreateTreasureIn)
 	m_tiles[randomTile]->AddItem(t);
 }
 
+void World::tileRenderingSetUp()
+{
+	for (size_t i = 0; i < m_tiles.size(); i++)
+	{
+		m_tiles[i]->DetermineTileType(this);
+	}
+}
+
 void World::AddRooms(std::vector<std::vector<int>>& const _rooms) {
 	m_roomsData.erase(m_roomsData.begin(), m_roomsData.end());
 	
@@ -725,6 +732,14 @@ Player* World::CreatePlayer()
 	
 }
 
+void World::PlacePlayer(std::vector<std::vector<int>>* _rooms)
+{
+	m_playerStart = GetPlayerStartLocation(_rooms == nullptr ? m_bsp->GetRoomTileIndexes() : (*_rooms), &m_roomPlayerSpawnin);
+	Tile* t = GetTileAtIndex(m_playerStart);
+	m_player->SetLocation(t);
+	t->SetContents(m_player);
+}
+
 void World::InvokeKeyUp(SDL_Keycode _key)
 {
 	BSP bsp = BSP(1,1);
@@ -788,11 +803,9 @@ void World::InvokeKeyUp(SDL_Keycode _key)
 			{
 				if (!m_playerCreated)
 					m_player = CreatePlayer();
-				m_playerStart = GetPlayerStartLocation(m_bsp->GetRoomTileIndexes(), &m_roomPlayerSpawnin);
-				Tile* t = GetTileAtIndex(m_playerStart);
-				m_player->SetLocation(t);
-				t->SetContents(m_player);
+				PlacePlayer();
 				CreateExit();
+				tileRenderingSetUp();
 			}
 		}
 			

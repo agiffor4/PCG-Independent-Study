@@ -100,10 +100,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;UseCamera;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;UseCamera;UseScale;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)DungeonCrawl\SDL\include;$(SolutionDir)DungeonCrawl\SDL2_mixer\include;$(SolutionDir)DungeonCrawl\SDL2_ttf\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <UndefinePreprocessorDefinitions>UseCamera</UndefinePreprocessorDefinitions>
+      <UndefinePreprocessorDefinitions>UseCamera;UseScale</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

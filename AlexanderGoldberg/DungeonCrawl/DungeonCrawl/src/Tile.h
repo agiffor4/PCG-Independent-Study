@@ -13,12 +13,85 @@ private:
 	Thing* m_contents = nullptr;
 	std::vector<Interactable*> m_items;
 	Vector2 m_posInGrid = Vector2();
-	World* m_world;
 	int m_posInVector = -1;
 	bool m_passable = true;
 	bool m_corridor = false;
 	int m_roomIn = -1;
 	TextA* m_text = nullptr;
+	enum class TileRenderType {
+		empty,
+		wall4Side, 
+		/*
+		 x
+		x0x
+		 x
+		*/
+		wall3Sidetop,
+		/*
+		 x
+		x0x
+		 o
+		*/
+		wall3SideBottom,
+		/*
+		 o
+		x0x
+		 x
+		*/
+		wall2SideTopL,
+		/*
+		 x
+		x0o
+		 o
+		*/
+		wall2SideTopR,
+		/*
+		 x
+		o0x
+		 o
+		*/
+		wall2SideBottomL,
+		/*
+		 o
+		x0o
+		 x
+		*/
+		wall2SideBottomR,
+		/*
+		 o
+		o0x
+		 x
+		*/
+		wall3SideLeft,
+		/*
+		 x
+		x0o
+		 x
+		*/
+		wall3SideRight,
+		/*
+		 x
+		o0x
+		 x
+		*/
+
+		/*
+		support this too?
+		 x
+		o0o
+		 x	
+		
+		*/
+
+	};
+	TileRenderType m_tilerRenderType = TileRenderType::empty;
+	enum class WallNeigbors {
+		above = 1,
+		below = 2,
+		right = 4,
+		left = 8,
+
+	};
 public:
 
 
@@ -44,5 +117,6 @@ public:
 	void ClearTileContents();
 	void Render(SDL_Renderer* _renderer) override;
 	void Update(float _dt) override;
+	void DetermineTileType(World* _world);
 };
 
