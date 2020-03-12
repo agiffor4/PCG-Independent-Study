@@ -38,6 +38,7 @@ void World::setWindowTitle()
 
 World::World(int _hTileCount, int _vTileCount, Scene* _scene)
 {
+	m_scale = 32.0f / 64.0f;
 	m_horizontalTileCount = _hTileCount;
 	m_verticalTileCount = _vTileCount;
 	m_scene = _scene;
@@ -399,14 +400,7 @@ void World::GenerateLevel()
 	PlacePlayer(&rooms);
 	
 	
-#if UseCamera == 1
-	Vector2 offset = t->GetPosition();	
-	offset.X *= 0.5f;
-	offset.Y *= 0.5f;
-	Camera::SetOffset(offset);
-	Vector2 center = Vector2(320, 240);
-	Camera::SetCenter(center);
-#endif
+
 	//EXIT generation
 	int exitIndex = CreateExit(&bsp);
 	GenerateDoors(exitIndex, 2, true, &bsp);
@@ -745,6 +739,15 @@ void World::PlacePlayer(std::vector<std::vector<int>>* _rooms)
 	Tile* t = GetTileAtIndex(m_playerStart);
 	m_player->SetLocation(t);
 	t->SetContents(m_player);
+#if UseCamera == 1
+	Vector2 offset = t->GetPosition();
+	
+	offset.X -= Camera::GetScreenSize().X * 0.5f;
+	offset.Y -= Camera::GetScreenSize().Y * 0.5f;
+	Camera::SetOffset(offset);	
+	Vector2 center = Vector2(Camera::GetScreenSize().X * 0.5f, Camera::GetScreenSize().Y * 0.5f);
+	Camera::SetCenter(center);
+#endif
 }
 
 void World::InvokeKeyUp(SDL_Keycode _key)
@@ -845,7 +848,7 @@ Vector2 World::CheckIfCameraShouldMove(Vector2 _cameraMoveDirection)
 	if (_cameraMoveDirection.Y == 1)
 	{
 		
-		if (startT->GetDestination().y - Camera::Offset().Y == 0 ||
+		if (startT->GetDestination().y - Camera::Offset().Y >= 0 ||
 			m_player->GetLocation()->GetDestination().y - Camera::Offset().Y > Camera::GetCenter().Y - tileSize.Y
 			)
 		{
@@ -857,7 +860,7 @@ Vector2 World::CheckIfCameraShouldMove(Vector2 _cameraMoveDirection)
 	if (_cameraMoveDirection.Y == -1)
 	{
 		
-		if (lastT->GetDestination().y - Camera::Offset().Y == Camera::GetScreenSize().Y - tileSize.Y || 
+		if (lastT->GetDestination().y - Camera::Offset().Y <= Camera::GetScreenSize().Y - tileSize.Y || 
 			m_player->GetLocation()->GetDestination().y < Camera::GetCenter().Y
 			)
 		{
@@ -868,10 +871,10 @@ Vector2 World::CheckIfCameraShouldMove(Vector2 _cameraMoveDirection)
 	//left
 	if (_cameraMoveDirection.X == -1)
 	{				
-		if (startT->GetDestination().x - Camera::Offset().X == 0 ||
+		if (startT->GetDestination().x - Camera::Offset().X >= 0 ||
 			m_player->GetLocation()->GetDestination().x > lastT->GetDestination().x - Camera::GetCenter().X
 			)
-		{
+		{			
 			_cameraMoveDirection.X = 0;
 		}
 	}
@@ -879,7 +882,7 @@ Vector2 World::CheckIfCameraShouldMove(Vector2 _cameraMoveDirection)
 	//right
 	if (_cameraMoveDirection.X == 1)
 	{
-		if (lastT->GetDestination().x - Camera::Offset().X == Camera::GetScreenSize().X - 32 ||
+		if (lastT->GetDestination().x - Camera::Offset().X <= Camera::GetScreenSize().X - 32 ||
 			m_player->GetLocation()->GetDestination().x < Camera::GetCenter().X
 			)
 		{

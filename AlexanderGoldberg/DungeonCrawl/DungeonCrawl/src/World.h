@@ -21,7 +21,6 @@ private:
 	int m_generationNumber = 0;
 protected:
 	
-
 	std::vector<RoomData> m_roomsData;
 	std::vector<Tile*> m_tiles;
 	int m_horizontalTileCount = 0;
@@ -51,7 +50,7 @@ protected:
 	int m_lastKeyRoom = -1;
 	int m_lastKeyDepth = -1;
 
-	float m_scale = 21.0f / 64.0f;
+	float m_scale = 32.0f / 64.0f;
 	void tileRenderingSetUp();
 public:
 
