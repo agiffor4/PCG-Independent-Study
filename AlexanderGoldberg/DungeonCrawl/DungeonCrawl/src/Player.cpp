@@ -83,8 +83,8 @@ void Player::InvokeKeyUp(SDL_Keycode _key)
 void Player::Initalize(World& _world, const std::string _path, const std::string _name, SDL_Renderer* _renderer, Uint32 _transparentColor)
 {
 	Renderable::Init(_path, _name, _renderer, _transparentColor);
-	m_world = &_world;
-	SetSize(m_world->GetTileSize().X, m_world->GetTileSize().Y);
+	m_world = &_world;	
+	
 }
 
 void Player::InteractWithThingInSpace()

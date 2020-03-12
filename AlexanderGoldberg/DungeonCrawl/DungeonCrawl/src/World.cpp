@@ -323,16 +323,18 @@ void World::GenerateTiles(int _screenWidth, int _screenHeight) {
 #else
 	Vector2 targetSize = Vector2(_screenWidth / m_horizontalTileCount, _screenHeight / m_verticalTileCount);
 #endif
-	float scale = 21 / 64;
+
 	for (size_t i = 0; i < m_verticalTileCount; i++)
 	{
 		for (size_t j = 0; j < m_horizontalTileCount; j++)
 		{
 			std::string name = "Tile (" + std::to_string(j) + ", " + std::to_string(i) + ")";
 			Tile* t = new Tile();
-			t->Init("img/blank_tile.bmp", name, GetTileCount(), j, i, Vector2(j * targetSize.X, i * targetSize.Y), m_scene->GetRenderer());
+			//t->Init("img/blank_tile.bmp", name, GetTileCount(), j, i, Vector2(j * targetSize.X, i * targetSize.X), m_scene->GetRenderer());		
+			t->Init("img/blank_tile.bmp", name, GetTileCount(), j, i, Vector2(j * m_scale, i * m_scale), m_scene->GetRenderer());
 			t->SetPassable(false);
-			t->SetSize(targetSize);
+			//t->SetSize(targetSize);
+			t->SetScale(m_scale);
 			AddTile(t);
 			InputManager::GetInputManager()->SubscribeToInput(t, InputManager::KeyPressType::MOUSEUP);
 			m_scene->AddRenderable(t);
@@ -465,7 +467,8 @@ int World::CreateExit(BSP* _bspToUse) {
 	
 	Exit* e = new Exit(this);
 	e->Init("img/Exit.bmp", "Exit", m_scene->GetRenderer());
-	e->SetSize(GetTileSize().X, GetTileSize().Y);
+	//e->SetSize(GetTileSize().X, GetTileSize().Y);
+	e->SetScale(m_scale);
 	e->SetLocation(t);
 	t->AddItem(e);
 	return t->GetPositionInVector();
@@ -498,7 +501,8 @@ void World::GenerateKeyDoorPair(int _roomToGenerateDoorsIn, RoomTree& _roomTree,
 		t->AddItem(d);
 		d->SetLocation(t);
 		d->Init(_doorImage, "Door", m_scene->GetRenderer());
-		d->SetSize(scale);
+		//d->SetSize(scale);
+		d->SetScale(m_scale);
 		k->SetDoor(d);
 	}
 
@@ -551,7 +555,8 @@ void World::GenerateKeyDoorPair(int _roomToGenerateDoorsIn, RoomTree& _roomTree,
 	t->AddItem(k);
 	k->SetLocation(t);
 	k->Init(_keyImage, "Key", m_scene->GetRenderer());
-	k->SetSize(scale);
+	//k->SetSize(scale);
+	k->SetScale(m_scale);
 	
 }
 void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bool _ensureDoorToExit, BSP* _bspToUse)
@@ -634,7 +639,8 @@ void World::createTreasureInRoom(int _roomToCreateTreasureIn)
 	t->SetLocation(m_tiles[randomTile]);
 	t->Init("img/Treasure.bmp", "Treasue", m_scene->GetRenderer());	
 	Vector2 scale = GetTileSize();
-	t->SetSize(scale);
+	//t->SetSize(scale);
+	t->SetScale(m_scale);
 	m_tiles[randomTile]->AddItem(t);
 }
 
@@ -728,6 +734,7 @@ Player* World::CreatePlayer()
 		m_playerCreated = true;		
 		Player* p = new Player();		
 		p->Initalize((*this), "img/Player.bmp", "Player", m_scene->GetRenderer());
+		p->SetScale(m_scale);
 		return p;
 	
 }

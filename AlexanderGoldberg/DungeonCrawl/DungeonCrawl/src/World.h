@@ -50,6 +50,8 @@ protected:
 	int m_keyDoorGenerationType = 1;
 	int m_lastKeyRoom = -1;
 	int m_lastKeyDepth = -1;
+
+	float m_scale = 21.0f / 64.0f;
 	void tileRenderingSetUp();
 public:
 

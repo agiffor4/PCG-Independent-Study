@@ -21,8 +21,8 @@ void Renderable::Init(const std::string _path, const std::string _name, SDL_Rend
 		m_texture = SDL_CreateTextureFromSurface(_renderer, surface);
 		m_destination.w = surface->w;
 		m_destination.h = surface->h;
-		m_scaleDefault.X = surface->w;
-		m_scaleDefault.Y = surface->h;
+		m_defaultSize.X = surface->w;
+		m_defaultSize.Y = surface->h;
 		
 	}
 	else
@@ -49,6 +49,14 @@ void Renderable::SetPosition(const Vector2& _pos) {
 const Vector2& Renderable::GetPosition() { return m_position;}
 SDL_Rect Renderable::GetDestination() { return m_destination; }
 
+void Renderable::SetScale(float _newScale)
+{
+	m_scale = _newScale;
+	m_currentSize.X = m_defaultSize.X * m_scale;
+	m_currentSize.Y = m_defaultSize.Y * m_scale;
+	updateScale();
+}
+
 void Renderable::SetSize(Vector2& _scale) {
 
 	SetSize(_scale.X, _scale.Y);
@@ -61,13 +69,17 @@ Vector2 Renderable::GetCurrentSize() {
 	return Vector2(m_destination.w, m_destination.h);
 
 }
+const Vector2& Renderable::GetDefaultSize()
+{
+	return m_defaultSize;
+}
 const std::string& Renderable::GetName()
 {
 	return m_name;
 }
 void Renderable::SetSize(float _x, float _y) {
-	m_scale.X = _x;
-	m_scale.Y = _y;
+	m_currentSize.X = _x;
+	m_currentSize.Y = _y;
 	updateScale();
 
 }
@@ -78,8 +90,8 @@ void Renderable::updateDestination()
 }
 void Renderable::updateScale()
 {
-	m_destination.w = m_scale.X;
-	m_destination.h = m_scale.Y;
+	m_destination.w = m_currentSize.X;
+	m_destination.h = m_currentSize.Y;
 }
 void Renderable::changeImage(std::string _imagePath, Uint32 _transparentColor)
 {
@@ -92,9 +104,9 @@ void Renderable::changeImage(std::string _imagePath, Uint32 _transparentColor)
 		m_texture = SDL_CreateTextureFromSurface(m_rendererRef, surface);
 		m_destination.w = surface->w;
 		m_destination.h = surface->h;
-		m_scaleDefault.X = surface->w;
-		m_scaleDefault.Y = surface->h;
-		SetSize(m_scale);
+		m_defaultSize.X = surface->w;
+		m_defaultSize.Y = surface->h;
+		SetSize(m_currentSize);
 
 	}
 	else
