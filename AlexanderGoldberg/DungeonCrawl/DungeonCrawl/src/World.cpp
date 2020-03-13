@@ -633,7 +633,8 @@ void World::createTreasureInRoom(int _roomToCreateTreasureIn)
 	int randomTile = containedTiles[rand() % containedTiles.size()];
 	Treasure* t = new Treasure();
 	t->SetLocation(m_tiles[randomTile]);
-	t->Init("img/Treasure.bmp", "Treasue", m_scene->GetRenderer());	
+	//t->Init("img/Treasure.bmp", "Treasue", m_scene->GetRenderer());	
+	t->Init("img/GemBlue.png", "Treasue", m_scene->GetRenderer());	
 	Vector2 scale = GetTileSize();
 	//t->SetSize(scale);
 	t->SetScale(m_scale);

@@ -1,7 +1,6 @@
 #include "Renderable.h"
 #include "Camera.h"
-
-
+#include "SDL_image.h"
 
 Renderable::Renderable()
 {
@@ -14,8 +13,8 @@ Renderable::~Renderable()
 }
 void Renderable::Init(const std::string _path, const std::string _name, SDL_Renderer* _renderer, Uint32 _transparentColor)
 {
-	m_name = _name;
-	SDL_Surface* surface = SDL_LoadBMP(_path.c_str());
+	m_name = _name;	
+	SDL_Surface* surface = IMG_Load(_path.c_str());
 	if (surface != nullptr)
 	{
 		m_rendererRef = _renderer;
