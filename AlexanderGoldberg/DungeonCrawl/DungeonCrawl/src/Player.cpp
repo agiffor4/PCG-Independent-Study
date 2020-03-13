@@ -75,6 +75,9 @@ void Player::InvokeKeyUp(SDL_Keycode _key)
 	case SDLK_e:
 		InteractWithThingInSpace();
 		break;
+	case SDLK_q:
+		GetLocation()->PrintTileData();
+		break;
 	default:
 		break;
 	}

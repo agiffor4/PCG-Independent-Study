@@ -5,6 +5,7 @@
 #include "TextA.h"
 #include "Camera.h"
 #include "World.h"
+#include "Shadow.h"
 Tile::Tile() {
 
 }
@@ -74,8 +75,8 @@ bool Tile::blockingInteractable() {
 }
 
 bool Tile::inBounds(int _x, int _y) {
-	if (_x > GetPosition().X && _x < GetPosition().X + GetDestination().w  - Camera::Offset().X&&
-		_y > GetPosition().Y && _y < GetPosition().Y + GetDestination().h - Camera::Offset().Y)
+	if (_x > GetDestination().x - Camera::Offset().X && _x < GetDestination().x + GetDestination().w  - Camera::Offset().X &&
+		_y > GetDestination().y - Camera::Offset().Y && _y < GetDestination().y + GetDestination().h - Camera::Offset().Y)
 	{
 		return true;
 	}
@@ -154,54 +155,67 @@ void Tile::InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y)
 	case IInputHandler::MouseButton::RIGHT:
 		if (inBounds(_x, _y))
 		{
-			auto lam = [](TileRenderType _type)
-			{
-				switch (_type)
-				{
-				case Tile::TileRenderType::empty:
-					return "empty";
-				case Tile::TileRenderType::wall4Side:
-					return "wall";
-				case Tile::TileRenderType::wall3Sidetop:
-					return "TC3";
-				case Tile::TileRenderType::wall3SideBottom:
-					return "BC3";
-				case Tile::TileRenderType::wall2SideTopL:
-					return "TLC";
-				case Tile::TileRenderType::wall2SideTopR:
-					return "TRC";
-				case Tile::TileRenderType::wall2SideBottomL:
-					return "BLC";
-				case Tile::TileRenderType::wall2SideBottomR:
-					return "BRC";
-				case Tile::TileRenderType::wall3SideLeft:
-					return "LC3";
-				case Tile::TileRenderType::wall3SideRight:
-					return "RC3";
-				default:
-					return "Error!";
-				}
-			};
-			printf("clicked on tile %s (index %d) in room with index %d, \n", m_name.c_str(), GetPositionInVector(), m_roomIn);
-			printf("Passable = %s\n", (IsPassable() ? "true." : "false."));
-			printf("Tile render type is %s\n", lam(m_tilerRenderType));
-			printf("Corridor = %s\n", (IsCorridor() ? "true." : "false."));
-			printf("Contains %s, \n", (m_contents != nullptr ? m_contents->GetName().c_str() : "Nothing"));
-			if (m_items.size() > 0)
-			{
-				printf("Other items present include, ");
-				for (size_t i = 0; i < m_items.size(); i++)
-					printf("%s, ", m_items[i]->GetName().c_str());
-				printf("\n");
-			}
-
-		}		
+			PrintTileData();
+		}
 		break;
 	case IInputHandler::MouseButton::MIDDLE:
 		break;
 	default:
 		break;
 	}
+}
+
+void Tile::PrintTileData()
+{
+	auto lam = [](TileRenderType _type)
+	{
+		switch (_type)
+		{
+		case Tile::TileRenderType::empty:
+			return "empty";
+		case Tile::TileRenderType::wall4Side:
+			return "wall";
+		case Tile::TileRenderType::wall3Sidetop:
+			return "TC3";
+		case Tile::TileRenderType::wall3SideBottom:
+			return "BC3";
+		case Tile::TileRenderType::wall2SideTopL:
+			return "TLC";
+		case Tile::TileRenderType::wall2SideTopR:
+			return "TRC";
+		case Tile::TileRenderType::wall2SideBottomL:
+			return "BLC";
+		case Tile::TileRenderType::wall2SideBottomR:
+			return "BRC";
+		case Tile::TileRenderType::wall3SideLeft:
+			return "LC3";
+		case Tile::TileRenderType::wall3SideRight:
+			return "RC3";	
+		case Tile::TileRenderType::wall1SideBottom:
+			return "W1B";
+		case Tile::TileRenderType::wall1SideTop:
+			return "W1T";
+		case Tile::TileRenderType::wall1SideLeft:
+			return "W1L";
+		case Tile::TileRenderType::wall1SideRight:
+			return "W1R";
+		default:
+			return "Error!";
+		}
+	};
+	printf("\nClicked on tile %s (index %d) in room with index %d, \n", m_name.c_str(), GetPositionInVector(), m_roomIn);
+	printf("Passable = %s\n", (IsPassable() ? "true." : "false."));
+	printf("Tile render type is %s\n", lam(m_tilerRenderType));
+	printf("Corridor = %s\n", (IsCorridor() ? "true." : "false."));
+	printf("Contains %s, \n", (m_contents != nullptr ? m_contents->GetName().c_str() : "Nothing"));
+	if (m_items.size() > 0)
+	{
+		printf("Other items present include, ");
+		for (size_t i = 0; i < m_items.size(); i++)
+			printf("%s, ", m_items[i]->GetName().c_str());
+		printf("\n");
+	}
+
 }
 
 void Tile::ClearTileContents() {
@@ -283,12 +297,7 @@ void Tile::Update(float _dt)
 void Tile::DetermineTileType(World* _world)
 {
 
-	/*if (IsPassable(true))
-		//_world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::DOWN) == nullptr && 
-	{
-		m_shouldRender = false;
-	}*/
-
+	m_tilerRenderType = TileRenderType::empty;
 	Uint8 flag = 0;
 	Tile* t = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::UP);
 	if(t == nullptr || !t->IsPassable(true))
@@ -302,7 +311,6 @@ void Tile::DetermineTileType(World* _world)
 	t = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::RIGHT);
 	if (t == nullptr || !t->IsPassable(true))
 		flag |= (Uint8)WallNeigbors::right;
-
 	if (flag & (Uint8)WallNeigbors::left && flag & (Uint8)WallNeigbors::below)
 		m_tilerRenderType = TileRenderType::wall2SideBottomL;
 	if (flag & (Uint8)WallNeigbors::right && flag & (Uint8)WallNeigbors::below)
@@ -321,30 +329,19 @@ void Tile::DetermineTileType(World* _world)
 		m_tilerRenderType = TileRenderType::wall3SideLeft;
 	if (flag & (Uint8)WallNeigbors::below && flag & (Uint8)WallNeigbors::right && flag & (Uint8)WallNeigbors::above)
 		m_tilerRenderType = TileRenderType::wall3SideRight;
+	if (flag & (Uint8)WallNeigbors::below && (flag ^ (Uint8)WallNeigbors::above) && (flag ^ (Uint8)WallNeigbors::right) && (flag ^ (Uint8)WallNeigbors::left))
+		m_tilerRenderType = TileRenderType::wall1SideBottom;
+	if (flag & (Uint8)WallNeigbors::above && (flag ^ (Uint8)WallNeigbors::below) && (flag ^ (Uint8)WallNeigbors::right) && (flag ^ (Uint8)WallNeigbors::left))
+		m_tilerRenderType = TileRenderType::wall1SideTop;
+	if (flag & (Uint8)WallNeigbors::right && (flag ^ (Uint8)WallNeigbors::below) && (flag ^ (Uint8)WallNeigbors::below) && (flag ^ (Uint8)WallNeigbors::above))
+		m_tilerRenderType = TileRenderType::wall1SideRight;
+	if (flag & (Uint8)WallNeigbors::left && (flag ^ (Uint8)WallNeigbors::below) && (flag ^ (Uint8)WallNeigbors::right) && (flag ^ (Uint8)WallNeigbors::above))
+		m_tilerRenderType = TileRenderType::wall1SideLeft;
+	if (flag & (Uint8)WallNeigbors::left && (flag & (Uint8)WallNeigbors::right) && (flag ^ (Uint8)WallNeigbors::below) && (flag ^ (Uint8)WallNeigbors::above))
+		m_tilerRenderType = TileRenderType::wall2SideLeftRight;
+	if (flag ^ (Uint8)WallNeigbors::left && (flag ^ (Uint8)WallNeigbors::right) && (flag & (Uint8)WallNeigbors::below) && (flag & (Uint8)WallNeigbors::above))
+		m_tilerRenderType = TileRenderType::wall2SideUpDown;
 
-
-	switch (m_tilerRenderType)
-	{
-	case Tile::TileRenderType::empty:
-		break;
-	case Tile::TileRenderType::wall4Side:
-		break;
-	case Tile::TileRenderType::wall3Sidetop:
-		break;
-	case Tile::TileRenderType::wall3SideBottom:
-		break;
-	case Tile::TileRenderType::wall2SideTopL:
-		break;
-	case Tile::TileRenderType::wall2SideTopR:
-		break;
-	case Tile::TileRenderType::wall2SideBottomL:
-		break;
-	case Tile::TileRenderType::wall2SideBottomR:
-		break;
-	default:
-		break;
-	}
-	
 		Tile* adj = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::UP);
 		if (adj != nullptr)
 		{
@@ -355,7 +352,6 @@ void Tile::DetermineTileType(World* _world)
 			}
 			else
 			{ 
-				
 				if (IsPassable(true))// if not a wall
 				{
 					SetPosition(Vector2(adj->GetPosition().X, adj->GetPosition().Y + GetDestination().w + 12));
@@ -367,6 +363,65 @@ void Tile::DetermineTileType(World* _world)
 			
 			}
 		}
-	
+		
+		if (IsPassable(true))
+		{
+			Shadow* s = nullptr;
+			switch (m_tilerRenderType)
+			{
+			case Tile::TileRenderType::empty:
+				break;
+			case Tile::TileRenderType::wall4Side:
+				break;
+			case Tile::TileRenderType::wall3Sidetop:
+				break;
+			case Tile::TileRenderType::wall3SideBottom:
+				break;
+			case Tile::TileRenderType::wall2SideTopL:
+				break;
+			case Tile::TileRenderType::wall2SideTopR:
+				break;
+			case Tile::TileRenderType::wall2SideBottomL:
+				break;
+			case Tile::TileRenderType::wall2SideBottomR:
+				break;
+			case Tile::TileRenderType::wall3SideLeft:
+				break;
+			case Tile::TileRenderType::wall3SideRight:
+				break;
+			case Tile::TileRenderType::wall1SideBottom:
+				/*s = new Shadow();
+				s->Init("img/Shadow_North.png", "Shadow North", m_rendererRef);
+				s->SetRenderableOffset(Vector2(0.0f, 0.0f));*/
+				break;
+			case Tile::TileRenderType::wall1SideTop:
+				s = new Shadow(); 
+				s->Init("img/Shadow_South.png", "Shadow South", m_rendererRef);
+				//s->Init("img/Shadow_North.png", "Shadow North", m_rendererRef);
+				//s->SetRenderableOffset(Vector2(0.0f, -8.0f));
+				break;
+			case Tile::TileRenderType::wall1SideLeft:
+				break;
+			case Tile::TileRenderType::wall1SideRight:
+				break;
+
+			case Tile::TileRenderType::wall2SideLeftRight:
+				break;
+			case Tile::TileRenderType::wall2SideUpDown:
+				s = new Shadow();
+				s->Init("img/Shadow_South.png", "Shadow South", m_rendererRef);
+				//s->SetRenderableOffset(Vector2(0.0f, -8.0f));
+				break;
+			default:
+				break;
+			}
+			if (s != nullptr)
+			{
+				
+				AddItem(s);				
+				s->SetLocation(this);
+			}
+				
+		}
 	
 }

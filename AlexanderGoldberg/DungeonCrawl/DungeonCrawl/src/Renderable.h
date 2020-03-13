@@ -17,7 +17,7 @@ private:
 	//SDL
 	SDL_Texture* m_texture = nullptr;
 	SDL_Rect m_destination = SDL_Rect();
-	SDL_Renderer* m_rendererRef = nullptr;
+	
 	
 	//rotation
 	float m_currentAngle = 0;
@@ -27,6 +27,7 @@ protected:
 	std::string m_name = "NO NAME SET";
 	void updateDestination();
 	void updateScale();
+	SDL_Renderer* m_rendererRef = nullptr;
 	//void changeImage(std::string _imagePath, Uint32 _transparentColor = -999);
 public:
 	static bool& renderOrderChanged();

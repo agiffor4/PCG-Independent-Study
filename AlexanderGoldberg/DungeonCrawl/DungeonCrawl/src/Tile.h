@@ -74,13 +74,41 @@ private:
 		o0x
 		 x
 		*/
-
+		wall1SideBottom,
+		/*		
+		 o
+		o0o
+		 x			
+		*/
+		wall1SideTop,
 		/*
-		support this too?
 		 x
 		o0o
-		 x	
-		
+		 o
+		*/
+		wall1SideLeft,
+		/*
+		 o
+		x0o
+		 o
+		*/
+		wall1SideRight,
+		/*
+		 o
+		o0x
+		 o
+		*/
+		wall2SideLeftRight,
+		/*
+		 o
+		x0x
+		 o
+		*/
+		wall2SideUpDown
+		/*
+		 x
+		o0o
+		 x
 		*/
 
 	};
@@ -114,6 +142,7 @@ public:
 	const Vector2& GetPositionInGrid();
 	void AddRoomNumber(int _roomTileIsIn, bool _renderNumbers, SDL_Renderer* _renderer);
 	void InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y) override;
+	void PrintTileData();
 	void ClearTileContents();
 	void Render(SDL_Renderer* _renderer) override;
 	void Update(float _dt) override;
