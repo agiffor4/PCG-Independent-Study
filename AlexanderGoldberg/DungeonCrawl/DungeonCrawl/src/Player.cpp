@@ -5,7 +5,6 @@
 #include "Scene.h"
 #include "Interactable.h"
 #include "Camera.h"
-#include "Light.h"
 Player::Player()
 {
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::UP);
@@ -78,13 +77,6 @@ void Player::InvokeKeyUp(SDL_Keycode _key)
 		break;
 	case SDLK_q:
 		GetLocation()->PrintTileData();
-		Light* l;
-		l = new Light();
-		l->Init("img/GemBlue.png", "Light", m_rendererRef);
-		l->SetWorld(m_world);
-		l->SetLightRadius(4);
-		GetLocation()->AddItem(l);
-		l->SetLocation(GetLocation());
 		break;
 	default:
 		break;

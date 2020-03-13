@@ -2,10 +2,9 @@
 #include "World.h"
 #include "Tile.h"
 #include "Player.h"
-#include "InputManager.h"
 #include <set>
-Light::Light() {
-	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::MOUSEUP);
+Light::Light()
+{
 }
 Light::~Light() {}
 void Light::SetLightRadius(int _lightRadiusInTiles)
@@ -54,46 +53,36 @@ void Light::SetLocation(Tile* _newLocation)
 std::set<Tile*> Light::GetEffectedTiles(Tile* _epicenter)
 {
 	std::set<Tile*> toIlluminate;
-	std::vector<Tile*> neighbors = m_world->GetNeighbors(_epicenter->GetPositionInVector(), true);
-	std::vector<Tile*> toAddToIll;
-	for (size_t j = 0; j < neighbors.size(); j++)
+	int center = _epicenter->GetPositionInVector();
+	
+	std::vector<Tile*> neigbors = m_world->GetNeighbors(center);
+	for (size_t i = 0; i < neigbors.size(); i++)
 	{
-		if (neighbors[j]->IsPassable(true))
-		{
-			toIlluminate.emplace(neighbors[j]);
-		}
+		toIlluminate.emplace(neigbors[i]);
 	}
-	auto startPoint = toIlluminate.begin();
-	if (m_lightRadiusInTiles > 1)
+	std::vector<Tile*> tempNeigbors;
+	for (size_t k = 0; k < m_lightRadiusInTiles; k++)
 	{
-		for (size_t i = 0; i < m_lightRadiusInTiles-1; i++)
+
+		for (size_t i = 0; i < tempNeigbors.size(); i++)
+			toIlluminate.emplace(tempNeigbors[i]);
+		tempNeigbors.clear();
+		for (auto itt = toIlluminate.begin(); itt != toIlluminate.end(); itt++)
 		{
-			neighbors.clear();
-			toAddToIll.clear();
-			for (auto k = startPoint; k != toIlluminate.end(); k++)
+			std::vector<Tile*> templist = m_world->GetNeighbors((*itt)->GetPositionInVector());
+			for (size_t i = 0; i < templist.size(); i++)
 			{
-				Tile* t = (*k);
-				if (t->GetPositionInVector() == 556 ||
-					t->GetPositionInVector() == 557 ||
-					t->GetPositionInVector() == 558)
+				if (templist[i]->IsPassable())
 				{
-					int foo = 0;
-				}
-				neighbors = m_world->GetNeighbors(t->GetPositionInVector());
-				for (size_t l = 0; l < neighbors.size(); l++)
-				{
-					if (neighbors[l]->IsPassable(true))
-						toAddToIll.push_back(neighbors[l]);
+					tempNeigbors.push_back(templist[i]);
 				}
 					
 			}
-			//startPoint = toIlluminate.end();
-			for (size_t j = 0; j < toAddToIll.size(); j++)
-			{
-				toIlluminate.emplace(toAddToIll[j]);
-			}
+				
 		}
 	}
+
+	
 	return toIlluminate;
 }
 
@@ -102,19 +91,5 @@ bool Light::Interaction()
 	return false;
 }
 
-void Light::InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y)
-{
-	switch (_mouse)
-	{
-	case IInputHandler::MouseButton::LEFT:
-		Illuminate(true);
-		break;
-	case IInputHandler::MouseButton::RIGHT:
-		Illuminate(false);
-		break;
-	case IInputHandler::MouseButton::MIDDLE:
-		break;
-	default:
-		break;
-	}
-}
+
+

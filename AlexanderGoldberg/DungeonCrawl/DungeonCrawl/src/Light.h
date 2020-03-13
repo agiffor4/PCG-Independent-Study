@@ -2,11 +2,10 @@
 #include "Holdable.h"
 #include <vector>
 #include <set>
-#include "IInputHandler.h"
 class Tile;
 class World;
 class Light :
-	public Holdable, public IInputHandler
+	public Holdable
 {
 protected:
 	int m_lightRadiusInTiles = 1;
@@ -18,7 +17,6 @@ public:
 	void SetLocation(Tile* _newLocation) override;
 	std::set<Tile*> GetEffectedTiles(Tile* _epicenter);
 	bool Interaction() override;
-	void InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y) override;
 	Light();
 	~Light();
 };
