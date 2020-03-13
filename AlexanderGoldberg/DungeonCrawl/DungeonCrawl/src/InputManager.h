@@ -27,6 +27,7 @@ public:
 	InputManager();
 	~InputManager();
 	void CheckInput();
+	void CheckInput(SDL_Event& e);
 	
 	template <typename T> void SubscribeToInput(T* _func, KeyPressType _upOrDown) {
 		IInputHandler* ih = (IInputHandler*)(_func);

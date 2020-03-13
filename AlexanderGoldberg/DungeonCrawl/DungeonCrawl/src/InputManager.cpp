@@ -15,24 +15,28 @@ void InputManager::CheckInput()
 {
 	while (SDL_PollEvent(&e))
 	{
-		
-		switch (e.type)
-		{
-		case SDL_KEYDOWN:
-			onKeyDown(e.key.keysym.sym);
-			break;
-		case SDL_KEYUP:
-			onKeyUp(e.key.keysym.sym);
-			break;
-		case SDL_MOUSEBUTTONDOWN:
-			onMouseDown(e.button);
-			break;
-		case SDL_MOUSEBUTTONUP:
-			onMouseUp(e.button);
-			break;
-		default:
-			break;
-		}
+		CheckInput(e);		
+	}
+}
+
+void InputManager::CheckInput(SDL_Event& e)
+{
+	switch (e.type)
+	{
+	case SDL_KEYDOWN:
+		onKeyDown(e.key.keysym.sym);
+		break;
+	case SDL_KEYUP:
+		onKeyUp(e.key.keysym.sym);
+		break;
+	case SDL_MOUSEBUTTONDOWN:
+		onMouseDown(e.button);
+		break;
+	case SDL_MOUSEBUTTONUP:
+		onMouseUp(e.button);
+		break;
+	default:
+		break;
 	}
 }
 

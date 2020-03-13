@@ -413,8 +413,8 @@ void Tile::DetermineTileType(World* _world)
 				s->Init("img/Shadow_South.png", "Shadow South", m_rendererRef);				
 				break;
 			case Tile::TileRenderType::wall1SideLeft:
-				/*s = new Shadow();
-				s->Init("img/Shadow_West.png", "Shadow West", m_rendererRef);*/
+				s = new Shadow();
+				s->Init("img/Shadow_West.png", "Shadow West", m_rendererRef);
 				break;
 			case Tile::TileRenderType::wall1SideRight:
 				s = new Shadow();

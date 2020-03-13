@@ -66,10 +66,22 @@ void mainLoop()
 	
 
 	Timer timer = Timer(3.0f);
+	SDL_Event e;
+
 	while (play)
 	{
 		float dt = deltaTime.GetCurrentDeltaTime();
-		InputManager::GetInputManager()->CheckInput();
+		
+		while (SDL_PollEvent(&e)) 
+		{
+			InputManager::GetInputManager()->CheckInput(e);			
+			if (e.type == SDL_QUIT)
+			{
+				play = false;
+			}
+
+		}
+		
 		scene->Update(dt);
 		scene->PlayAudio();		
 		scene->Render();
