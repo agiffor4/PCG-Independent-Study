@@ -99,6 +99,7 @@ Interactable* Tile::InteractWithItem()
 }
 void Tile::AddItem(Interactable* _newItem)
 {
+	_newItem->SetScale(GetScale());
 	m_items.push_back(_newItem);
 }
 
@@ -199,6 +200,10 @@ void Tile::PrintTileData()
 			return "W1L";
 		case Tile::TileRenderType::wall1SideRight:
 			return "W1R";
+		case Tile::TileRenderType::wall2SideUpDown:
+			return "W2UD";
+		case Tile::TileRenderType::wall2SideLeftRight:
+			return "w2LR";
 		default:
 			return "Error!";
 		}
@@ -247,7 +252,7 @@ void Tile::ClearTileContents() {
 void Tile::Render(SDL_Renderer* _renderer)
 {
 	Renderable::Render(_renderer);
-	for (size_t i = 0; i < m_items.size(); i++)
+	for (size_t i = 0; i < (m_hasShadow  ? m_items.size() - 1 : m_items.size()); i++)
 	{
 		if (m_items[i] != nullptr)
 		{
@@ -261,6 +266,15 @@ void Tile::Render(SDL_Renderer* _renderer)
 		m_contents->SetPosition(GetPosition().X, GetPosition().Y);
 		m_contents->Render(_renderer);
 	}
+	if (m_hasShadow && m_items.size() > 0)
+	{
+		if (m_items[m_items.size() -1] != nullptr)
+		{
+			m_items[m_items.size() - 1]->SetPosition(GetPosition().X, GetPosition().Y);
+			m_items[m_items.size() - 1]->Render(_renderer);
+		}
+	}
+
 	if (m_text != nullptr)
 	{
 		m_text->Render(_renderer);
@@ -311,6 +325,15 @@ void Tile::DetermineTileType(World* _world)
 	t = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::RIGHT);
 	if (t == nullptr || !t->IsPassable(true))
 		flag |= (Uint8)WallNeigbors::right;
+
+	if (flag & (Uint8)WallNeigbors::below && (flag ^ (Uint8)WallNeigbors::above) && (flag ^ (Uint8)WallNeigbors::right) && (flag ^ (Uint8)WallNeigbors::left))
+		m_tilerRenderType = TileRenderType::wall1SideBottom;
+	if (flag & (Uint8)WallNeigbors::above && (flag ^ (Uint8)WallNeigbors::below) && (flag ^ (Uint8)WallNeigbors::right) && (flag ^ (Uint8)WallNeigbors::left))
+		m_tilerRenderType = TileRenderType::wall1SideTop;
+	if (flag & (Uint8)WallNeigbors::right && (flag ^ (Uint8)WallNeigbors::below) && (flag ^ (Uint8)WallNeigbors::left) && (flag ^ (Uint8)WallNeigbors::above))
+		m_tilerRenderType = TileRenderType::wall1SideRight;
+	if (flag & (Uint8)WallNeigbors::left && (flag ^ (Uint8)WallNeigbors::below) && (flag ^ (Uint8)WallNeigbors::right) && (flag ^ (Uint8)WallNeigbors::above))
+		m_tilerRenderType = TileRenderType::wall1SideLeft;
 	if (flag & (Uint8)WallNeigbors::left && flag & (Uint8)WallNeigbors::below)
 		m_tilerRenderType = TileRenderType::wall2SideBottomL;
 	if (flag & (Uint8)WallNeigbors::right && flag & (Uint8)WallNeigbors::below)
@@ -328,15 +351,7 @@ void Tile::DetermineTileType(World* _world)
 	if (flag & (Uint8)WallNeigbors::left && flag & (Uint8)WallNeigbors::below && flag & (Uint8)WallNeigbors::above)
 		m_tilerRenderType = TileRenderType::wall3SideLeft;
 	if (flag & (Uint8)WallNeigbors::below && flag & (Uint8)WallNeigbors::right && flag & (Uint8)WallNeigbors::above)
-		m_tilerRenderType = TileRenderType::wall3SideRight;
-	if (flag & (Uint8)WallNeigbors::below && (flag ^ (Uint8)WallNeigbors::above) && (flag ^ (Uint8)WallNeigbors::right) && (flag ^ (Uint8)WallNeigbors::left))
-		m_tilerRenderType = TileRenderType::wall1SideBottom;
-	if (flag & (Uint8)WallNeigbors::above && (flag ^ (Uint8)WallNeigbors::below) && (flag ^ (Uint8)WallNeigbors::right) && (flag ^ (Uint8)WallNeigbors::left))
-		m_tilerRenderType = TileRenderType::wall1SideTop;
-	if (flag & (Uint8)WallNeigbors::right && (flag ^ (Uint8)WallNeigbors::below) && (flag ^ (Uint8)WallNeigbors::below) && (flag ^ (Uint8)WallNeigbors::above))
-		m_tilerRenderType = TileRenderType::wall1SideRight;
-	if (flag & (Uint8)WallNeigbors::left && (flag ^ (Uint8)WallNeigbors::below) && (flag ^ (Uint8)WallNeigbors::right) && (flag ^ (Uint8)WallNeigbors::above))
-		m_tilerRenderType = TileRenderType::wall1SideLeft;
+		m_tilerRenderType = TileRenderType::wall3SideRight;	
 	if (flag & (Uint8)WallNeigbors::left && (flag & (Uint8)WallNeigbors::right) && (flag ^ (Uint8)WallNeigbors::below) && (flag ^ (Uint8)WallNeigbors::above))
 		m_tilerRenderType = TileRenderType::wall2SideLeftRight;
 	if (flag ^ (Uint8)WallNeigbors::left && (flag ^ (Uint8)WallNeigbors::right) && (flag & (Uint8)WallNeigbors::below) && (flag & (Uint8)WallNeigbors::above))
@@ -390,27 +405,27 @@ void Tile::DetermineTileType(World* _world)
 			case Tile::TileRenderType::wall3SideRight:
 				break;
 			case Tile::TileRenderType::wall1SideBottom:
-				/*s = new Shadow();
+				s = new Shadow();
 				s->Init("img/Shadow_North.png", "Shadow North", m_rendererRef);
-				s->SetRenderableOffset(Vector2(0.0f, 0.0f));*/
 				break;
 			case Tile::TileRenderType::wall1SideTop:
 				s = new Shadow(); 
-				s->Init("img/Shadow_South.png", "Shadow South", m_rendererRef);
-				//s->Init("img/Shadow_North.png", "Shadow North", m_rendererRef);
-				//s->SetRenderableOffset(Vector2(0.0f, -8.0f));
+				s->Init("img/Shadow_South.png", "Shadow South", m_rendererRef);				
 				break;
 			case Tile::TileRenderType::wall1SideLeft:
+				/*s = new Shadow();
+				s->Init("img/Shadow_West.png", "Shadow West", m_rendererRef);*/
 				break;
 			case Tile::TileRenderType::wall1SideRight:
+				s = new Shadow();
+				s->Init("img/Shadow_East.png", "Shadow East", m_rendererRef);				
 				break;
-
 			case Tile::TileRenderType::wall2SideLeftRight:
 				break;
 			case Tile::TileRenderType::wall2SideUpDown:
 				s = new Shadow();
 				s->Init("img/Shadow_South.png", "Shadow South", m_rendererRef);
-				//s->SetRenderableOffset(Vector2(0.0f, -8.0f));
+				s->SetRenderableOffset(Vector2(0, -16));
 				break;
 			default:
 				break;
@@ -420,6 +435,7 @@ void Tile::DetermineTileType(World* _world)
 				
 				AddItem(s);				
 				s->SetLocation(this);
+				m_hasShadow = true;
 			}
 				
 		}

@@ -113,6 +113,7 @@ private:
 
 	};
 	TileRenderType m_tilerRenderType = TileRenderType::empty;
+	bool m_hasShadow = false;
 	enum class WallNeigbors {
 		above = 1,
 		below = 2,
