@@ -152,6 +152,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Holdable.cpp" />
+    <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\Shadow.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Ammo.cpp" />
@@ -187,6 +189,8 @@
     <ClCompile Include="src\Treasure.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Holdable.h" />
+    <ClInclude Include="src\Light.h" />
     <ClInclude Include="src\Shadow.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Ammo.h" />

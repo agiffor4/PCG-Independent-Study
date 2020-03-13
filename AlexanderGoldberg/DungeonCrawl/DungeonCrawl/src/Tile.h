@@ -6,16 +6,19 @@ class Interactable;
 class Thing;
 class World;
 class TextA;
+class Shadow;
 class Tile :
 	public Renderable, IInputHandler
 {
 private:
 	Thing* m_contents = nullptr;
 	std::vector<Interactable*> m_items;
+	std::vector<Shadow*> m_shadows;
 	Vector2 m_posInGrid = Vector2();
 	int m_posInVector = -1;
 	bool m_passable = true;
 	bool m_corridor = false;
+	bool m_illuminated = false;
 	int m_roomIn = -1;
 	TextA* m_text = nullptr;
 	enum class TileRenderType {
@@ -113,7 +116,6 @@ private:
 
 	};
 	TileRenderType m_tilerRenderType = TileRenderType::empty;
-	bool m_hasShadow = false;
 	enum class WallNeigbors {
 		above = 1,
 		below = 2,
@@ -139,6 +141,7 @@ public:
 	int GetPositionInVector();
 	Interactable* InteractWithItem();
 	void AddItem(Interactable* _newItem);
+	void AddShadow(Shadow* _newShadow);
 	Interactable* RemoveItem(Interactable* _toRemove, bool _deleteOnRemoval);
 	const Vector2& GetPositionInGrid();
 	void AddRoomNumber(int _roomTileIsIn, bool _renderNumbers, SDL_Renderer* _renderer);
@@ -148,5 +151,6 @@ public:
 	void Render(SDL_Renderer* _renderer) override;
 	void Update(float _dt) override;
 	void DetermineTileType(World* _world);
+	void SetIlluminated(bool _illuminated);
 };
 

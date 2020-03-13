@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "World.h"
 #include "Shadow.h"
+
 Tile::Tile() {
 
 }
@@ -118,6 +119,14 @@ void Tile::AddItem(Interactable* _newItem)
 	m_items.push_back(_newItem);
 }
 
+void Tile::AddShadow(Shadow* _newShadow)
+{
+	_newShadow->SetScale(GetScale());
+	m_shadows.push_back(_newShadow);
+}
+
+
+
 Interactable* Tile::RemoveItem(Interactable* _toRemove, bool _deleteOnRemoval)
 {
 	Interactable* toReturn = nullptr;
@@ -165,7 +174,7 @@ void Tile::InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y)
 		if (inBounds(_x, _y))
 		{
 			printf("clicked on tile %s (index %d), setting passable to %s\n", m_name.c_str(), GetPositionInVector(), (!IsPassable() ? "true." : "false."));
-			SetPassable(!IsPassable());
+			SetPassable(!IsPassable());			
 		}
 		break;
 	case IInputHandler::MouseButton::RIGHT:
@@ -267,7 +276,7 @@ void Tile::ClearTileContents() {
 void Tile::Render(SDL_Renderer* _renderer)
 {
 	Renderable::Render(_renderer);
-	for (size_t i = 0; i < (m_hasShadow  ? m_items.size() - 1 : m_items.size()); i++)
+	for (size_t i = 0; i < m_items.size(); i++)
 	{
 		if (m_items[i] != nullptr)
 		{
@@ -281,14 +290,18 @@ void Tile::Render(SDL_Renderer* _renderer)
 		m_contents->SetPosition(GetPosition().X, GetPosition().Y);
 		m_contents->Render(_renderer);
 	}
-	if (m_hasShadow && m_items.size() > 0)
+	if (!m_illuminated)
 	{
-		if (m_items[m_items.size() -1] != nullptr)
+		for (size_t i = 0; i < m_shadows.size(); i++)
 		{
-			m_items[m_items.size() - 1]->SetPosition(GetPosition().X, GetPosition().Y);
-			m_items[m_items.size() - 1]->Render(_renderer);
+			if (m_shadows[i] != nullptr)
+			{
+				m_shadows[i]->SetPosition(GetPosition().X, GetPosition().Y);
+				m_shadows[i]->Render(_renderer);
+			}
 		}
 	}
+	
 
 	if (m_text != nullptr)
 	{
@@ -410,7 +423,7 @@ void Tile::DetermineTileType(World* _world)
 			case Tile::TileRenderType::wall2SideTopL:
 				s = new Shadow();
 				s->Init("img/Shadow_West.png", "Shadow North West 1", m_rendererRef);
-				AddItem(s);
+				AddShadow(s);
 				s->SetLocation(this);
 				s = new Shadow();
 				s->Init("img/Shadow_South.png", "Shadow North West 2", m_rendererRef);
@@ -418,7 +431,7 @@ void Tile::DetermineTileType(World* _world)
 			case Tile::TileRenderType::wall2SideTopR:
 				s = new Shadow();
 				s->Init("img/Shadow_East.png", "Shadow North East 1", m_rendererRef);
-				AddItem(s);
+				AddShadow(s);
 				s->SetLocation(this);
 				s = new Shadow();
 				s->Init("img/Shadow_South.png", "Shadow North East 2", m_rendererRef);
@@ -426,7 +439,7 @@ void Tile::DetermineTileType(World* _world)
 			case Tile::TileRenderType::wall2SideBottomL:
 				s = new Shadow();
 				s->Init("img/Shadow_West.png", "Shadow South West 1", m_rendererRef);
-				AddItem(s);
+				AddShadow(s);
 				s->SetLocation(this);
 				s = new Shadow();
 				s->Init("img/Shadow_North.png", "Shadow South West 2", m_rendererRef);
@@ -434,7 +447,7 @@ void Tile::DetermineTileType(World* _world)
 			case Tile::TileRenderType::wall2SideBottomR:
 				s = new Shadow();
 				s->Init("img/Shadow_East.png", "Shadow South East 1", m_rendererRef);
-				AddItem(s);
+				AddShadow(s);
 				s->SetLocation(this);
 				s = new Shadow();
 				s->Init("img/Shadow_North.png", "Shadow South East 2", m_rendererRef);
@@ -467,11 +480,15 @@ void Tile::DetermineTileType(World* _world)
 			if (s != nullptr)
 			{
 				
-				AddItem(s);				
+				AddShadow(s);				
 				s->SetLocation(this);
-				m_hasShadow = true;
 			}
 				
 		}
 	
+}
+
+void Tile::SetIlluminated(bool _illuminated)
+{
+	m_illuminated = _illuminated;
 }

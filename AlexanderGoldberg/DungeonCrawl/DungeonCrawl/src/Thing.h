@@ -10,7 +10,7 @@ protected:
 public:
 	Thing();
 	~Thing();
-	void SetLocation(Tile* _newLocation);
+	virtual void SetLocation(Tile* _newLocation);
 	Tile* GetLocation();
 	bool ShouldDelete();
 
