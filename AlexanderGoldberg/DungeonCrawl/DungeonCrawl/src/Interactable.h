@@ -14,6 +14,7 @@ public:
 	void SetBlocksPassage(bool _val);
 	bool GetBlocksPassage();
 	bool IsflaggedForDeletion();
+	bool GetAllowInteraction();
 	bool InteratctionWrapper();
 };
 

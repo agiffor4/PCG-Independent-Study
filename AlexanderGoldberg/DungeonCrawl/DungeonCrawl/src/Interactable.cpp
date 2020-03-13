@@ -29,3 +29,8 @@ bool Interactable::IsflaggedForDeletion()
 {
 	return m_flagForDelation;
 }
+
+bool Interactable::GetAllowInteraction()
+{
+	return m_allowInteraction;
+}

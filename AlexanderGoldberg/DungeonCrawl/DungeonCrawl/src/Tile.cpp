@@ -87,13 +87,28 @@ Interactable* Tile::InteractWithItem()
 {	
 	if (!m_items.empty())
 	{
-		Interactable* toReturn = m_items[m_items.size() -1];
+		int fromBack = 1;
+		Interactable* toReturn = m_items[m_items.size() - fromBack];
+		while (!toReturn->GetAllowInteraction())
+		{
+			fromBack++;
+			int target = m_items.size() - fromBack;
+			if (target > -1)
+			{
+				toReturn = m_items[target];
+			}
+			else
+			{
+				return nullptr;
+			}
+			
+		}
+		
 		if (toReturn->InteratctionWrapper()) // if returns true then adds to inventory
 		{
 			m_items.erase(m_items.end() - 1, m_items.end());
 			return toReturn;
 		}
-		
 	}
 	return nullptr;
 }
@@ -393,12 +408,36 @@ void Tile::DetermineTileType(World* _world)
 			case Tile::TileRenderType::wall3SideBottom:
 				break;
 			case Tile::TileRenderType::wall2SideTopL:
+				s = new Shadow();
+				s->Init("img/Shadow_West.png", "Shadow North West 1", m_rendererRef);
+				AddItem(s);
+				s->SetLocation(this);
+				s = new Shadow();
+				s->Init("img/Shadow_South.png", "Shadow North West 2", m_rendererRef);
 				break;
 			case Tile::TileRenderType::wall2SideTopR:
+				s = new Shadow();
+				s->Init("img/Shadow_East.png", "Shadow North East 1", m_rendererRef);
+				AddItem(s);
+				s->SetLocation(this);
+				s = new Shadow();
+				s->Init("img/Shadow_South.png", "Shadow North East 2", m_rendererRef);
 				break;
 			case Tile::TileRenderType::wall2SideBottomL:
+				s = new Shadow();
+				s->Init("img/Shadow_West.png", "Shadow South West 1", m_rendererRef);
+				AddItem(s);
+				s->SetLocation(this);
+				s = new Shadow();
+				s->Init("img/Shadow_North.png", "Shadow South West 2", m_rendererRef);
 				break;
 			case Tile::TileRenderType::wall2SideBottomR:
+				s = new Shadow();
+				s->Init("img/Shadow_East.png", "Shadow South East 1", m_rendererRef);
+				AddItem(s);
+				s->SetLocation(this);
+				s = new Shadow();
+				s->Init("img/Shadow_North.png", "Shadow South East 2", m_rendererRef);
 				break;
 			case Tile::TileRenderType::wall3SideLeft:
 				break;
@@ -409,6 +448,7 @@ void Tile::DetermineTileType(World* _world)
 				s->Init("img/Shadow_North.png", "Shadow North", m_rendererRef);
 				break;
 			case Tile::TileRenderType::wall1SideTop:
+			case Tile::TileRenderType::wall2SideUpDown:
 				s = new Shadow(); 
 				s->Init("img/Shadow_South.png", "Shadow South", m_rendererRef);				
 				break;
@@ -417,15 +457,9 @@ void Tile::DetermineTileType(World* _world)
 				s->Init("img/Shadow_West.png", "Shadow West", m_rendererRef);
 				break;
 			case Tile::TileRenderType::wall1SideRight:
-				s = new Shadow();
-				s->Init("img/Shadow_East.png", "Shadow East", m_rendererRef);				
-				break;
 			case Tile::TileRenderType::wall2SideLeftRight:
-				break;
-			case Tile::TileRenderType::wall2SideUpDown:
 				s = new Shadow();
-				s->Init("img/Shadow_South.png", "Shadow South", m_rendererRef);
-				s->SetRenderableOffset(Vector2(0, -16));
+				s->Init("img/Shadow_East.png", "Shadow East", m_rendererRef);
 				break;
 			default:
 				break;
