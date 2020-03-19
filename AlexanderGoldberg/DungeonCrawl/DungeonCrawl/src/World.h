@@ -46,7 +46,7 @@ protected:
 	void setWindowTitle();
 	void generateTreasure();
 	void createTreasureInRoom(int _roomToCreateTreasureIn);
-	int m_keyDoorGenerationType = 1;
+	int m_keyDoorGenerationType = 0;
 	int m_lastKeyRoom = -1;
 	int m_lastKeyDepth = -1;
 

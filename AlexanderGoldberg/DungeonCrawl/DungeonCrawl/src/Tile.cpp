@@ -264,6 +264,7 @@ void Tile::ClearTileContents() {
 		else
 			m_contents->SetLocation(nullptr);
 	}
+	
 	SetContents(nullptr);
 	SetPassable(false);
 	int size = m_items.size();
@@ -278,6 +279,19 @@ void Tile::ClearTileContents() {
 	m_items.erase(m_items.begin(), m_items.end());
 	if(m_text != nullptr)
 		m_text->CleanUp();
+
+	size = m_shadows.size();
+	for (size_t i = 0; i < size; i++)
+	{
+		if (m_shadows[i] != nullptr)
+		{
+			delete(m_shadows[i]);
+			m_shadows[i] = nullptr;
+		}
+	}
+	m_shadows.erase(m_shadows.begin(), m_shadows.end());
+	m_illuminated = false;
+	m_inFogOfWar = true;
 	m_roomIn = -1;
 }
 

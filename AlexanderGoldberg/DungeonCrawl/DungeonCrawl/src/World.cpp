@@ -501,10 +501,34 @@ void World::GenerateKeyDoorPair(int _roomToGenerateDoorsIn, RoomTree& _roomTree,
 
 	if (m_lastKeyDepth == -1)
 		m_lastKeyDepth = _roomTree.GetDeepestDepth();
-
-	switch (m_keyDoorGenerationType)
+	switch ((BSP::TunnelingType)m_keyDoorGenerationType)
 	{
-	case 0:
+	case BSP::TunnelingType::Base:
+		do
+		{
+			int randomRoom = rand() % m_roomsData.size();
+			if (randomRoom != _roomToGenerateDoorsIn)
+			{
+				int depthToCheckFor = m_lastKeyDepth >= _roomTree.GetDeepestDepth() - 1 ? m_lastKeyDepth - 3 : (m_lastKeyDepth > 2 ? m_lastKeyDepth - 2 : m_lastKeyDepth);
+				if (!m_roomsData[randomRoom].sm_Locked
+					&& _roomTree.IsRoomDepthGreaterOrEqual(randomRoom, depthToCheckFor))
+				{
+					keyTileIndex = _bspToUse->GetRandomTileInRoom(randomRoom);
+					m_lastKeyDepth = _roomTree.GetRoomDepth(randomRoom);
+					if (m_lastKeyDepth < 0)
+						m_lastKeyDepth = 0;
+					validKeyLocation = true;
+					m_lastKeyRoom = randomRoom;
+				}
+			}
+		} while (!validKeyLocation);
+		break;
+	case BSP::TunnelingType::Hub:
+	case BSP::TunnelingType::StringOfRooms:
+	case BSP::TunnelingType::RoomToRoom:
+	case BSP::TunnelingType::RegionToRegion:
+	default:
+		break;
 		do
 		{
 			int randomRoom = rand() % m_roomsData.size();
@@ -517,31 +541,8 @@ void World::GenerateKeyDoorPair(int _roomToGenerateDoorsIn, RoomTree& _roomTree,
 				}
 			}
 		} while (!validKeyLocation);
-		break;
-	case 1:
-		do
-		{
-			int randomRoom = rand() % m_roomsData.size();
-			if (randomRoom != _roomToGenerateDoorsIn)
-			{
-				int depthToCheckFor = m_lastKeyDepth >= _roomTree.GetDeepestDepth()-1 ? m_lastKeyDepth - 3 : (m_lastKeyDepth > 2 ? m_lastKeyDepth - 2 : m_lastKeyDepth);
-				if (!m_roomsData[randomRoom].sm_Locked 
-					&& _roomTree.IsRoomDepthGreaterOrEqual(randomRoom, depthToCheckFor))
-				{
-					keyTileIndex = _bspToUse->GetRandomTileInRoom(randomRoom);
-					m_lastKeyDepth = _roomTree.GetRoomDepth(randomRoom);
-					if (m_lastKeyDepth < 0)
-						m_lastKeyDepth = 0;					
-					validKeyLocation = true;
-					m_lastKeyRoom = randomRoom;
-				}
-			}
-		} while (!validKeyLocation);
-		break;
-	default:
-		
-		break;
 	}
+	
 	t = GetTileAtIndex(keyTileIndex);
 	t->AddItem(k);
 	k->SetLocation(t);
@@ -564,8 +565,48 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 	if (_ensureDoorToExit)
 		GenerateKeyDoorPair(exitRoomIndex, roomTree, doorPath, keyPath, _bspToUse);
 	m_lastKeyDepth = roomTree.GetDeepestDepth();
-	
-	switch (m_keyDoorGenerationType)
+	switch ((BSP::TunnelingType)m_keyDoorGenerationType)
+	{
+	case BSP::TunnelingType::Base:
+
+		for (size_t i = 0; i < _keyDoorPairCountToGenerate; i++)
+		{
+			int roomToLock = 0;
+			if (m_roomsData.size() > 2)
+			{
+				do
+				{
+					roomToLock = roomTree.GetRandomParentWithinRange((m_lastKeyDepth > 4 ? 2 : m_lastKeyDepth > 3 ? 1 : 0), m_lastKeyRoom);
+				} while (roomToLock == exitRoomIndex || roomToLock == playerStartRoomIndex);
+			}
+			doorPath = "img/" + numToColor[i] + "Door.bmp";
+			keyPath = "img/" + numToColor[i] + "KeyCard.bmp";
+			GenerateKeyDoorPair(roomToLock, roomTree, doorPath, keyPath, _bspToUse);
+		}
+		break;
+	case BSP::TunnelingType::Hub:
+	case BSP::TunnelingType::StringOfRooms:
+	case BSP::TunnelingType::RoomToRoom:
+	case BSP::TunnelingType::RegionToRegion:
+	default:
+		for (size_t i = 0; i < _keyDoorPairCountToGenerate; i++)
+		{
+			int roomToLock = 0;
+			if (m_roomsData.size() > 2)
+			{
+				do
+				{
+					roomToLock = rand() % m_roomsData.size();
+				} while (roomToLock == exitRoomIndex || roomToLock == playerStartRoomIndex);
+			}
+			//m_lastDoorDepth = roomTree.GetRoomDepth(roomToLock);
+			doorPath = "img/" + numToColor[i] + "Door.bmp";
+			keyPath = "img/" + numToColor[i] + "KeyCard.bmp";
+			GenerateKeyDoorPair(roomToLock, roomTree, doorPath, keyPath, _bspToUse);
+		}
+		break;
+	}
+	/*switch (m_keyDoorGenerationType)
 	{
 	case 0:
 		for (size_t i = 0; i < _keyDoorPairCountToGenerate; i++)
@@ -602,7 +643,7 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 		break;
 	default:
 		break;
-	}
+	}*/
 
 
 }
