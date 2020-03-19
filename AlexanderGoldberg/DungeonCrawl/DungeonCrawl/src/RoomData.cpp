@@ -9,3 +9,8 @@ bool RoomData::Contains(int _index) {
 	}
 	return false;
 }
+
+int RoomData::GetRandomTile()
+{
+	return sm_containsTiles[rand() % sm_containsTiles.size()];
+}

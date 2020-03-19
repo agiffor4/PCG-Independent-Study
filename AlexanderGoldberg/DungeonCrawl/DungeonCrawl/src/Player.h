@@ -5,6 +5,7 @@
 #include "Timer.h"
 class Scene;
 class Interactable;
+class Holdable;
 class Player :
 	public Thing, public IInputHandler
 {
@@ -16,6 +17,7 @@ public:
 	void InvokeKeyDown(SDL_Keycode _key) override;
 	void InvokeKeyUp(SDL_Keycode _key) override;
 	void Initalize(World& _world, const std::string _path, const std::string _name, SDL_Renderer* _renderer, Uint32 _transparentColor = -999);
+	void SetLineOfSight(bool _inLineOfSight);
 protected:
 	
 	//MOVEMENT VARIABLES
@@ -32,10 +34,13 @@ protected:
 	World* m_world;
 	std::vector<Thing*> m_inventory;
 	int m_inventoryMax = -1;
+	int m_lineOfSightRadius = 2;
+	Holdable* m_holdables[2];
 	void InteractWithThingInSpace();
 	void attack(Vector2 _direction);
 	void move(Vector2 _direction);
 	World::TileDirection convertVectorToDirection(Vector2& const _toConvert);
 	void setDirectionFromFlagValues(Uint8 _flag);
+	
+	std::set<Tile*> getTilesInLineOfSight(Tile* _epicenter);
 };
-

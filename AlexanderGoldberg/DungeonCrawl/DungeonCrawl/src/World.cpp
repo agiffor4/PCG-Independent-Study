@@ -12,6 +12,7 @@
 #include "RoomTree.h"
 #include "Treasure.h"
 #include "Camera.h"
+#include "Light.h"
 #define Debug = 1;
 
 std::string numToColor[] = { "Red", "Blue", "Yellow"};
@@ -463,9 +464,6 @@ int World::CreateExit(BSP* _bspToUse) {
 	
 	Exit* e = new Exit(this);
 	e->Init("img/Exit.bmp", "Exit", m_scene->GetRenderer());
-	//e->SetSize(GetTileSize().X, GetTileSize().Y);
-	e->SetScale(m_scale);
-	e->SetLocation(t);
 	t->AddItem(e);
 	return t->GetPositionInVector();
 }
@@ -494,11 +492,8 @@ void World::GenerateKeyDoorPair(int _roomToGenerateDoorsIn, RoomTree& _roomTree,
 	{
 		DoorA* d = new DoorA();
 		t = GetTileAtIndex(doorTileIndex[i]);
-		t->AddItem(d);
-		d->SetLocation(t);
 		d->Init(_doorImage, "Door", m_scene->GetRenderer());
-		//d->SetSize(scale);
-		d->SetScale(m_scale);
+		t->AddItem(d);
 		k->SetDoor(d);
 	}
 
@@ -604,14 +599,23 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 			keyPath = "img/" + numToColor[i] + "KeyCard.bmp";
 			GenerateKeyDoorPair(roomToLock, roomTree, doorPath, keyPath, _bspToUse);
 		}
+		break;
 	default:
 		break;
 	}
+
 
 }
 void World::GenerateItems(int _exitLocation, BSP* _bspToUse) {
 	
 	generateTreasure();
+	int randomTile = m_roomsData[rand() % m_roomsData.size()].GetRandomTile();
+	Light* l = new Light();
+	l->Init("img/Torch.png", "Light", m_scene->GetRenderer(), this);
+	m_tiles[randomTile]->AddItem(l);
+	
+
+	
 }
 
 void World::generateTreasure() {	
@@ -632,12 +636,8 @@ void World::createTreasureInRoom(int _roomToCreateTreasureIn)
 	#define containedTiles m_roomsData[_roomToCreateTreasureIn].sm_containsTiles
 	int randomTile = containedTiles[rand() % containedTiles.size()];
 	Treasure* t = new Treasure();
-	t->SetLocation(m_tiles[randomTile]);
 	//t->Init("img/Treasure.bmp", "Treasue", m_scene->GetRenderer());	
-	t->Init("img/GemBlue.png", "Treasue", m_scene->GetRenderer());	
-	Vector2 scale = GetTileSize();
-	//t->SetSize(scale);
-	t->SetScale(m_scale);
+	t->Init("img/GemBlue.png", "Treasue", m_scene->GetRenderer());
 	m_tiles[randomTile]->AddItem(t);
 }
 
@@ -751,6 +751,7 @@ void World::PlacePlayer(std::vector<std::vector<int>>* _rooms)
 	Tile* t = GetTileAtIndex(m_playerStart);
 	m_player->SetLocation(t);
 	t->SetContents(m_player);
+	m_player->SetLineOfSight(true);
 #if UseCamera == 1
 	Vector2 offset = t->GetPosition();
 	

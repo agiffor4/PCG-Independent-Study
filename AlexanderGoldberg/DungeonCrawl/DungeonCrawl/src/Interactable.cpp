@@ -15,6 +15,7 @@ Interactable::Interactable()
 Interactable::~Interactable()
 {
 }
+
 void Interactable::SetBlocksPassage(bool _val)
 {
 	m_blocksPassage = _val;

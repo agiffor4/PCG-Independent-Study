@@ -3,9 +3,9 @@
 #include "IInputHandler.h"
 #include <vector>
 class Interactable;
-class Thing;
 class World;
 class TextA;
+class Thing;
 class Shadow;
 class Tile :
 	public Renderable, IInputHandler
@@ -19,6 +19,8 @@ private:
 	bool m_passable = true;
 	bool m_corridor = false;
 	bool m_illuminated = false;
+	bool m_inFogOfWar = true;
+	bool m_renderFogOfWar = true;
 	int m_roomIn = -1;
 	TextA* m_text = nullptr;
 	enum class TileRenderType {
@@ -113,6 +115,11 @@ private:
 		o0o
 		 x
 		*/
+		/*
+		ooo
+		o0o
+		oox
+		*/
 
 	};
 	TileRenderType m_tilerRenderType = TileRenderType::empty;
@@ -121,6 +128,10 @@ private:
 		below = 2,
 		right = 4,
 		left = 8,
+		northeast = 16,
+		northwest = 32,
+		southeast = 64,
+		southwest = 128
 
 	};
 public:
@@ -152,5 +163,6 @@ public:
 	void Update(float _dt) override;
 	void DetermineTileType(World* _world);
 	void SetIlluminated(bool _illuminated);
+	void SetFogOfWar(bool _inFogOfWar);
 };
 

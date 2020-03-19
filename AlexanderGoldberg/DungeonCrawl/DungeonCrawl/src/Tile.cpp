@@ -116,6 +116,7 @@ Interactable* Tile::InteractWithItem()
 void Tile::AddItem(Interactable* _newItem)
 {
 	_newItem->SetScale(GetScale());
+	_newItem->SetLocation(this);
 	m_items.push_back(_newItem);
 }
 
@@ -123,6 +124,7 @@ void Tile::AddShadow(Shadow* _newShadow)
 {
 	_newShadow->SetScale(GetScale());
 	m_shadows.push_back(_newShadow);
+	_newShadow->SetLocation(this);
 }
 
 
@@ -244,7 +246,13 @@ void Tile::PrintTileData()
 			printf("%s, ", m_items[i]->GetName().c_str());
 		printf("\n");
 	}
-
+	if (m_shadows.size() > 0)
+	{
+		printf("Shadows present include, ");
+		for (size_t i = 0; i < m_shadows.size(); i++)
+			printf("%s, ", m_shadows[i]->GetName().c_str());
+		printf("\n");
+	}
 }
 
 void Tile::ClearTileContents() {
@@ -276,23 +284,30 @@ void Tile::ClearTileContents() {
 void Tile::Render(SDL_Renderer* _renderer)
 {
 	Renderable::Render(_renderer);
-	for (size_t i = 0; i < m_items.size(); i++)
+	if (!m_renderFogOfWar || !m_inFogOfWar)
 	{
-		if (m_items[i] != nullptr)
+		for (size_t i = 0; i < m_items.size(); i++)
 		{
-			m_items[i]->SetPosition(GetPosition().X, GetPosition().Y);
-			m_items[i]->Render(_renderer);
+			if (m_items[i] != nullptr)
+			{
+				m_items[i]->SetPosition(GetPosition().X, GetPosition().Y);
+				m_items[i]->Render(_renderer);
+			}
+
+		}
+		if (m_contents != nullptr)
+		{
+			m_contents->SetPosition(GetPosition().X, GetPosition().Y);
+			m_contents->Render(_renderer);
 		}
 
 	}
-	if (m_contents != nullptr)
-	{
-		m_contents->SetPosition(GetPosition().X, GetPosition().Y);
-		m_contents->Render(_renderer);
-	}
+	
+
+
 	if (!m_illuminated)
 	{
-		for (size_t i = 0; i < m_shadows.size(); i++)
+		for (size_t i = 0; i < (m_inFogOfWar && m_renderFogOfWar ? m_shadows.size() : m_shadows.size() -1); i++)
 		{
 			if (m_shadows[i] != nullptr)
 			{
@@ -353,6 +368,18 @@ void Tile::DetermineTileType(World* _world)
 	t = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::RIGHT);
 	if (t == nullptr || !t->IsPassable(true))
 		flag |= (Uint8)WallNeigbors::right;
+	t = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::UPRIGHT);
+	if (t == nullptr || !t->IsPassable(true))
+		flag |= (Uint8)WallNeigbors::northeast;
+	t = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::UPLEFT);
+	if (t == nullptr || !t->IsPassable(true))
+		flag |= (Uint8)WallNeigbors::northwest;
+	t = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::DOWNRIGHT);
+	if (t == nullptr || !t->IsPassable(true))
+		flag |= (Uint8)WallNeigbors::southeast;
+	t = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::DOWNLEFT);
+	if (t == nullptr || !t->IsPassable(true))
+		flag |= (Uint8)WallNeigbors::southwest;
 
 	if (flag & (Uint8)WallNeigbors::below && (flag ^ (Uint8)WallNeigbors::above) && (flag ^ (Uint8)WallNeigbors::right) && (flag ^ (Uint8)WallNeigbors::left))
 		m_tilerRenderType = TileRenderType::wall1SideBottom;
@@ -424,7 +451,6 @@ void Tile::DetermineTileType(World* _world)
 				s = new Shadow();
 				s->Init("img/Shadow_West.png", "Shadow North West 1", m_rendererRef);
 				AddShadow(s);
-				s->SetLocation(this);
 				s = new Shadow();
 				s->Init("img/Shadow_South.png", "Shadow North West 2", m_rendererRef);
 				break;
@@ -432,7 +458,6 @@ void Tile::DetermineTileType(World* _world)
 				s = new Shadow();
 				s->Init("img/Shadow_East.png", "Shadow North East 1", m_rendererRef);
 				AddShadow(s);
-				s->SetLocation(this);
 				s = new Shadow();
 				s->Init("img/Shadow_South.png", "Shadow North East 2", m_rendererRef);
 				break;
@@ -440,7 +465,6 @@ void Tile::DetermineTileType(World* _world)
 				s = new Shadow();
 				s->Init("img/Shadow_West.png", "Shadow South West 1", m_rendererRef);
 				AddShadow(s);
-				s->SetLocation(this);
 				s = new Shadow();
 				s->Init("img/Shadow_North.png", "Shadow South West 2", m_rendererRef);
 				break;
@@ -448,7 +472,6 @@ void Tile::DetermineTileType(World* _world)
 				s = new Shadow();
 				s->Init("img/Shadow_East.png", "Shadow South East 1", m_rendererRef);
 				AddShadow(s);
-				s->SetLocation(this);
 				s = new Shadow();
 				s->Init("img/Shadow_North.png", "Shadow South East 2", m_rendererRef);
 				break;
@@ -478,17 +501,68 @@ void Tile::DetermineTileType(World* _world)
 				break;
 			}
 			if (s != nullptr)
+				AddShadow(s);
+
+			if (flag & (Uint8)WallNeigbors::northeast 
+				&& !(flag & (Uint8)WallNeigbors::right)
+				&& !(flag & (Uint8)WallNeigbors::above)
+				&& !(flag & (Uint8)WallNeigbors::northwest)
+			   )
 			{
-				
-				AddShadow(s);				
-				s->SetLocation(this);
+				s = new Shadow();
+				s->Init("img/Shadow_North_East.png", "Shadow North East", m_rendererRef);
+				AddShadow(s);
 			}
+
+			if (flag & (Uint8)WallNeigbors::southeast 
+				&& !(flag & (Uint8)WallNeigbors::below)
+				&& !(flag & (Uint8)WallNeigbors::right))
+			{
+				s = new Shadow();
+				s->Init("img/Shadow_South_East.png", "Shadow South East", m_rendererRef);
+				AddShadow(s);
+			}
+			if (flag & (Uint8)WallNeigbors::northwest 
+				&& !(flag & (Uint8)WallNeigbors::left)
+				&& !(flag & (Uint8)WallNeigbors::above)
+				&& !(flag & (Uint8)WallNeigbors::northeast)
+				) 
+			{
+				s = new Shadow();
+				s->Init("img/Shadow_North_West.png", "Shadow North West", m_rendererRef);
+				AddShadow(s);
+			}
+			
+			if (flag & (Uint8)WallNeigbors::southwest 
+				&& !(flag & (Uint8)WallNeigbors::below)
+				&& !(flag & (Uint8)WallNeigbors::left)
+				&& !(flag & (Uint8)WallNeigbors::southeast)
+				)
+			{
+				s = new Shadow();
+				s->Init("img/Shadow_South_West.png", "Shadow South West", m_rendererRef);
+				AddShadow(s);
 				
+			}
 		}
-	
+		Shadow* s = new Shadow();
+		s->Init("img/FogOfWar.png", "Fog Of War", m_rendererRef);
+		AddShadow(s);
 }
 
 void Tile::SetIlluminated(bool _illuminated)
 {
 	m_illuminated = _illuminated;
+}
+
+void Tile::SetFogOfWar(bool _inFogOfWar)
+{ 
+	if (!m_illuminated)
+	{
+		m_inFogOfWar = _inFogOfWar;
+	}
+	else
+	{
+		m_inFogOfWar = false;
+	}
 }

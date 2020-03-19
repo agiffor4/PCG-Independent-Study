@@ -5,18 +5,23 @@
 #include "Scene.h"
 #include "Interactable.h"
 #include "Camera.h"
+#include "Holdable.h"
 Player::Player()
 {
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::UP);
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::DOWN);
 	m_shouldDelete = false;
 	m_moveRate.SetTimer(0.2f);
+	m_holdables[0] = nullptr;
+	m_holdables[1] = nullptr;
 }
 
 
 
 Player::~Player()
 {
+	
+	
 }
 
 void Player::Update(float _dt)
@@ -88,6 +93,7 @@ void Player::Initalize(World& _world, const std::string _path, const std::string
 	Renderable::Init(_path, _name, _renderer, _transparentColor);
 	m_world = &_world;	
 	SetRenderLayer(15);
+	
 }
 
 void Player::InteractWithThingInSpace()
@@ -97,7 +103,15 @@ void Player::InteractWithThingInSpace()
 		Interactable* retrievedItem = m_location->InteractWithItem();
 		if (retrievedItem != nullptr)
 		{
-			m_inventory.push_back(retrievedItem);
+			Holdable* h = dynamic_cast<Holdable*>(retrievedItem);
+			if (h != nullptr)
+			{
+				m_holdables[0] = h;
+			}
+			else
+			{
+				m_inventory.push_back(retrievedItem);
+			}
 		}
 	}
 }
@@ -105,6 +119,7 @@ void Player::InteractWithThingInSpace()
 void Player::attack(Vector2 _direction)
 {
 }
+
 
 void Player::move(Vector2 _direction)
 {
@@ -115,21 +130,26 @@ void Player::move(Vector2 _direction)
 		Tile* toMoveTo = m_world->GetAdjacentTile(GetLocation()->GetPositionInVector(), convertVectorToDirection(_direction));
 		if (toMoveTo != nullptr && toMoveTo->IsPassable())
 		{
+
+			SetLineOfSight(false);
 			GetLocation()->MoveContentsTo(toMoveTo);
-			SetLocation(toMoveTo);			
-			
-#if UseCamera == 1
-Vector2 adjustedDirection = Camera::ClampMovement(_direction);
-adjustedDirection.Y *= -1;
-Camera::SetOffset(Camera::Offset() + (adjustedDirection * m_location->GetCurrentSize().X));
-#endif
-			
-			
-			
+			SetLocation(toMoveTo);
+			for (size_t i = 0; i < 2; i++)
+			{
+				if (m_holdables[i] != nullptr)
+				{
+					m_holdables[i]->SetLocation(toMoveTo);
+				}
+
+			}
+			SetLineOfSight(true);
+			#if UseCamera == 1
+				Vector2 adjustedDirection = Camera::ClampMovement(_direction);
+				adjustedDirection.Y *= -1;
+				Camera::SetOffset(Camera::Offset() + (adjustedDirection * m_location->GetCurrentSize().X));
+			#endif
 		}
 	}
-	
-	
 }
 
 World::TileDirection Player::convertVectorToDirection(Vector2& const _toConvert)
@@ -175,3 +195,48 @@ void Player::setDirectionFromFlagValues(Uint8 _flag)
 		
 }
 
+void Player::SetLineOfSight(bool _inLineOfSight)
+{
+	auto tilesInRange = getTilesInLineOfSight(GetLocation());
+	for (auto i = tilesInRange.begin(); i != tilesInRange.end(); i++)
+	{
+		(*i)->SetFogOfWar(!_inLineOfSight);
+	}
+}
+
+
+std::set<Tile*> Player::getTilesInLineOfSight(Tile* _epicenter)
+{
+	std::set<Tile*> toIlluminate;
+	int center = _epicenter->GetPositionInVector();
+
+	std::vector<Tile*> neigbors = m_world->GetNeighbors(center);
+	for (size_t i = 0; i < neigbors.size(); i++)
+	{
+		toIlluminate.emplace(neigbors[i]);
+	}
+	std::vector<Tile*> tempNeigbors;
+	for (size_t k = 0; k < m_lineOfSightRadius; k++)
+	{
+
+		for (size_t i = 0; i < tempNeigbors.size(); i++)
+			toIlluminate.emplace(tempNeigbors[i]);
+		tempNeigbors.clear();
+		for (auto itt = toIlluminate.begin(); itt != toIlluminate.end(); itt++)
+		{
+			std::vector<Tile*> templist = m_world->GetNeighbors((*itt)->GetPositionInVector());
+			for (size_t i = 0; i < templist.size(); i++)
+			{
+				if (templist[i]->IsPassable())
+				{
+					tempNeigbors.push_back(templist[i]);
+				}
+
+			}
+
+		}
+	}
+	toIlluminate.emplace(_epicenter);
+
+	return toIlluminate;
+}

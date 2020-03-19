@@ -14,6 +14,7 @@ public:
 	int sm_region = -1;
 	bool sm_Locked = false;
 	bool Contains(int _index);
+	int GetRandomTile();
 		
 };
 

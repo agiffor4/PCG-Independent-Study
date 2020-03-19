@@ -37,6 +37,7 @@ void Light::Illuminate(bool _lightUp) {
 			for (auto i = inLight.begin();  i != inLight.end(); i++)
 			{
 				(*i)->SetIlluminated(_lightUp);
+				(*i)->SetFogOfWar(!_lightUp);
 			}
 		}
 	}
@@ -48,6 +49,12 @@ void Light::SetLocation(Tile* _newLocation)
 	Illuminate(false);
 	Thing::SetLocation(_newLocation);
 	Illuminate(true);
+}
+
+void Light::Init(const std::string _path, const std::string _name, SDL_Renderer* _renderer, World* _world, Uint32 _transparentColor)
+{
+	SetWorld(_world);
+	Renderable::Init(_path, _name, _renderer, _transparentColor);
 }
 
 std::set<Tile*> Light::GetEffectedTiles(Tile* _epicenter)
@@ -81,14 +88,14 @@ std::set<Tile*> Light::GetEffectedTiles(Tile* _epicenter)
 				
 		}
 	}
-
+	toIlluminate.emplace(_epicenter);
 	
 	return toIlluminate;
 }
 
 bool Light::Interaction()
 {
-	return false;
+	return true;
 }
 
 
