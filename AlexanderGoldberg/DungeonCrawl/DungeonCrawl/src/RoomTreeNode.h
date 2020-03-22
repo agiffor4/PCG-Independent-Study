@@ -27,6 +27,7 @@ public:
 	bool m_ChildAndParent = false;
 	bool m_Checked = false;
 	int m_Index = -1;
+	const std::vector<RoomTreeNode*>& GetChildren();
 
 	
 };

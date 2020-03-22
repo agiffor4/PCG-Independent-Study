@@ -6,6 +6,7 @@ void Quit::quit() {
 
 Quit::Quit(bool* _falseify) {
 	m_play = _falseify;
+	SetName("Quit");
 }
 
 void Quit::InvokeKeyUp(SDL_Keycode _key) {}

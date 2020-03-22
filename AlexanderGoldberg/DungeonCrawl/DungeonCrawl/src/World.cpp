@@ -43,6 +43,7 @@ World::World(int _hTileCount, int _vTileCount, Scene* _scene)
 	m_horizontalTileCount = _hTileCount;
 	m_verticalTileCount = _vTileCount;
 	m_scene = _scene;
+	SetName("World");
 }
 World::~World() 
 {
@@ -565,6 +566,8 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 	if (_ensureDoorToExit)
 		GenerateKeyDoorPair(exitRoomIndex, roomTree, doorPath, keyPath, _bspToUse);
 	m_lastKeyDepth = roomTree.GetDeepestDepth();
+	roomTree.GenerateRoomTree(m_roomsData, _bspToUse->RoomIndexTileIsIn(m_playerStart));
+	roomTree.PrintTree();
 	switch ((BSP::TunnelingType)m_keyDoorGenerationType)
 	{
 	case BSP::TunnelingType::Base:
@@ -579,8 +582,8 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 					roomToLock = roomTree.GetRandomParentWithinRange((m_lastKeyDepth > 4 ? 2 : m_lastKeyDepth > 3 ? 1 : 0), m_lastKeyRoom);
 				} while (roomToLock == exitRoomIndex || roomToLock == playerStartRoomIndex);
 			}
-			doorPath = "img/" + numToColor[i] + "Door.bmp";
-			keyPath = "img/" + numToColor[i] + "KeyCard.bmp";
+			doorPath = "img/" + (i < 3 ? numToColor[i] : numToColor[0]) + "Door.bmp";
+			keyPath = "img/" + (i < 3 ? numToColor[i] : numToColor[0]) + "KeyCard.bmp";
 			GenerateKeyDoorPair(roomToLock, roomTree, doorPath, keyPath, _bspToUse);
 		}
 		break;
@@ -606,44 +609,7 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 		}
 		break;
 	}
-	/*switch (m_keyDoorGenerationType)
-	{
-	case 0:
-		for (size_t i = 0; i < _keyDoorPairCountToGenerate; i++)
-		{
-			int roomToLock = 0;
-			if (m_roomsData.size() > 2)
-			{
-				do
-				{
-					roomToLock = rand() % m_roomsData.size();
-				} while (roomToLock == exitRoomIndex || roomToLock == playerStartRoomIndex);
-			}
-			//m_lastDoorDepth = roomTree.GetRoomDepth(roomToLock);
-			doorPath = "img/" + numToColor[i] + "Door.bmp";
-			keyPath = "img/" + numToColor[i] + "KeyCard.bmp";
-			GenerateKeyDoorPair(roomToLock, roomTree, doorPath, keyPath, _bspToUse);
-		}
-		break;
-	case 1:
-		for (size_t i = 0; i < _keyDoorPairCountToGenerate; i++)
-		{
-			int roomToLock = 0;
-			if (m_roomsData.size() > 2)
-			{
-				do
-				{
-					roomToLock = roomTree.GetRandomParentWithinRange((m_lastKeyDepth > 4 ? 2 : m_lastKeyDepth > 3 ? 1 : 0), m_lastKeyRoom);
-				} while (roomToLock == exitRoomIndex || roomToLock == playerStartRoomIndex);
-			}
-			doorPath = "img/" + numToColor[i] + "Door.bmp";
-			keyPath = "img/" + numToColor[i] + "KeyCard.bmp";
-			GenerateKeyDoorPair(roomToLock, roomTree, doorPath, keyPath, _bspToUse);
-		}
-		break;
-	default:
-		break;
-	}*/
+	
 
 
 }

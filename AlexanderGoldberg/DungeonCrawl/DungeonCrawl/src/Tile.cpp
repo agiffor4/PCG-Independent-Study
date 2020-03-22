@@ -20,6 +20,7 @@ void Tile::Init(const std::string _path, const std::string _name, int _currentIn
 	m_posInGrid.Y = _yIndex;	
 	Renderable::Init(_path, _name, _renderer, _transparentColor);
 	SetPosition(GetDefaultSize().X * _startPos.X, GetDefaultSize().Y * _startPos.Y);
+	SetName(_name);
 }
 void Tile::SetPassable(bool _val) {
 

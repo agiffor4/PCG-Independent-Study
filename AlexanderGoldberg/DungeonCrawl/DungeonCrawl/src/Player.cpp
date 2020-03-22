@@ -93,6 +93,7 @@ void Player::Initalize(World& _world, const std::string _path, const std::string
 	Renderable::Init(_path, _name, _renderer, _transparentColor);
 	m_world = &_world;	
 	SetRenderLayer(15);
+	SetName("Player");
 	
 }
 

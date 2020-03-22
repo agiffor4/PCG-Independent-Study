@@ -9,7 +9,7 @@ private:
 	std::vector<RoomTreeNode*> m_childParentNodes;
 	void generateConnections(RoomTreeNode* _parent, const std::vector<RoomData>& _roomData);
 	
-	void unlockRooms(int _roomToUnlock, int _originLockRoom);
+	void unlockRooms(int _roomToUnlock, int _originLockRoom, std::vector<bool>& _alreadyUnlocked);
 	void lockRooms(int _roomToLock);
 	int m_deepestDepth = -1;
 public:	
@@ -27,5 +27,7 @@ public:
 	int GetRandomParentWithinRange(int _maxNumberOfparents, int _startingRoomIndex);
 
 	int GetRoomDepth(int _room);
+	void PrintTree();
+	void PrintBranch(std::vector<RoomTreeNode*> _children, int _parentIndex, std::vector<bool>& _printedAlready);
 };
 

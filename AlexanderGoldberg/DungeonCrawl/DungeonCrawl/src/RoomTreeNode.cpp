@@ -74,3 +74,8 @@ bool RoomTreeNode::ShouldStopLocking()
 	return false;
 }
 
+const std::vector<RoomTreeNode*>& RoomTreeNode::GetChildren()
+{
+	return m_branches;
+}
+

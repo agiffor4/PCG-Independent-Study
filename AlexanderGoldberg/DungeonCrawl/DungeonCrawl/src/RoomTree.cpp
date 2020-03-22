@@ -54,8 +54,10 @@ std::vector<int> RoomTree::StartLockRooms(int _roomToLock)
 					break;
 				index = m_nodesInTree[index]->GetParent()->m_Index;
 			}
-
-			unlockRooms(index, _roomToLock);
+			std::vector<bool> alreadyChecked;
+			alreadyChecked.reserve(m_nodesInTree.size());
+			alreadyChecked.assign(alreadyChecked.capacity(), false);
+			unlockRooms(index, _roomToLock, alreadyChecked);
 		}
 	}
 	std::vector<int> indexesOfInaccessibleRooms;
@@ -104,19 +106,97 @@ int RoomTree::GetRoomDepth(int _room)
 {
 	return m_nodesInTree[_room]->GetDepth();
 }
-void RoomTree::unlockRooms(int _roomToUnlock, int _originLockRoom)
+void RoomTree::PrintTree()
+{
+	RoomTreeNode* root = nullptr;
+	for (size_t i = 0; i < m_nodesInTree.size(); i++)
+	{
+		if (m_nodesInTree[i]->GetParent() == nullptr)
+		{
+			root = m_nodesInTree[i];
+			break;
+		}
+			
+	}
+	std::vector<bool> printedChildParent;
+	printedChildParent.reserve(m_nodesInTree.size());
+	for (size_t i = 0; i < m_nodesInTree.size(); i++)
+	{
+		printedChildParent.push_back(false);
+	}
+	printf("__________________________\n");
+	PrintBranch(root->GetChildren(), root->m_Index, printedChildParent);
+	printf("__________________________\n");
+
+
+}
+
+void RoomTree::PrintBranch(std::vector<RoomTreeNode*> _children, int _parentIndex, std::vector<bool>& _printedAlready)
+{
+	if (_children.size() > 0)
+	{
+		printf("%d<", _parentIndex);
+		for (size_t i = 0; i < _children.size(); i++)
+		{
+			printf("%d", _children[i]->m_Index);
+			if (i < _children.size() - 1)
+			{
+				if (_children[i]->m_ChildAndParent)
+				{
+					printf("*, ");
+					
+				}
+				else
+				{
+					printf(", ");
+				}
+			}
+			else
+			{
+				if (_children[i]->m_ChildAndParent)
+				{
+					printf("*>\n");
+				}
+				else
+				{
+					printf(">\n");
+				}
+				
+			}
+		}
+		for (size_t i = 0; i < _children.size(); i++)
+		{
+			if (!_printedAlready[_children[i]->m_Index])
+			{
+				if (_children[i]->m_ChildAndParent)
+					_printedAlready[_children[i]->m_Index] = true;
+				PrintBranch(_children[i]->GetChildren(), _children[i]->m_Index, _printedAlready);
+			}
+			
+		}
+	}
+	else
+	{
+		printf("%d<>\n", _parentIndex);
+	}
+}
+
+
+void RoomTree::unlockRooms(int _roomToUnlock, int _originLockRoom, std::vector<bool>& _alreadyUnlocked)
 {	
 		for (size_t i = 0; i < m_nodesInTree[_roomToUnlock]->ChildCount(); i++)
 		{
+				_alreadyUnlocked[_roomToUnlock] = true;
 				m_nodesInTree[_roomToUnlock]->GetChild(i)->Lock(false);
-				m_nodesInTree[_roomToUnlock]->Lock(true);
-				for (size_t i = 0; i < m_nodesInTree[_roomToUnlock]->ChildCount(); i++) {
-
-					unlockRooms(m_nodesInTree[_roomToUnlock]->GetChild(i)->m_Index, _originLockRoom);
+				for (size_t i = 0; i < m_nodesInTree[_roomToUnlock]->ChildCount(); i++) 
+				{
+					if (!_alreadyUnlocked[m_nodesInTree[_roomToUnlock]->GetChild(i)->m_Index])
+					{
+						unlockRooms(m_nodesInTree[_roomToUnlock]->GetChild(i)->m_Index, _originLockRoom, _alreadyUnlocked);
+					}
+					
 				}
 		}
-	
-	
 	
 }
 

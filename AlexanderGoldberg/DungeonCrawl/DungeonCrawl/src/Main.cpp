@@ -47,7 +47,7 @@ void mainLoop()
 	DeltaTime deltaTime = DeltaTime();	
 	
 
-#if UseHigherGrid == 0
+#if UseHigherGrid == 1
 	int gridSizeX = 30;
 	int gridSizeY = 30;
 #else
