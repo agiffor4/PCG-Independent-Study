@@ -504,6 +504,7 @@ void World::GenerateKeyDoorPair(int _roomToGenerateDoorsIn, RoomTree& _roomTree,
 		m_lastKeyDepth = _roomTree.GetDeepestDepth();
 	switch ((BSP::TunnelingType)m_keyDoorGenerationType)
 	{
+	case BSP::TunnelingType::Hub:
 	case BSP::TunnelingType::Base:
 		do
 		{
@@ -524,12 +525,11 @@ void World::GenerateKeyDoorPair(int _roomToGenerateDoorsIn, RoomTree& _roomTree,
 			}
 		} while (!validKeyLocation);
 		break;
-	case BSP::TunnelingType::Hub:
+
 	case BSP::TunnelingType::StringOfRooms:
 	case BSP::TunnelingType::RoomToRoom:
 	case BSP::TunnelingType::RegionToRegion:
 	default:
-		break;
 		do
 		{
 			int randomRoom = rand() % m_roomsData.size();
@@ -542,6 +542,8 @@ void World::GenerateKeyDoorPair(int _roomToGenerateDoorsIn, RoomTree& _roomTree,
 				}
 			}
 		} while (!validKeyLocation);
+		break;
+		
 	}
 	
 	t = GetTileAtIndex(keyTileIndex);
@@ -570,6 +572,7 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 	roomTree.PrintTree();
 	switch ((BSP::TunnelingType)m_keyDoorGenerationType)
 	{
+	case BSP::TunnelingType::Hub:
 	case BSP::TunnelingType::Base:
 
 		for (size_t i = 0; i < _keyDoorPairCountToGenerate; i++)
@@ -587,7 +590,7 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 			GenerateKeyDoorPair(roomToLock, roomTree, doorPath, keyPath, _bspToUse);
 		}
 		break;
-	case BSP::TunnelingType::Hub:
+	
 	case BSP::TunnelingType::StringOfRooms:
 	case BSP::TunnelingType::RoomToRoom:
 	case BSP::TunnelingType::RegionToRegion:
@@ -602,9 +605,8 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 					roomToLock = rand() % m_roomsData.size();
 				} while (roomToLock == exitRoomIndex || roomToLock == playerStartRoomIndex);
 			}
-			//m_lastDoorDepth = roomTree.GetRoomDepth(roomToLock);
-			doorPath = "img/" + numToColor[i] + "Door.bmp";
-			keyPath = "img/" + numToColor[i] + "KeyCard.bmp";
+			doorPath = "img/" + (i < 3 ? numToColor[i] : numToColor[0]) + "Door.bmp";
+			keyPath = "img/" + (i < 3 ? numToColor[i] : numToColor[0]) + "KeyCard.bmp";
 			GenerateKeyDoorPair(roomToLock, roomTree, doorPath, keyPath, _bspToUse);
 		}
 		break;
@@ -802,27 +804,12 @@ void World::InvokeKeyUp(SDL_Keycode _key)
 		setWindowTitle();
 		break;
 	case SDLK_1:
-		m_pathGenerationType = 0;
-		setWindowTitle();
-		printf("Path generation type set to %s\n", bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType).c_str());
-		break;
 	case SDLK_2:
-		m_pathGenerationType = 1;
-		setWindowTitle();
-		printf("Path generation type set to %s\n", bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType).c_str());
-		break;
 	case SDLK_3:
-		m_pathGenerationType = 2;
-		setWindowTitle();
-		printf("Path generation type set to %s\n", bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType).c_str());
-		break;
 	case SDLK_4:
-		m_pathGenerationType = 3;
-		setWindowTitle();
-		printf("Path generation type set to %s\n", bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType).c_str());
-		break;
 	case SDLK_5:
-		m_pathGenerationType = 4;
+		m_pathGenerationType =  ((int)_key) - 49;
+		m_keyDoorGenerationType = ((int)_key) - 49;
 		setWindowTitle();
 		printf("Path generation type set to %s\n", bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType).c_str());
 		break;

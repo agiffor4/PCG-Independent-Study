@@ -464,13 +464,13 @@ std::vector<int> BSP::GeneratePaths(AStarSearch& _AStar, bool _overwritePrevious
 			TunnelingBase(_AStar, indexesOfRoomTiles, m_usePreviouslyDugPathsInPathGeneration);
 			break;
 		case BSP::TunnelingType::Hub:
-			TunnelingHub(_AStar, indexesOfRoomTiles, m_usePreviouslyDugPathsInPathGeneration, false, true);
+			printf("hub center is %d\n", TunnelingHub(_AStar, indexesOfRoomTiles, m_usePreviouslyDugPathsInPathGeneration, false, true));
 			break;
 		case BSP::TunnelingType::StringOfRooms:
 			TunnelingStringsOfRooms(_AStar, indexesOfRoomTiles, m_usePreviouslyDugPathsInPathGeneration);
 			break;
 		case BSP::TunnelingType::RoomToRoom:			
-			TunnelingRoomToRoom(_AStar, indexesOfRoomTiles); 
+			TunnelingRoomToRoom(_AStar, indexesOfRoomTiles, true, false); 
 			break;  		
 		case BSP::TunnelingType::RegionToRegion:
 			TunnelingRegionToRegion(_AStar, indexesOfRoomTiles, m_usePreviouslyDugPathsInPathGeneration);
@@ -682,7 +682,8 @@ int BSP::TunnelingHub(AStarSearch& _AStar, std::vector<std::vector<int>>& const 
 	// if _repeatRoomDigs there will be more paths connecting rooms and existing paths may be  wider
 	int originRoom = _centralRoomToSpiralFrom;
 	const std::vector<RectA>& roomRegions = m_roomRegions;
-	
+	_AStar.SetEmptyTileCost(5);
+	_AStar.SetWallDigCost(0);
 	Vector2 worldCenter = Vector2(m_tree[0]->GetRect().x2 / 2, m_tree[0]->GetRect().y2 / 2);
 	if (_randomizeWhichRoomIsOrigin)
 	{
