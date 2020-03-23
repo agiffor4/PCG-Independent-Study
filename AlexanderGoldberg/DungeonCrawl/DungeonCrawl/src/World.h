@@ -95,7 +95,7 @@ public:
 	Player* CreatePlayer();
 	void PlacePlayer(std::vector<std::vector<int>>* _rooms = nullptr);
 	void InvokeKeyUp(SDL_Keycode _key) override;
-	
+	void centerCameraOnPlayer(Tile* _tileToCenterOn);
 	Vector2 CheckIfCameraShouldMove(Vector2 _cameraMoveDirection);
 	//DEBUGGINg
 	void printRoomData();

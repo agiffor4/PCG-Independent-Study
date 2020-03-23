@@ -8,7 +8,7 @@
 #include "Shadow.h"
 
 Tile::Tile() {
-
+	//m_renderFogOfWar = false;
 }
 Tile::~Tile() {
 	Renderable::CleanUp();

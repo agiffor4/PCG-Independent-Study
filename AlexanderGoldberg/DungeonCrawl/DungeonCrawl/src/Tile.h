@@ -20,7 +20,7 @@ private:
 	bool m_corridor = false;
 	bool m_illuminated = false;
 	bool m_inFogOfWar = true;
-	bool m_renderFogOfWar = false;
+	bool m_renderFogOfWar = true;
 	int m_roomIn = -1;
 	TextA* m_text = nullptr;
 	enum class TileRenderType {

@@ -658,12 +658,12 @@ void World::tileRenderingSetUp()
 	}
 
 #if UseCamera == 1	
-	Vector2 offset = GetTileAtIndex(m_playerStart)->GetPosition();
+	/*Vector2 offset = GetTileAtIndex(m_playerStart)->GetPosition();
 	offset.X -= Camera::GetScreenSize().X * 0.5f;
 	offset.Y -= Camera::GetScreenSize().Y * 0.5f;
 	Camera::SetOffset(offset);
 	Vector2 center = Vector2(Camera::GetScreenSize().X * 0.5f, Camera::GetScreenSize().Y * 0.5f);
-	Camera::SetCenter(center);
+	Camera::SetCenter(center);*/
 #endif
 }
 
@@ -762,13 +762,7 @@ void World::PlacePlayer(std::vector<std::vector<int>>* _rooms)
 	t->SetContents(m_player);
 	m_player->SetLineOfSight(true);
 #if UseCamera == 1
-	Vector2 offset = t->GetPosition();
-	
-	offset.X -= Camera::GetScreenSize().X * 0.5f;
-	offset.Y -= Camera::GetScreenSize().Y * 0.5f;
-	Camera::SetOffset(offset);	
-	Vector2 center = Vector2(Camera::GetScreenSize().X * 0.5f, Camera::GetScreenSize().Y * 0.5f);
-	Camera::SetCenter(center);
+	centerCameraOnPlayer(t);
 #endif
 }
 
@@ -840,17 +834,56 @@ void World::InvokeKeyUp(SDL_Keycode _key)
 		m_markRooms = !m_markRooms;
 		setWindowTitle();
 		break;
-		
+	case SDLK_t:
+		Camera::SetOffset(Camera::Offset() - Vector2(32.0, 0.0));
+		break;
 	default:
 		break;
 	}
 }
 
+void World::centerCameraOnPlayer(Tile* _tileToCenterOn)
+{
+	Vector2 offset = _tileToCenterOn->GetPosition();
+	offset.X -= Camera::GetScreenSize().X * 0.5f;
+	offset.Y -= Camera::GetScreenSize().Y * 0.5f;
+	Camera::SetOffset(offset);
+	Vector2 center = Vector2(Camera::GetScreenSize().X * 0.5f, Camera::GetScreenSize().Y * 0.5f);
+	Camera::SetCenter(center);
+
+	Vector2 tileSize = m_tiles[0]->GetCurrentSize();
+	Tile* lastT = m_tiles[m_tiles.size() - 1];
+	Tile* startT = m_tiles[0];
+	/*if (lastT->GetDestination().y - Camera::Offset().Y < Camera::GetScreenSize().Y -tileSize.Y)
+	{
+		_cameraMoveDirection.Y = 0
+	}*/
+	while (lastT->GetDestination().x - Camera::Offset().X < Camera::GetScreenSize().X - tileSize.X)
+	{
+		Camera::SetOffset(Camera::Offset() + Vector2(-tileSize.X, 0.0));
+	}
+	while (lastT->GetDestination().x - Camera::Offset().X < 0)
+	{
+		Camera::SetOffset(Camera::Offset() + Vector2(tileSize.X, 0.0));
+	}
+
+
+	while (lastT->GetDestination().y - Camera::Offset().Y < Camera::GetScreenSize().Y - tileSize.Y)
+	{
+		Camera::SetOffset(Camera::Offset() + Vector2(0.0, -tileSize.Y));
+	}
+	while (lastT->GetDestination().y - Camera::Offset().Y < 0)
+	{
+		Camera::SetOffset(Camera::Offset() + Vector2(0.0, tileSize.Y));
+	}
+
+}
+
 Vector2 World::CheckIfCameraShouldMove(Vector2 _cameraMoveDirection)
 {
 	Vector2 tileSize = m_tiles[0]->GetCurrentSize();
-#define lastT m_tiles[m_tiles.size() - 1]
-#define startT m_tiles[0]
+	Tile* lastT  = m_tiles[m_tiles.size() - 1];
+	Tile* startT = m_tiles[0];
 	
 	if (_cameraMoveDirection.Y == 1)
 	{
