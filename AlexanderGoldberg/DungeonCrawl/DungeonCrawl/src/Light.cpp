@@ -36,8 +36,9 @@ void Light::Illuminate(bool _lightUp) {
 			std::set<Tile*> inLight = GetEffectedTiles(epicenter);
 			for (auto i = inLight.begin();  i != inLight.end(); i++)
 			{
-				(*i)->SetIlluminated(_lightUp);
-				(*i)->SetFogOfWar(!_lightUp);
+				int dist = (_lightUp ? Vector2::GetMagnitude(GetLocation()->GetPositionInGrid(), (*i)->GetPositionInGrid()) : -1);
+				(*i)->SetIlluminated(_lightUp, dist);
+				(*i)->SetFogOfWar(!_lightUp, dist);
 			}
 		}
 	}

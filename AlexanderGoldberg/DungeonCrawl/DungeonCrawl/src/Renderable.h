@@ -17,7 +17,7 @@ private:
 	//SDL
 	SDL_Texture* m_texture = nullptr;
 	SDL_Rect m_destination = SDL_Rect();
-	
+	SDL_Color m_colorMod = { 255, 255, 255, 255 };
 	
 	//rotation
 	float m_currentAngle = 0;
@@ -28,6 +28,10 @@ protected:
 	void updateDestination();
 	void updateScale();
 	SDL_Renderer* m_rendererRef = nullptr;
+	void storeTextureColorMod();
+	void revertTextureColorMod();
+	void getTextureColorMod(SDL_Color& _color);
+	void setTextureColorMod(SDL_Color _color);
 	//void changeImage(std::string _imagePath, Uint32 _transparentColor = -999);
 public:
 	static bool& renderOrderChanged();

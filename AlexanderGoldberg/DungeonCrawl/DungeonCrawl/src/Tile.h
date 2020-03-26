@@ -19,8 +19,10 @@ private:
 	bool m_passable = true;
 	bool m_corridor = false;
 	bool m_illuminated = false;
+	int m_distanceFromLightsource = -1;
 	bool m_inFogOfWar = true;
 	bool m_renderFogOfWar = true;
+	int m_distanceFromSource = -1;
 	int m_roomIn = -1;
 	TextA* m_text = nullptr;
 	enum class TileRenderType {
@@ -162,7 +164,7 @@ public:
 	void Render(SDL_Renderer* _renderer) override;
 	void Update(float _dt) override;
 	void DetermineTileType(World* _world);
-	void SetIlluminated(bool _illuminated);
-	void SetFogOfWar(bool _inFogOfWar);
+	void SetIlluminated(bool _illuminated, int _distanceFromLightsource);
+	void SetFogOfWar(bool _inFogOfWar, int _distanceFromSource);
 };
 

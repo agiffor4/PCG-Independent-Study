@@ -100,6 +100,22 @@ void Renderable::updateScale()
 	m_destination.w = m_currentSize.X;
 	m_destination.h = m_currentSize.Y;
 }
+void Renderable::storeTextureColorMod()
+{
+	getTextureColorMod(m_colorMod);
+}
+void Renderable::revertTextureColorMod()
+{
+	setTextureColorMod(m_colorMod); 
+}
+void Renderable::getTextureColorMod(SDL_Color& _color)
+{
+	SDL_GetTextureColorMod(m_texture, &_color.r, &_color.g, &_color.b);
+}
+void Renderable::setTextureColorMod(SDL_Color _color)
+{
+	SDL_SetTextureColorMod(m_texture, _color.r, _color.g, _color.b);
+}
 bool& Renderable::renderOrderChanged(){
 	static bool s_renderOrderChanged;
 	return s_renderOrderChanged;

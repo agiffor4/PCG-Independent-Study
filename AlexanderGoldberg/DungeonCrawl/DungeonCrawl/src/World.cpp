@@ -689,25 +689,59 @@ void World::AddRooms(std::vector<std::vector<int>>& const _rooms) {
 void World::FillRoomDataStructs(BSP* _bsp) {
 	if (_bsp == nullptr)
 		_bsp = m_bsp;
-	for (size_t i = 0; i < m_roomsData.size(); i++)
+	
+	if (_bsp != nullptr)
 	{
-		if (_bsp != nullptr)
-			_bsp->ExitsFromRoom(m_roomsData[i].sm_region, m_roomsData[i].sm_exitCount, m_roomsData[i].sm_regionsExitingTo, m_roomsData[i].sm_CorridorExits, (*this));
-	}
-
-	for (size_t i = 0; i < m_roomsData.size(); i++)
-	{
-		auto itt = m_roomsData[i].sm_regionsExitingTo.begin();
-		auto ittEnd = m_roomsData[i].sm_regionsExitingTo.end();
-		while (itt != ittEnd)
+		std::vector<int> toRemove;
+		for (size_t i = 0; i < m_roomsData.size(); i++)
 		{
-			int index = (*itt);
-			int exitCountForGivenRoom = m_roomsData[index].sm_exitCount;
-			m_roomsData[i].sm_connectedness += exitCountForGivenRoom;
-			itt++;
+			_bsp->ExitsFromRoom(m_roomsData[i].sm_region, m_roomsData[i].sm_exitCount, m_roomsData[i].sm_regionsExitingTo, m_roomsData[i].sm_CorridorExits, (*this));
+			
+			for (auto j = m_roomsData[i].sm_CorridorExits.begin(); j != m_roomsData[i].sm_CorridorExits.end(); j++)
+			{
+				int exitY = GetTileAtIndex(m_roomsData[i].sm_containsTiles[m_roomsData[i].sm_containsTiles.size() - 1])->GetPositionInGrid().Y;
+				int roomY = GetTileAtIndex((*j))->GetPositionInGrid().Y;
+				int exitX = GetTileAtIndex(m_roomsData[i].sm_containsTiles[m_roomsData[i].sm_containsTiles.size() - 1])->GetPositionInGrid().X;
+				int roomX = GetTileAtIndex((*j))->GetPositionInGrid().X;
+				if (roomY == exitY)
+				{
+					
+					GetTileAtIndex((*j) - GetMapDimentions().X)->SetCorridor(true);
+					GetTileAtIndex((*j) - GetMapDimentions().X)->SetPassable(true);
+					GetTileAtIndex((*j))->SetCorridor(false);
+					GetTileAtIndex((*j))->SetPassable(false);
+					int index = ((*j) - GetMapDimentions().X) - 1;
+					if (exitX < roomX)
+						index = ((*j) - GetMapDimentions().X) + 1;
+					GetTileAtIndex(index)->SetCorridor(true);
+					GetTileAtIndex(index)->SetPassable(true);
+					m_roomsData[i].sm_CorridorExits.emplace((*j) - GetMapDimentions().X);
+					toRemove.push_back((*j));
+				}
+			}
 		}
+		for (size_t i = 0; i < m_roomsData.size(); i++)
+		{
+			for (size_t j = 0; j < toRemove.size(); j++)
+			{
+				m_roomsData[i].sm_CorridorExits.erase(toRemove[j]);
+			}
+		}
+		for (size_t i = 0; i < m_roomsData.size(); i++)
+		{
+			auto itt = m_roomsData[i].sm_regionsExitingTo.begin();
+			auto ittEnd = m_roomsData[i].sm_regionsExitingTo.end();
+			while (itt != ittEnd)
+			{
+				int index = (*itt);
+				int exitCountForGivenRoom = m_roomsData[index].sm_exitCount;
+				m_roomsData[i].sm_connectedness += exitCountForGivenRoom;
+				itt++;
+			}
 
+		}
 	}
+	
 }
 
 void World::AddPaths(std::vector<int>& const _paths) {
@@ -854,10 +888,6 @@ void World::centerCameraOnPlayer(Tile* _tileToCenterOn)
 	Vector2 tileSize = m_tiles[0]->GetCurrentSize();
 	Tile* lastT = m_tiles[m_tiles.size() - 1];
 	Tile* startT = m_tiles[0];
-	/*if (lastT->GetDestination().y - Camera::Offset().Y < Camera::GetScreenSize().Y -tileSize.Y)
-	{
-		_cameraMoveDirection.Y = 0
-	}*/
 	while (lastT->GetDestination().x - Camera::Offset().X < Camera::GetScreenSize().X - tileSize.X)
 	{
 		Camera::SetOffset(Camera::Offset() + Vector2(-tileSize.X, 0.0));

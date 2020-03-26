@@ -201,7 +201,8 @@ void Player::SetLineOfSight(bool _inLineOfSight)
 	auto tilesInRange = getTilesInLineOfSight(GetLocation());
 	for (auto i = tilesInRange.begin(); i != tilesInRange.end(); i++)
 	{
-		(*i)->SetFogOfWar(!_inLineOfSight);
+		int dist = Vector2::GetMagnitude(GetLocation()->GetPositionInGrid(), (*i)->GetPositionInGrid());
+		(*i)->SetFogOfWar(!_inLineOfSight, (_inLineOfSight ?  dist : -1));
 	}
 }
 

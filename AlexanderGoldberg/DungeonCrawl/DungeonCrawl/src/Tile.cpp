@@ -298,7 +298,26 @@ void Tile::ClearTileContents() {
 
 void Tile::Render(SDL_Renderer* _renderer)
 {
+	storeTextureColorMod();
+	if (m_inFogOfWar)
+	{
+		setTextureColorMod({ 50, 50, 50, 100 });
+	}
+	else
+	{
+		if (m_illuminated)
+		{
+			Uint8 shade = 255 -(m_distanceFromLightsource * 10);
+			setTextureColorMod({ shade, shade, shade, 100 });
+		}
+		else
+		{
+			Uint8 shade = 150 - (m_distanceFromSource * 10);
+			setTextureColorMod({ shade, shade, shade, 100 });
+		}
+	}
 	Renderable::Render(_renderer);
+	revertTextureColorMod();
 	if (!m_renderFogOfWar || !m_inFogOfWar)
 	{
 		for (size_t i = 0; i < m_items.size(); i++)
@@ -322,7 +341,7 @@ void Tile::Render(SDL_Renderer* _renderer)
 
 	if (!m_illuminated)
 	{
-		for (size_t i = 0; i < (m_inFogOfWar && m_renderFogOfWar ? m_shadows.size() : m_shadows.size() -1); i++)
+		for (size_t i = 0; i < m_shadows.size(); i++)
 		{
 			if (m_shadows[i] != nullptr)
 			{
@@ -560,18 +579,17 @@ void Tile::DetermineTileType(World* _world)
 				
 			}
 		}
-		Shadow* s = new Shadow();
-		s->Init("img/FogOfWar.png", "Fog Of War", m_rendererRef);
-		AddShadow(s);
 }
 
-void Tile::SetIlluminated(bool _illuminated)
+void Tile::SetIlluminated(bool _illuminated, int _distanceFromLightsource)
 {
 	m_illuminated = _illuminated;
+	m_distanceFromLightsource = _distanceFromLightsource;
 }
 
-void Tile::SetFogOfWar(bool _inFogOfWar)
+void Tile::SetFogOfWar(bool _inFogOfWar, int _distanceFromSource)
 { 
+	m_distanceFromSource = _distanceFromSource;
 	if (!m_illuminated)
 	{
 		m_inFogOfWar = _inFogOfWar;
