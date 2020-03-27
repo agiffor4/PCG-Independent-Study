@@ -13,6 +13,15 @@
 #include "Treasure.h"
 #include "Camera.h"
 #include "Light.h"
+
+#include "HealthPickUp.h"
+/*#include "Chest.h"
+#include "Weapon.h"
+#include "Trap.h"
+#include "TrapPlayer.h"
+#include "Bomb.h"
+#include "Ammo.h"
+*/
 #define Debug = 1;
 
 std::string numToColor[] = { "Red", "Blue", "Yellow"};

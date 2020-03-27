@@ -44,16 +44,19 @@ bool Tile::IsCorridor()
 }
 void Tile::SetContents(Thing* _newContents)
 {
-	/*
 	if (m_contents != nullptr)
 	{
 		if (m_contents->ShouldDelete())
 			delete(m_contents);
 		else
 			m_contents->SetLocation(nullptr);
-	}*/
+	}
 	
 	m_contents = _newContents;
+	for (size_t i = 0; i < m_items.size(); i++)
+	{
+		m_items[i]->InteractionOnEnteringTile(m_contents);
+	}
 	
 }
 Thing* Tile::GetContents()
@@ -506,9 +509,12 @@ void Tile::DetermineTileType(World* _world)
 			case Tile::TileRenderType::wall2SideBottomL:
 				s = new Shadow();
 				s->Init("img/Shadow_West.png", "Shadow South West 1", m_rendererRef);
-				AddShadow(s);
-				s = new Shadow();
-				s->Init("img/Shadow_North.png", "Shadow South West 2", m_rendererRef);
+				if (_world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::RIGHT)->IsPassable())
+				{
+					AddShadow(s);
+					s = new Shadow();
+					s->Init("img/Shadow_North.png", "Shadow South West 2", m_rendererRef);
+				}
 				break;
 			case Tile::TileRenderType::wall2SideBottomR:
 				s = new Shadow();

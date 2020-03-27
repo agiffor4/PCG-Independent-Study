@@ -43,3 +43,7 @@ bool Interactable::GetAllowInteraction()
 {
 	return m_allowInteraction;
 }
+
+void Interactable::InteractionOnEnteringTile(Thing* _thingInitatingInteraction)
+{
+}

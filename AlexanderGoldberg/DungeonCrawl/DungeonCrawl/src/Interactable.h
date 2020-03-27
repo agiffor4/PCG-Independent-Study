@@ -15,6 +15,7 @@ public:
 	bool GetBlocksPassage();
 	bool IsflaggedForDeletion();
 	bool GetAllowInteraction();
+	virtual void InteractionOnEnteringTile(Thing* _thingInitatingInteraction);
 	bool InteratctionWrapper(Thing* _thingInitatingInteraction);
 	void Render(SDL_Renderer* _renderer, Uint8 _shade);
 };
