@@ -7,6 +7,12 @@ Bomb::Bomb(World* _world)
 	m_world = _world;
 }
 
+void Bomb::Throw(Thing* _thrower, bool _damagesThrower)
+{
+	m_thrower = _thrower;
+	m_damagesThrower = _damagesThrower;
+}
+
 bool Bomb::Interaction(Thing* _thingInitatingInteraction)
 {
 	return false;
@@ -24,11 +30,15 @@ void Bomb::Detonate()
 	{
 		if (t->GetContents() != nullptr)
 		{
-			Damagable* d = dynamic_cast<Damagable*>(t->GetContents());
-			if (d != nullptr)
+			if (m_damagesThrower || (m_thrower != t->GetContents()))
 			{
-				d->TakeDamage(m_damageInflicted);
+				Damagable* d = dynamic_cast<Damagable*>(t->GetContents());
+				if (d != nullptr)
+				{
+					d->TakeDamage(m_damageInflicted);
+				}
 			}
+			
 		}
 	}
 }
