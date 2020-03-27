@@ -115,8 +115,7 @@ void RoomTree::PrintTree()
 		{
 			root = m_nodesInTree[i];
 			break;
-		}
-			
+		}	
 	}
 	std::vector<bool> printedChildParent;
 	printedChildParent.reserve(m_nodesInTree.size());
@@ -135,7 +134,7 @@ void RoomTree::PrintBranch(std::vector<RoomTreeNode*> _children, int _parentInde
 {
 	if (_children.size() > 0)
 	{
-		printf("%d<", _parentIndex);
+		printf("%d[%d]<", _parentIndex, m_nodesInTree[_parentIndex]->GetDepth());
 		for (size_t i = 0; i < _children.size(); i++)
 		{
 			printf("%d", _children[i]->m_Index);
@@ -248,6 +247,8 @@ void RoomTree::generateConnections(RoomTreeNode* _parent, const std::vector<Room
 				else
 				{
 					m_nodesInTree[currentIndex]->AddChild(m_nodesInTree[roomIndex]);
+					if (m_nodesInTree[currentParentIndex]->GetDepth() < m_nodesInTree[currentIndex]->GetDepth()-1)
+						m_nodesInTree[currentIndex]->SetDepth(m_nodesInTree[currentParentIndex]->GetDepth() + 1);
 					m_nodesInTree[roomIndex]->m_ChildAndParent = true;
 				}
 			}

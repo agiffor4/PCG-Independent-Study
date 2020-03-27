@@ -6,6 +6,6 @@ class Treasure :
 public:
 	Treasure();
 	~Treasure();
-	bool Interaction() override;
+	bool Interaction(Thing* _thingInitatingInteraction) override;
 };
 

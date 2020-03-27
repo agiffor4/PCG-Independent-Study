@@ -14,6 +14,7 @@ Player::Player()
 	m_moveRate.SetTimer(0.2f);
 	m_holdables[0] = nullptr;
 	m_holdables[1] = nullptr;
+	SetHealthMax(100);
 }
 
 
@@ -241,4 +242,6 @@ std::set<Tile*> Player::getTilesInLineOfSight(Tile* _epicenter)
 	toIlluminate.emplace(_epicenter);
 
 	return toIlluminate;
+}
+void Player::die() {
 }

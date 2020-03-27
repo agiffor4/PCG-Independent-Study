@@ -5,7 +5,7 @@ Treasure::Treasure() {
 }
 Treasure::~Treasure() {}
 
-bool Treasure::Interaction()
+bool Treasure::Interaction(Thing* _thingInitatingInteraction)
 {
 	m_flagForDelation = true;
 	return false;

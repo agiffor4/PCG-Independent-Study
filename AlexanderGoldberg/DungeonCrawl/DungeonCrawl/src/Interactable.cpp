@@ -1,12 +1,20 @@
 #include "Interactable.h"
-
-bool Interactable::InteratctionWrapper()
+#include "Tile.h"
+bool Interactable::InteratctionWrapper(Thing* _thingInitatingInteraction)
 {
 	if (m_allowInteraction)
 	{
-		return Interaction();
+		return Interaction(_thingInitatingInteraction);
 	}
 	return false;
+}
+void Interactable::Render(SDL_Renderer* _renderer, Uint8 _shade)
+{
+	storeTextureColorMod();
+	setTextureColorMod({ _shade , _shade , _shade , 255 });
+	Renderable::Render(_renderer);
+	revertTextureColorMod();
+
 }
 Interactable::Interactable()
 {

@@ -7,7 +7,7 @@ void Key::SetDoor(DoorA* _door)
 Key::Key() {}
 Key::~Key() {}
 
-bool Key::Interaction()
+bool Key::Interaction(Thing* _thingInitatingInteraction)
 {
 	
 		if (m_door.size() > 0)

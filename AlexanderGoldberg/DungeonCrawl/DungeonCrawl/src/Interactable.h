@@ -10,12 +10,13 @@ protected:
 public:
 	Interactable();
 	virtual ~Interactable();
-	virtual bool Interaction() = 0; //returns false if it should not be added to the player inventory ineteraction
+	virtual bool Interaction(Thing* _thingInitatingInteraction) = 0; //returns false if it should not be added to the player inventory ineteraction
 	void SetBlocksPassage(bool _val);
 	bool GetBlocksPassage();
 	bool IsflaggedForDeletion();
 	bool GetAllowInteraction();
-	bool InteratctionWrapper();
+	bool InteratctionWrapper(Thing* _thingInitatingInteraction);
+	void Render(SDL_Renderer* _renderer, Uint8 _shade);
 };
 
 

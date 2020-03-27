@@ -152,6 +152,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Damagable.cpp" />
+    <ClCompile Include="src\Bomb.cpp" />
+    <ClCompile Include="src\Chest.cpp" />
     <ClCompile Include="src\Holdable.cpp" />
     <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\Shadow.cpp" />
@@ -187,8 +190,14 @@
     <ClCompile Include="src\World.cpp" />
     <ClCompile Include="src\RoomTreeNode.cpp" />
     <ClCompile Include="src\Treasure.cpp" />
+    <ClCompile Include="src\Trap.cpp" />
+    <ClCompile Include="src\TrapPlayer.cpp" />
+    <ClCompile Include="src\Weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Damagable.h" />
+    <ClInclude Include="src\Bomb.h" />
+    <ClInclude Include="src\Chest.h" />
     <ClInclude Include="src\Holdable.h" />
     <ClInclude Include="src\Light.h" />
     <ClInclude Include="src\Shadow.h" />
@@ -306,6 +315,9 @@
     <ClInclude Include="src\Thing.h" />
     <ClInclude Include="src\World.h" />
     <ClInclude Include="src\Treasure.h" />
+    <ClInclude Include="src\Trap.h" />
+    <ClInclude Include="src\TrapPlayer.h" />
+    <ClInclude Include="src\Weapon.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL\lib\x64\SDL2.dll" />

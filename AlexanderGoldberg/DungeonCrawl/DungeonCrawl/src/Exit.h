@@ -9,6 +9,6 @@ protected:
 public:
 	Exit(World* _world);
 	~Exit();
-	bool Interaction() override;
+	bool Interaction(Thing* _thingInitatingInteraction) override;
 };
 

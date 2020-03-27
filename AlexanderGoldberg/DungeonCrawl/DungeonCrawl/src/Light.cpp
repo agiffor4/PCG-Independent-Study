@@ -94,7 +94,7 @@ std::set<Tile*> Light::GetEffectedTiles(Tile* _epicenter)
 	return toIlluminate;
 }
 
-bool Light::Interaction()
+bool Light::Interaction(Thing* _thingInitatingInteraction)
 {
 	return true;
 }

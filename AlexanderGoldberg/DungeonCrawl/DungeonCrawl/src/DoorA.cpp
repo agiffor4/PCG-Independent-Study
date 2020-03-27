@@ -7,7 +7,7 @@ DoorA::DoorA()
 }
 DoorA::~DoorA() {}
 
-bool DoorA::Interaction()
+bool DoorA::Interaction(Thing* _thingInitatingInteraction)
 {
 	return false;
 }

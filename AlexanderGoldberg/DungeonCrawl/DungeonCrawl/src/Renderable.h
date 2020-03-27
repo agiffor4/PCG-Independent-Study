@@ -58,5 +58,6 @@ public:
 	const Vector2& GetRenderableOffSet();
 	const std::string& GetName();
 	virtual void CleanUp();
+
 };
 

@@ -17,7 +17,7 @@ public:
 	void SetLocation(Tile* _newLocation) override;
 	void Init(const std::string _path, const std::string _name, SDL_Renderer* _renderer, World* _world, Uint32 _transparentColor = -999);
 	std::set<Tile*> GetEffectedTiles(Tile* _epicenter);
-	bool Interaction() override;
+	bool Interaction(Thing* _thingInitatingInteraction) override;
 	Light();
 	~Light();
 };

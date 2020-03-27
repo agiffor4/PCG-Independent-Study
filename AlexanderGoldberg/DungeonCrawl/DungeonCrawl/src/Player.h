@@ -1,5 +1,5 @@
 #pragma once
-#include "Thing.h"
+#include "Damagable.h"
 #include "IInputHandler.h"
 #include "World.h"
 #include "Timer.h"
@@ -7,7 +7,7 @@ class Scene;
 class Interactable;
 class Holdable;
 class Player :
-	public Thing, public IInputHandler
+	public Damagable, public IInputHandler
 {
 
 public:	
@@ -43,4 +43,5 @@ protected:
 	void setDirectionFromFlagValues(Uint8 _flag);
 	
 	std::set<Tile*> getTilesInLineOfSight(Tile* _epicenter);
+	void die() override;
 };

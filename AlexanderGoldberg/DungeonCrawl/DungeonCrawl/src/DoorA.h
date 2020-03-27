@@ -6,7 +6,7 @@ class DoorA :
 public:
 	DoorA();
 	~DoorA();
-	bool Interaction() override;
+	bool Interaction(Thing* _thingInitatingInteraction) override;
 	void Update(float dt) override;
 };
 

@@ -106,7 +106,8 @@ Interactable* Tile::InteractWithItem()
 			
 		}
 		
-		if (toReturn->InteratctionWrapper()) // if returns true then adds to inventory
+		
+		if (toReturn->InteratctionWrapper(m_contents)) // if returns true then adds to inventory
 		{
 			m_items.erase(m_items.end() - 1, m_items.end());
 			return toReturn;
@@ -299,25 +300,32 @@ void Tile::ClearTileContents() {
 void Tile::Render(SDL_Renderer* _renderer)
 {
 	storeTextureColorMod();
+	Uint8 fogTint = 50;
+	Uint8 shade = 255;
 	if (m_inFogOfWar)
 	{
-		setTextureColorMod({ 50, 50, 50, 100 });
+		setTextureColorMod({ fogTint, fogTint, fogTint, 100 });
 	}
 	else
 	{
+		int lightModifer = 30;
 		if (m_illuminated)
 		{
-			Uint8 shade = 255 -(m_distanceFromLightsource * 10);
+			shade = 255 -(m_distanceFromLightsource * (lightModifer / 2));
+			if (shade < fogTint)
+				shade = fogTint;
 			setTextureColorMod({ shade, shade, shade, 100 });
 		}
 		else
 		{
-			Uint8 shade = 150 - (m_distanceFromSource * 10);
+			shade = 150 - (m_distanceFromSource * lightModifer);
+			if (shade < fogTint)
+				shade = fogTint;
 			setTextureColorMod({ shade, shade, shade, 100 });
 		}
 	}
 	Renderable::Render(_renderer);
-	revertTextureColorMod();
+
 	if (!m_renderFogOfWar || !m_inFogOfWar)
 	{
 		for (size_t i = 0; i < m_items.size(); i++)
@@ -325,7 +333,7 @@ void Tile::Render(SDL_Renderer* _renderer)
 			if (m_items[i] != nullptr)
 			{
 				m_items[i]->SetPosition(GetPosition().X, GetPosition().Y);
-				m_items[i]->Render(_renderer);
+				m_items[i]->Render(_renderer, shade);
 			}
 
 		}
@@ -336,7 +344,7 @@ void Tile::Render(SDL_Renderer* _renderer)
 		}
 
 	}
-	
+	revertTextureColorMod();
 
 
 	if (!m_illuminated)
@@ -599,3 +607,5 @@ void Tile::SetFogOfWar(bool _inFogOfWar, int _distanceFromSource)
 		m_inFogOfWar = false;
 	}
 }
+
+

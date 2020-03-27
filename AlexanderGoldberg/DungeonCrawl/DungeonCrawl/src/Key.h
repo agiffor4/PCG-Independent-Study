@@ -11,6 +11,6 @@ public:
 	void SetDoor(DoorA* _door);
 	Key();
 	~Key();
-	bool Interaction() override;
+	bool Interaction(Thing* _thingInitatingInteraction) override;
 };
 
