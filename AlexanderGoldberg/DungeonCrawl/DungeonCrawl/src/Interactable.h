@@ -11,11 +11,12 @@ public:
 	Interactable();
 	virtual ~Interactable();
 	virtual bool Interaction(Thing* _thingInitatingInteraction) = 0; //returns false if it should not be added to the player inventory ineteraction
+	virtual void InteractionOnEnteringTile(Thing* _thingInitatingInteraction);
 	void SetBlocksPassage(bool _val);
 	bool GetBlocksPassage();
 	bool IsflaggedForDeletion();
 	bool GetAllowInteraction();
-	virtual void InteractionOnEnteringTile(Thing* _thingInitatingInteraction);
+	
 	bool InteratctionWrapper(Thing* _thingInitatingInteraction);
 	void Render(SDL_Renderer* _renderer, Uint8 _shade);
 };
