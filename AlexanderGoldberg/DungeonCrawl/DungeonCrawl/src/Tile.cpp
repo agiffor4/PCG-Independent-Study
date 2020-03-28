@@ -614,4 +614,9 @@ void Tile::SetFogOfWar(bool _inFogOfWar, int _distanceFromSource)
 	}
 }
 
+const std::vector<Interactable*>& Tile::GetItems()
+{
+	return m_items;
+}
+
 

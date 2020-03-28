@@ -38,7 +38,14 @@ void Bomb::Detonate()
 					d->TakeDamage(m_damageInflicted);
 				}
 			}
-			
+		}
+		for (size_t i = 0; i < t->GetItems().size(); i++)
+		{
+			Damagable* d = dynamic_cast<Damagable*>(t->GetItems()[i]);
+			if (d != nullptr)
+			{
+				d->TakeDamage(m_damageInflicted);
+			}
 		}
 	}
 }

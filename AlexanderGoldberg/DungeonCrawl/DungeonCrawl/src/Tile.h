@@ -166,6 +166,7 @@ public:
 	void DetermineTileType(World* _world);
 	void SetIlluminated(bool _illuminated, int _distanceFromLightsource);
 	void SetFogOfWar(bool _inFogOfWar, int _distanceFromSource);
+	const std::vector<Interactable*>& GetItems();
 
 };
 

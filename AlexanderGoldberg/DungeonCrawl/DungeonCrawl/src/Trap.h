@@ -1,7 +1,8 @@
 #pragma once
 #include "Interactable.h"
+#include "Damagable.h"
 class Trap :
-	public Interactable
+	public Interactable, public Damagable
 {
 protected:
 	int m_damageInfliction = 5;
