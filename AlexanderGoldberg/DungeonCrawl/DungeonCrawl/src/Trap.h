@@ -1,8 +1,7 @@
 #pragma once
 #include "Interactable.h"
-#include "Damagable.h"
 class Trap :
-	public Interactable, public Damagable
+	public Interactable
 {
 protected:
 	int m_damageInfliction = 5;
@@ -13,6 +12,6 @@ public:
 	void SetTrapDamage(int _damageInfliction);
 	bool Interaction(Thing* _thingInitatingInteraction) override;
 	void InteractionOnEnteringTile(Thing* _thingInitatingInteraction) override;
-
+	
 };
 

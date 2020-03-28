@@ -27,7 +27,9 @@ void Trap::InteractionOnEnteringTile(Thing* _thingInitatingInteraction)
 			if (m_trapCharges == 0)
 			{
 				m_allowInteraction = false;
+				m_shouldRender = false;
 			}
 		}
 	}
 }
+

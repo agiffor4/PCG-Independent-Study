@@ -15,12 +15,18 @@
 #include "Light.h"
 
 #include "HealthPickUp.h"
-/*#include "Chest.h"
+#include "Bomb.h"
+#include "Ammo.h"
+
+
+/*
+#include "BombDisarmer.h"
+#include "Trap.h"
+#include "Chest.h"
 #include "Weapon.h"
 #include "Trap.h"
 #include "TrapPlayer.h"
-#include "Bomb.h"
-#include "Ammo.h"
+
 */
 #define Debug = 1;
 
@@ -342,13 +348,10 @@ void World::GenerateTiles(int _screenWidth, int _screenHeight) {
 		{
 			std::string name = "Tile (" + std::to_string(j) + ", " + std::to_string(i) + ")";
 			Tile* t = new Tile();
-			//t->Init("img/blank_tile.bmp", name, GetTileCount(), j, i, Vector2(j * targetSize.X, i * targetSize.X), m_scene->GetRenderer());		
 			t->Init("img/blank_tile.bmp", name, GetTileCount(), j, i, Vector2(j * m_scale, i * m_scale), m_scene->GetRenderer());
 			t->SetPassable(false);
-			//t->SetSize(targetSize);
 			t->SetScale(m_scale);
-			AddTile(t);
-			InputManager::GetInputManager()->SubscribeToInput(t, InputManager::KeyPressType::MOUSEUP);
+			AddTile(t);			
 			m_scene->AddRenderable(t);
 
 		}

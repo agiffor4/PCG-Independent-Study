@@ -6,9 +6,10 @@
 #include "Camera.h"
 #include "World.h"
 #include "Shadow.h"
-
+#include "InputManager.h"
 Tile::Tile() {
-	//m_renderFogOfWar = false;
+	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::MOUSEUP);
+	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::UP);
 }
 Tile::~Tile() {
 	Renderable::CleanUp();
@@ -28,10 +29,13 @@ void Tile::SetPassable(bool _val) {
 	if (m_passable)
 	{
 		changeImage("img/blank_tile.bmp");
+		m_solid = false;
+		
 	}
 	else
 	{
 		changeImage("img/block_tile.bmp");
+		m_solid = true;
 	}
 }
 void Tile::SetCorridor(bool _val)
@@ -178,7 +182,7 @@ void Tile::InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y)
 	switch (_mouse)
 	{
 	case IInputHandler::MouseButton::LEFT:
-		if (inBounds(_x, _y))
+		if (m_clickAble && inBounds(_x, _y))
 		{
 			printf("clicked on tile %s (index %d), setting passable to %s\n", m_name.c_str(), GetPositionInVector(), (!IsPassable() ? "true." : "false."));
 			SetPassable(!IsPassable());			
@@ -194,6 +198,14 @@ void Tile::InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y)
 		break;
 	default:
 		break;
+	}
+}
+
+void Tile::InvokeKeyUp(SDL_Keycode _key)
+{
+	if (_key == SDLK_BACKQUOTE)
+	{
+		m_clickAble = !m_clickAble;
 	}
 }
 

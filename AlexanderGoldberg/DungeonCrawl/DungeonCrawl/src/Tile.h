@@ -1,14 +1,13 @@
 #pragma once
-#include "Renderable.h"
+#include "Thing.h"
 #include "IInputHandler.h"
 #include <vector>
 class Interactable;
 class World;
 class TextA;
-class Thing;
 class Shadow;
 class Tile :
-	public Renderable, IInputHandler
+	public Thing, IInputHandler
 {
 private:
 	Thing* m_contents = nullptr;
@@ -136,6 +135,7 @@ private:
 		southwest = 128
 
 	};
+	bool m_clickAble = false;
 public:
 
 
@@ -159,6 +159,7 @@ public:
 	const Vector2& GetPositionInGrid();
 	void AddRoomNumber(int _roomTileIsIn, bool _renderNumbers, SDL_Renderer* _renderer);
 	void InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y) override;
+	void InvokeKeyUp(SDL_Keycode _key) override;
 	void PrintTileData();
 	void ClearTileContents();
 	void Render(SDL_Renderer* _renderer) override;

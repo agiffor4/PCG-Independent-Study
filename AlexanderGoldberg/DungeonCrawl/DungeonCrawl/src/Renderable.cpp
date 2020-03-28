@@ -49,6 +49,16 @@ void Renderable::SetPosition(const Vector2& _pos) {
 }
 
 const Vector2& Renderable::GetPosition() { return m_position;}
+const Vector2 Renderable::GetCameraAdjustPosition(bool _centered)
+{
+	SDL_Rect cameraAdjustedDestination = m_destination;
+	cameraAdjustedDestination.x -= Camera::Offset().X;
+	cameraAdjustedDestination.y -= Camera::Offset().Y;
+	cameraAdjustedDestination.x += m_renderOffset.X;
+	cameraAdjustedDestination.y += m_renderOffset.Y;
+	
+	return Vector2(cameraAdjustedDestination.x + (_centered ? m_destination.w * 0.5f : 0), cameraAdjustedDestination.y + (_centered ? m_destination.h * 0.5f : 0));
+}
 SDL_Rect Renderable::GetDestination() { return m_destination; }
 
 void Renderable::SetScale(float _newScale)
@@ -116,6 +126,10 @@ void Renderable::setTextureColorMod(SDL_Color _color)
 {
 	SDL_SetTextureColorMod(m_texture, _color.r, _color.g, _color.b);
 }
+const Vector2 Renderable::getCenterOfTexture()
+{
+	return Vector2(m_destination.x  + (m_destination.w *0.5f), m_destination.y + (m_destination.h * 0.5f));
+}
 bool& Renderable::renderOrderChanged(){
 	static bool s_renderOrderChanged;
 	return s_renderOrderChanged;
@@ -160,7 +174,7 @@ void Renderable::Render(SDL_Renderer* renderer)
 	{
 		if (renderer != nullptr)
 		{
-			SDL_Rect cameraAdjustedDestination = m_destination;			
+			SDL_Rect cameraAdjustedDestination = m_destination;
 			cameraAdjustedDestination.x -= Camera::Offset().X;
 			cameraAdjustedDestination.y -= Camera::Offset().Y;
 			cameraAdjustedDestination.x += m_renderOffset.X;

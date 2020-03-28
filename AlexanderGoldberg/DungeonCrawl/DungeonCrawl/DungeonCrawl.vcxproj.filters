@@ -159,6 +159,18 @@
     <ClCompile Include="src\Damagable.cpp">
       <Filter>Source Files\Things</Filter>
     </ClCompile>
+    <ClCompile Include="src\BombDisarmer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TrapDisarmer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Projectile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MouseAim.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\DeltaTime.h">
@@ -528,6 +540,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Damagable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BombDisarmer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TrapDisarmer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Projectile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MouseAim.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

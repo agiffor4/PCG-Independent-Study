@@ -2,23 +2,41 @@
 #include "Renderable.h"
 #include "Tile.h"
 #include <algorithm>
+#include "Thing.h"
 Scene::Scene(SDL_Renderer* _renderer)
 {
 	m_rendererRef = _renderer;
 }
-Scene::~Scene() {}
+Scene::~Scene() {
+	for (size_t i = 0; i < m_collisionChecks.size(); i++)
+	{
+		m_collisionChecks[i] = nullptr;
+	}
+}
 
 void Scene::AddRenderable(const std::string _path, const std::string _name, float _x, float _y, float _renderDist)
 {
 	m_renderables.push_back(std::unique_ptr<Renderable>(new Renderable()));
 	m_renderables[m_renderables.size() - 1]->Init(_path, _name, m_rendererRef);
 	m_renderables[m_renderables.size() - 1]->SetPosition(_x, _y);
+	addCollidable(m_renderables[m_renderables.size() - 1].get());
 }
 
 
 void Scene::AddRenderable(Renderable* _renderable, float _renderDist)
 {
 	m_renderables.push_back(std::unique_ptr<Renderable>(_renderable));
+	addCollidable(_renderable);
+	
+}
+
+void Scene::addCollidable(Renderable* _renderable)
+{
+	Thing* thing = dynamic_cast<Thing*>(_renderable);
+	if (thing != nullptr)
+	{
+		m_collisionChecks.push_back(thing);
+	}
 }
 
 
@@ -87,6 +105,20 @@ void Scene::Update(float _dt)
 	for (int i = 0; i < m_renderables.size(); i++)
 	{
 		m_renderables[i]->Update(_dt);
+	}
+
+	for (size_t i = 0; i < m_collisionChecks.size(); i++)
+	{
+		if (m_collisionChecks[i]->ShouldCheckCollision())
+		{
+			for (size_t j = 0; j < m_collisionChecks.size(); j++)
+			{
+				if (m_collisionChecks[j]->IsSolid() && m_collisionChecks[j] != m_collisionChecks[i])
+				{
+					m_collisionChecks[i]->CheckCollision(m_collisionChecks[j]);
+				}
+			}
+		}
 	}
 }
 

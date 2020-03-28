@@ -152,6 +152,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\MouseAim.cpp" />
+    <ClCompile Include="src\Projectile.cpp" />
+    <ClCompile Include="src\BombDisarmer.cpp" />
     <ClCompile Include="src\Damagable.cpp" />
     <ClCompile Include="src\Bomb.cpp" />
     <ClCompile Include="src\Chest.cpp" />
@@ -193,8 +196,12 @@
     <ClCompile Include="src\Trap.cpp" />
     <ClCompile Include="src\TrapPlayer.cpp" />
     <ClCompile Include="src\Weapon.cpp" />
+    <ClCompile Include="src\TrapDisarmer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\MouseAim.h" />
+    <ClInclude Include="src\Projectile.h" />
+    <ClInclude Include="src\BombDisarmer.h" />
     <ClInclude Include="src\Damagable.h" />
     <ClInclude Include="src\Bomb.h" />
     <ClInclude Include="src\Chest.h" />
@@ -318,6 +325,7 @@
     <ClInclude Include="src\Trap.h" />
     <ClInclude Include="src\TrapPlayer.h" />
     <ClInclude Include="src\Weapon.h" />
+    <ClInclude Include="src\TrapDisarmer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL\lib\x64\SDL2.dll" />

@@ -32,6 +32,7 @@ protected:
 	void revertTextureColorMod();
 	void getTextureColorMod(SDL_Color& _color);
 	void setTextureColorMod(SDL_Color _color);
+	const Vector2 getCenterOfTexture();
 	//void changeImage(std::string _imagePath, Uint32 _transparentColor = -999);
 public:
 	static bool& renderOrderChanged();
@@ -47,6 +48,7 @@ public:
 	void SetPosition(Vector2& pos);
 	void SetPosition(const Vector2& pos);
 	const Vector2& GetPosition();
+	const Vector2 GetCameraAdjustPosition(bool _centered = false);
 	SDL_Rect GetDestination();
 	void SetScale(float _newScale);
 	float GetScale();

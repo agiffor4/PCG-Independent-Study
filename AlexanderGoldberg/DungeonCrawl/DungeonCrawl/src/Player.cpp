@@ -6,6 +6,7 @@
 #include "Interactable.h"
 #include "Camera.h"
 #include "Holdable.h"
+#include "Weapon.h"
 Player::Player()
 {
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::UP);
@@ -205,6 +206,23 @@ void Player::SetLineOfSight(bool _inLineOfSight)
 		int dist = Vector2::GetMagnitude(GetLocation()->GetPositionInGrid(), (*i)->GetPositionInGrid());
 		(*i)->SetFogOfWar(!_inLineOfSight, (_inLineOfSight ?  dist : -1));
 	}
+}
+
+bool Player::AddAmmo(int _amount)
+{
+	if (m_equipedWeapon != nullptr)
+	{
+		return m_equipedWeapon->AddAmmo(_amount);
+	}
+	return false;
+}
+
+void Player::Render(SDL_Renderer* _renderer)
+{
+	Renderable::Render(_renderer);
+	Vector2 v = GetCameraAdjustPosition(true);
+	m_mouseAim.SetOrigin(v);
+	m_mouseAim.Render(_renderer);
 }
 
 
