@@ -75,6 +75,11 @@ bool Damagable::IsDead()
 	return m_health == 0;
 }
 
+float Damagable::GetHealth()
+{
+	return m_health;
+}
+
 float Damagable::GetHealthAsPercent()
 {
 	return (float)m_health / (float)m_healthMax;

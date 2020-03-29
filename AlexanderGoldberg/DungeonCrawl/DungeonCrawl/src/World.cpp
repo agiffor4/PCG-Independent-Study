@@ -635,6 +635,8 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 void World::GenerateItems(int _exitLocation, BSP* _bspToUse) {
 	
 	generateTreasure();
+	generateChests();
+
 	int randomTile = m_roomsData[rand() % m_roomsData.size()].GetRandomTile();
 	Light* l = new Light();
 	l->Init("img/Torch.png", "Light", m_scene->GetRenderer(), this);
@@ -653,6 +655,19 @@ void World::generateTreasure() {
 			{
 				createTreasureInRoom(m_roomsData[i].sm_region);
 			}
+		}
+	}
+}
+
+void World::generateChests()
+{
+	for (size_t i = 0; i < m_roomsData.size(); i++)
+	{
+		if ((rand() % (100 - (m_roomsData[i].sm_exitCount * 7))) > 50)
+		{
+			Chest* c = new Chest(this, m_scene->GetRenderer());
+			c->Init("img/pics/Chest.png", "Chest", m_scene->GetRenderer());
+			GetTileAtIndex(m_roomsData[i].GetRandomTile())->AddItem(c);
 		}
 	}
 }

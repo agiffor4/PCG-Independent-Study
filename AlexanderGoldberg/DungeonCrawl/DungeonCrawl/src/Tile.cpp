@@ -10,6 +10,7 @@
 Tile::Tile() {
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::MOUSEUP);
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::UP);
+	//m_renderFogOfWar = false;
 }
 Tile::~Tile() {
 	Renderable::CleanUp();
@@ -30,7 +31,6 @@ void Tile::SetPassable(bool _val) {
 	{
 		changeImage("img/blank_tile.bmp");
 		m_solid = false;
-		m_shouldRender = false;
 		
 	}
 	else
@@ -318,28 +318,33 @@ void Tile::Render(SDL_Renderer* _renderer)
 	storeTextureColorMod();
 	Uint8 fogTint = 50;
 	Uint8 shade = 255;
-	if (m_inFogOfWar)
+	if (m_renderFogOfWar)
 	{
-		setTextureColorMod({ fogTint, fogTint, fogTint, 100 });
-	}
-	else
-	{
-		int lightModifer = 30;
-		if (m_illuminated)
+		if (m_inFogOfWar)
 		{
-			shade = 255 -(m_distanceFromLightsource * (lightModifer / 2));
-			if (shade < fogTint)
-				shade = fogTint;
-			setTextureColorMod({ shade, shade, shade, 100 });
+			setTextureColorMod({ fogTint, fogTint, fogTint, 100 });
 		}
 		else
 		{
-			shade = 150 - (m_distanceFromSource * lightModifer);
-			if (shade < fogTint)
-				shade = fogTint;
-			setTextureColorMod({ shade, shade, shade, 100 });
+			int lightModifer = 30;
+			if (m_illuminated)
+			{
+				shade = 255 - (m_distanceFromLightsource * (lightModifer / 2));
+				if (shade < fogTint)
+					shade = fogTint;
+				setTextureColorMod({ shade, shade, shade, 100 });
+			}
+			else
+			{
+				shade = 150 - (m_distanceFromSource * lightModifer);
+				if (shade < fogTint)
+					shade = fogTint;
+				setTextureColorMod({ shade, shade, shade, 100 });
+			}
 		}
 	}
+	
+	
 	Renderable::Render(_renderer);
 
 	if (!m_renderFogOfWar || !m_inFogOfWar)

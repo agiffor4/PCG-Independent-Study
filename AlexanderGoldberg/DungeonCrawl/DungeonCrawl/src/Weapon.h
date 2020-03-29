@@ -28,8 +28,9 @@ public:
 	void Fire(Vector2 _direction, bool _costAmmo = true);
 	bool Interaction(Thing* _thingInitatingInteraction) override;
 	void InteractionOnEnteringTile(Thing* _thingInitatingInteraction) override;
-
 	void Update(float _dt) override;
+	int GetAmmo();
+	float GetAmmoAsPercent();
 };
 
 

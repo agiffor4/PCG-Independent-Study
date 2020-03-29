@@ -87,3 +87,13 @@ void Weapon::Update(float _dt)
 {
 	m_fireTimer.CountDownAutoCheckBool(_dt);
 }
+
+int Weapon::GetAmmo()
+{
+	return m_ammo;
+}
+
+float Weapon::GetAmmoAsPercent()
+{
+	return m_ammo / m_ammoMax;
+}

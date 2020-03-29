@@ -249,6 +249,16 @@ void Player::EquipWeapon(Weapon* _weapon)
 	m_equipedWeapon = _weapon;
 }
 
+int Player::GetAmmo()
+{
+	return m_equipedWeapon == nullptr ? -1 : m_equipedWeapon->GetAmmo();
+}
+
+float Player::GetAmmoAsPercent()
+{
+	return m_equipedWeapon != nullptr ? m_equipedWeapon->GetAmmoAsPercent() : 0.0f;
+}
+
 
 std::set<Tile*> Player::getTilesInLineOfSight(Tile* _epicenter)
 {

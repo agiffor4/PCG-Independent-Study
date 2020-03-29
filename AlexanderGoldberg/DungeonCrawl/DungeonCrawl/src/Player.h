@@ -24,6 +24,8 @@ public:
 	bool AddAmmo(int _amount);
 	void Render(SDL_Renderer* _renderer)override;
 	void EquipWeapon(Weapon* _weapon);
+	int GetAmmo();
+	float GetAmmoAsPercent();
 protected:
 	//MOVEMENT VARIABLES
 	enum class MovementDirection {

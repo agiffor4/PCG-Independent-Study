@@ -18,8 +18,8 @@ const Vector2 MouseAim::GetDirection()
 }
 
 void MouseAim::Render(SDL_Renderer* _renderer)
-{
+{/*
 	int x, y;
 	SDL_GetMouseState(&x, &y);
-	SDL_RenderDrawLine(_renderer, m_orignPosition.X, m_orignPosition.Y,x, y);
+	SDL_RenderDrawLine(_renderer, m_orignPosition.X, m_orignPosition.Y,x, y);*/
 }

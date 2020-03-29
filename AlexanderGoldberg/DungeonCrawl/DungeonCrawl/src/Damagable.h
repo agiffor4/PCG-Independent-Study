@@ -21,6 +21,7 @@ public:
 	bool TakeDamage(int _amount); //returns true if damage reduces health to 0 or less
 	bool Heal(int _amount); // returns true if already at max health
 	bool IsDead();
+	float GetHealth();
 	float GetHealthAsPercent();
 	float GetPercentOfTotalHealth(int _percent0To100);
 	float GetOnePercentOfCurrentHealth(int _percent0To100);

@@ -45,6 +45,7 @@ protected:
 	AStarSearch* m_AStar = nullptr;
 	void setWindowTitle();
 	void generateTreasure();
+	void generateChests();
 	void createTreasureInRoom(int _roomToCreateTreasureIn);
 	int m_keyDoorGenerationType = 0;
 	int m_lastKeyRoom = -1;
