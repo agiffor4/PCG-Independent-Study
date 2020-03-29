@@ -17,12 +17,12 @@
 #include "HealthPickUp.h"
 #include "Bomb.h"
 #include "Ammo.h"
-
 #include "Weapon.h"
+#include "Chest.h"
 /*
 #include "BombDisarmer.h"
 #include "Trap.h"
-#include "Chest.h"
+
 
 #include "Trap.h"
 #include "TrapPlayer.h"
@@ -327,6 +327,11 @@ std::vector<Tile*> World::GetNeighbors(int _tileToFindNeighborsFor, bool _getDia
 std::vector<Tile*> World::GetTiles()
 {
 	return m_tiles;;
+}
+
+int World::GetRandomTileInRoom(int _roomIndexToGetRandomTileFrom)
+{
+	return m_roomsData[_roomIndexToGetRandomTileFrom].GetRandomTile();
 }
 
 

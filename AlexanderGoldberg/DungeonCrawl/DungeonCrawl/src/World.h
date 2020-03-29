@@ -70,6 +70,7 @@ public:
 	std::vector<Tile*> GetNeighbors(Tile* _tileToFindNeighborsFor, bool _getDiagonals = true);
 	std::vector<Tile*> GetNeighbors(int _tileToFindNeighborsFor, bool _getDiagonals = true);
 	std::vector<Tile*> GetTiles();
+	int GetRandomTileInRoom(int _roomIndexToGetRandomTileFrom);
 	void AddTile(Tile* _renderable);
 	int GetTileCount();	
 	Vector2 GetTileSize();
