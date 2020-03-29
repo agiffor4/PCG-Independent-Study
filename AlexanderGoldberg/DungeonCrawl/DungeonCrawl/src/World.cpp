@@ -663,7 +663,7 @@ void World::generateChests()
 {
 	for (size_t i = 0; i < m_roomsData.size(); i++)
 	{
-		if ((rand() % (100 - (m_roomsData[i].sm_exitCount * 7))) > 50)
+		if ((rand() % (100 - (m_roomsData[i].sm_exitCount * 7))) > 30)
 		{
 			Chest* c = new Chest(this, m_scene->GetRenderer());
 			c->Init("img/pics/Chest.png", "Chest", m_scene->GetRenderer());
