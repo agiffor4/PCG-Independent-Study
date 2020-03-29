@@ -11,17 +11,19 @@ class Holdable;
 class Player :
 	public Damagable, public IInputHandler
 {
-
+	
 public:	
 	Player();
 	~Player();
 	void Update(float _dt) override;
 	void InvokeKeyDown(SDL_Keycode _key) override;
 	void InvokeKeyUp(SDL_Keycode _key) override;
+	void InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y) override;
 	void Initalize(World& _world, const std::string _path, const std::string _name, SDL_Renderer* _renderer, Uint32 _transparentColor = -999);
 	void SetLineOfSight(bool _inLineOfSight);
 	bool AddAmmo(int _amount);
 	void Render(SDL_Renderer* _renderer)override;
+	void EquipWeapon(Weapon* _weapon);
 protected:
 	//MOVEMENT VARIABLES
 	enum class MovementDirection {

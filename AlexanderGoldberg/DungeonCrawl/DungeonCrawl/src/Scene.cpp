@@ -8,10 +8,7 @@ Scene::Scene(SDL_Renderer* _renderer)
 	m_rendererRef = _renderer;
 }
 Scene::~Scene() {
-	for (size_t i = 0; i < m_collisionChecks.size(); i++)
-	{
-		m_collisionChecks[i] = nullptr;
-	}
+	
 }
 
 void Scene::AddRenderable(const std::string _path, const std::string _name, float _x, float _y, float _renderDist)
@@ -30,12 +27,49 @@ void Scene::AddRenderable(Renderable* _renderable, float _renderDist)
 	
 }
 
+void Scene::RemoveRenderable(Renderable* _renderable)
+{
+	removeCollidable(_renderable);
+	for (auto itt = m_renderables.begin(); itt != m_renderables.end(); itt++)
+	{
+		if ((*itt).get() == _renderable)
+		{
+			m_renderables.erase(itt);
+			break;
+		}
+
+	}
+}
+
+void Scene::ClearCollidables()
+{
+	for (size_t i = 0; i < m_collisionChecks.size(); i++)
+	{
+		m_collisionChecks[i] = nullptr;
+	}
+	m_collisionChecks.clear();
+}
+
 void Scene::addCollidable(Renderable* _renderable)
 {
 	Thing* thing = dynamic_cast<Thing*>(_renderable);
 	if (thing != nullptr)
 	{
 		m_collisionChecks.push_back(thing);
+	}
+}
+
+void Scene::removeCollidable(Renderable* _renderable)
+{
+	Thing* toRemove = dynamic_cast<Thing*>(_renderable);
+	for (auto itt = m_collisionChecks.begin(); itt != m_collisionChecks.end(); itt++)
+	{
+		if ((*itt) == toRemove)
+		{
+			m_collisionChecks.erase(itt);
+			break;
+		}
+
 	}
 }
 
@@ -123,3 +157,4 @@ void Scene::Update(float _dt)
 }
 
 SDL_Renderer* Scene::GetRenderer() { return m_rendererRef; }
+

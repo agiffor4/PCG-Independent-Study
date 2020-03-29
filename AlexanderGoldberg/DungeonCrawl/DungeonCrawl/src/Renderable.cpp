@@ -130,6 +130,10 @@ const Vector2 Renderable::getCenterOfTexture()
 {
 	return Vector2(m_destination.x  + (m_destination.w *0.5f), m_destination.y + (m_destination.h * 0.5f));
 }
+void Renderable::setAngle(float _angle)
+{
+	m_currentAngle = _angle;
+}
 bool& Renderable::renderOrderChanged(){
 	static bool s_renderOrderChanged;
 	return s_renderOrderChanged;

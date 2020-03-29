@@ -87,6 +87,7 @@ void mainLoop()
 		scene->Render();
 
 	}
+	scene->ClearCollidables();
 	CleanUpSDL(window, renderer);
 	printf("Used seed %d.\n", seed);
 }

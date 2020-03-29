@@ -30,6 +30,7 @@ void Tile::SetPassable(bool _val) {
 	{
 		changeImage("img/blank_tile.bmp");
 		m_solid = false;
+		m_shouldRender = false;
 		
 	}
 	else

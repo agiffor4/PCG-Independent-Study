@@ -18,12 +18,12 @@
 #include "Bomb.h"
 #include "Ammo.h"
 
-
+#include "Weapon.h"
 /*
 #include "BombDisarmer.h"
 #include "Trap.h"
 #include "Chest.h"
-#include "Weapon.h"
+
 #include "Trap.h"
 #include "TrapPlayer.h"
 
@@ -796,6 +796,11 @@ Player* World::CreatePlayer()
 		Player* p = new Player();		
 		p->Initalize((*this), "img/Player.bmp", "Player", m_scene->GetRenderer());
 		p->SetScale(m_scale);
+		Weapon* w = new Weapon(m_scene);
+		
+		m_scene->AddRenderable(w);
+		w->SetHolder(p);
+		p->EquipWeapon(w);
 		return p;
 	
 }

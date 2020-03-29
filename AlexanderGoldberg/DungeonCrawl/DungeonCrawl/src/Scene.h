@@ -14,6 +14,7 @@ protected:
 	std::vector<Thing*> m_collisionChecks;
 	SDL_Renderer* m_rendererRef = nullptr;
 	void addCollidable(Renderable* _renderable);
+	void removeCollidable(Renderable* _renderable);
 public:
 	
 	Scene(SDL_Renderer* _renderer);
@@ -21,8 +22,8 @@ public:
 	void AddRenderable(const std::string _path, const std::string _name, float _x = 0, float _y = 0, float _renderDist = 0);
 	void AddRenderable(const std::string _path, const std::string _name, Vector2 _position, float _renderDist = 0);
 	void AddRenderable(Renderable* _renderable, float _renderDist = 0);
-	
-
+	void RemoveRenderable(Renderable* _renderable);
+	void ClearCollidables();
 	//int AddSound(AudioFileA& _sound, bool _playOnCreate);
 	void StartPlayingLastSound();
 	void StartPlayingSoundAtIndex(int _index);
@@ -32,5 +33,5 @@ public:
 	void Update(float _dt);
 	void PlayAudio();
 	SDL_Renderer* GetRenderer();
-	
+
 };

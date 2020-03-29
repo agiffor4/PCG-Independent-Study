@@ -33,6 +33,7 @@ protected:
 	void getTextureColorMod(SDL_Color& _color);
 	void setTextureColorMod(SDL_Color _color);
 	const Vector2 getCenterOfTexture();
+	void setAngle(float _angle);
 	//void changeImage(std::string _imagePath, Uint32 _transparentColor = -999);
 public:
 	static bool& renderOrderChanged();

@@ -2,7 +2,6 @@
 #include "Tile.h"
 #include "World.h"
 #include "InputManager.h"
-#include "Scene.h"
 #include "Interactable.h"
 #include "Camera.h"
 #include "Holdable.h"
@@ -11,6 +10,7 @@ Player::Player()
 {
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::UP);
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::DOWN);
+	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::MOUSEUP);
 	m_shouldDelete = false;
 	m_moveRate.SetTimer(0.2f);
 	m_holdables[0] = nullptr;
@@ -84,6 +84,25 @@ void Player::InvokeKeyUp(SDL_Keycode _key)
 		break;
 	case SDLK_q:
 		GetLocation()->PrintTileData();
+		break;
+	default:
+		break;
+	}
+}
+
+void Player::InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y)
+{
+	switch (_mouse)
+	{
+	case IInputHandler::MouseButton::LEFT:		
+		if (m_equipedWeapon != nullptr)
+		{
+			m_equipedWeapon->Fire(m_mouseAim.GetDirection());
+		}
+		break;
+	case IInputHandler::MouseButton::RIGHT:
+		break;
+	case IInputHandler::MouseButton::MIDDLE:
 		break;
 	default:
 		break;
@@ -223,6 +242,11 @@ void Player::Render(SDL_Renderer* _renderer)
 	Vector2 v = GetCameraAdjustPosition(true);
 	m_mouseAim.SetOrigin(v);
 	m_mouseAim.Render(_renderer);
+}
+
+void Player::EquipWeapon(Weapon* _weapon)
+{
+	m_equipedWeapon = _weapon;
 }
 
 
