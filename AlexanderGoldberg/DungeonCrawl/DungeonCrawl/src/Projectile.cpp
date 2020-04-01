@@ -27,12 +27,8 @@ void Projectile::OnSpawn(const Vector2& _spawnPosition, const Vector2& _directio
 	m_damage = _damage;
 	m_checkCollision = true;
 	m_shouldRender = true;
-	float angle = (acosf(Vector2::Dot(Vector2(0, -1), _direction)) * rad2Deg);
-	if (_direction.X < 0)
-	{
-		angle = 360 - angle;
-	}
-	setAngle(angle);
+	
+	setAngle(vectorToAngle(_direction));
 	
 }
 

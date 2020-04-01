@@ -14,6 +14,7 @@ class Player;
 class BSP;
 class AStarSearch;
 class RoomTree;
+class Weapon;
 class World : public IInputHandler
 {
 private:
@@ -45,8 +46,10 @@ protected:
 	AStarSearch* m_AStar = nullptr;
 	void setWindowTitle();
 	void generateTreasure();
+	void generateWeapon();
 	void generateChests();
 	void createTreasureInRoom(int _roomToCreateTreasureIn);
+	void createWeaponInRoom(int _roomToCreateTreasureIn);
 	int m_keyDoorGenerationType = 0;
 	int m_lastKeyRoom = -1;
 	int m_lastKeyDepth = -1;
@@ -95,6 +98,7 @@ public:
 	int GetIndexOfRoomTileIsIn(int _index);
 	int GetPlayerStartLocation(const std::vector<std::vector<int>>& _rooms, int* roomSpawnedIn);
 	Player* CreatePlayer();
+	Weapon* CreateWeapon();
 	void PlacePlayer(std::vector<std::vector<int>>* _rooms = nullptr);
 	void InvokeKeyUp(SDL_Keycode _key) override;
 	void centerCameraOnPlayer(Tile* _tileToCenterOn);

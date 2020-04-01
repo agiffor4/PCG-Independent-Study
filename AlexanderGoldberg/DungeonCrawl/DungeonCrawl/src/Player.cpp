@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "Holdable.h"
 #include "Weapon.h"
+
 Player::Player()
 {
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::UP);
@@ -125,12 +126,44 @@ void Player::InteractWithThingInSpace()
 		Interactable* retrievedItem = m_location->InteractWithItem();
 		if (retrievedItem != nullptr)
 		{
-			Holdable* h = dynamic_cast<Holdable*>(retrievedItem);
-			if (h != nullptr)
+			
+			bool actionPerformed = false;
+			if (!actionPerformed)
 			{
-				m_holdables[0] = h;
+				Holdable* h = dynamic_cast<Holdable*>(retrievedItem);
+				if (h != nullptr)
+				{
+					if (m_holdables[0] == nullptr)
+					{
+						m_holdables[0] = h;
+					}
+					else if (m_holdables[1] == nullptr)
+					{
+						m_holdables[1] = h;
+					}
+					else
+					{
+						dropHoldable();
+					}
+					actionPerformed = true;
+				}
 			}
-			else
+			if (!actionPerformed)
+			{
+				if (dropWeapon())
+				{
+					Weapon* w = dynamic_cast<Weapon*>(retrievedItem);
+					w->SetHolder(this);
+					w->PickUp();
+					EquipWeapon(w);
+				}
+			}
+			if (!actionPerformed)
+			{
+
+			}
+			
+			if(!actionPerformed)
 			{
 				m_inventory.push_back(retrievedItem);
 			}
@@ -215,6 +248,73 @@ void Player::setDirectionFromFlagValues(Uint8 _flag)
 	if (_flag & (Uint8)MovementDirection::DOWN && _flag & (Uint8)MovementDirection::UP)
 		m_direction.Y = 0;
 		
+}
+
+void Player::dropHoldable()
+{
+	Tile* t = findEmptyAdjacentSpace();
+	if (t != nullptr)
+	{
+		t->AddItem(m_holdables[0]);
+		m_holdables[0] = nullptr;
+	}
+}
+
+bool Player::dropWeapon()
+{
+	if (m_equipedWeapon != nullptr)
+	{
+		Tile* t = findEmptyAdjacentSpace();
+		if (t != nullptr)
+		{
+			m_equipedWeapon->Drop();
+			t->AddItem(m_equipedWeapon);
+			m_equipedWeapon->SetHolder(nullptr);
+			EquipWeapon(nullptr);
+			return true;
+		}
+		return false;
+	}
+	return true;
+}
+
+Tile* Player::findEmptyAdjacentSpace()
+{
+	std::vector<Tile*> negihbors = m_world->GetNeighbors(GetLocation());
+	Tile* t = GetLocation();
+	bool checked[8] = { false, false, false, false, false, false, false, false };
+	auto allHaveBeenChecked = [](bool* _array, int _index)
+	{
+		
+		for (size_t i = 0; i < _index; i++)
+		{
+			if (!_array[i]) //if any of the array elements have not been checked (equal false) then return false
+				return false;
+		}
+		return true;
+	};
+	int index = 0;
+	bool noEmptySpace = false;
+	do
+	{
+		
+		
+		index = rand() % negihbors.size();
+		if (!checked[index])
+		{
+			checked[index] = true;
+			t = negihbors[index];
+		}
+		else
+		{
+			if (allHaveBeenChecked(checked, 8))
+			{
+				return nullptr;
+			}
+		}
+	} while (t->GetItems().size() > 0 || !t->IsPassable());
+
+	return t;
 }
 
 void Player::SetLineOfSight(bool _inLineOfSight)

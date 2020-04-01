@@ -47,3 +47,18 @@ bool Interactable::GetAllowInteraction()
 void Interactable::InteractionOnEnteringTile(Thing* _thingInitatingInteraction)
 {
 }
+
+void Interactable::Drop()
+{
+	m_shouldRender = true;
+}
+
+void Interactable::PickUp()
+{
+	m_shouldRender = false;
+	if (GetLocation() != nullptr)
+	{
+		GetLocation()->RemoveItem(this, false);
+		SetLocation(nullptr);
+	}
+}

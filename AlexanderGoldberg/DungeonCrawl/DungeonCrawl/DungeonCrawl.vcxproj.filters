@@ -34,6 +34,12 @@
     <Filter Include="Source Files\Tree">
       <UniqueIdentifier>{a820dd1a-753e-48c0-a06d-e7f52b7fe996}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Interactables\Weapons">
+      <UniqueIdentifier>{8b166514-78bc-4b40-83ef-50270ce44f81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Interactables\Pickups">
+      <UniqueIdentifier>{9b1397d0-5369-4cb4-9f11-ad8c38a6acc4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -105,15 +111,6 @@
     <ClCompile Include="src\DoorA.cpp">
       <Filter>Source Files\Interactables</Filter>
     </ClCompile>
-    <ClCompile Include="src\Key.cpp">
-      <Filter>Source Files\Interactables</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Ammo.cpp">
-      <Filter>Source Files\Interactables</Filter>
-    </ClCompile>
-    <ClCompile Include="src\HealthPickUp.cpp">
-      <Filter>Source Files\Interactables</Filter>
-    </ClCompile>
     <ClCompile Include="src\Treasure.cpp">
       <Filter>Source Files\Interactables</Filter>
     </ClCompile>
@@ -153,9 +150,6 @@
     <ClCompile Include="src\TrapPlayer.cpp">
       <Filter>Source Files\Interactables</Filter>
     </ClCompile>
-    <ClCompile Include="src\Weapon.cpp">
-      <Filter>Source Files\Interactables</Filter>
-    </ClCompile>
     <ClCompile Include="src\Damagable.cpp">
       <Filter>Source Files\Things</Filter>
     </ClCompile>
@@ -169,6 +163,30 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\MouseAim.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HealthPickUp.cpp">
+      <Filter>Source Files\Interactables\Pickups</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Key.cpp">
+      <Filter>Source Files\Interactables\Pickups</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Ammo.cpp">
+      <Filter>Source Files\Interactables\Pickups</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Weapon.cpp">
+      <Filter>Source Files\Interactables\Weapons</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WeaponBasic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WeaponHexShot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WeaponShotgun.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WeaponTriplicate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -552,6 +570,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\MouseAim.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WeaponBasic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WeaponHexShot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WeaponShotgun.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WeaponTriplicate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

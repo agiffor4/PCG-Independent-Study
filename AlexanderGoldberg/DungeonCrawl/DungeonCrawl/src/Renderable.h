@@ -6,7 +6,7 @@
 class Renderable
 {
 private:
-	
+
 	//basic funcationality
 	Vector2 m_position = Vector2();	
 	Vector2 m_currentSize = Vector2();
@@ -23,6 +23,8 @@ private:
 	float m_currentAngle = 0;
 	int m_lastCurrentAngle = 0;
 protected:
+	const float rad2Deg = 180.0f / M_PI;
+	const float deg2Rad = M_PI / 180.0f;
 	bool m_shouldRender = false;
 	std::string m_name = "NO NAME SET";
 	void updateDestination();
@@ -34,7 +36,7 @@ protected:
 	void setTextureColorMod(SDL_Color _color);
 	const Vector2 getCenterOfTexture();
 	void setAngle(float _angle);
-	//void changeImage(std::string _imagePath, Uint32 _transparentColor = -999);
+	float vectorToAngle(Vector2 _direction);
 public:
 	static bool& renderOrderChanged();
 	void changeImage(std::string _imagePath, Uint32 _transparentColor = -999);

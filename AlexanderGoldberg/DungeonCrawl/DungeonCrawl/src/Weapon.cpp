@@ -2,9 +2,7 @@
 #include "Projectile.h"
 #include "Player.h"
 #include "Scene.h"
-void Weapon::drop()
-{
-}
+
 
 Projectile* Weapon::getProjectile()
 {
@@ -22,10 +20,9 @@ Projectile* Weapon::getProjectile()
 	return m_projectiles[m_projectiles.size() -1];
 }
 
-Weapon::Weapon(Scene* _scene)
+Weapon::Weapon()
 {
-	m_scene = _scene;
-	m_rendererRef = _scene->GetRenderer();
+	
 }
 
 Weapon::~Weapon()
@@ -35,6 +32,12 @@ Weapon::~Weapon()
 		m_scene->RemoveRenderable(m_projectiles[i]);
 	}
 	m_projectiles.clear();*/
+}
+
+void Weapon::InitializeWeapon(Scene* _scene)
+{
+	m_scene = _scene;
+	m_rendererRef = _scene->GetRenderer();
 }
 
 bool Weapon::AddAmmo(int _amount)
@@ -51,10 +54,12 @@ void Weapon::SetHolder(Player* _holder)
 {
 	m_holder = _holder;
 }
-
-void Weapon::Fire(Vector2 _direction, bool _costAmmo)
+void Weapon::Fire(Vector2 _direction) {
+	fire(_direction, true);
+}
+void Weapon::fire(Vector2 _direction, bool _costAmmo, bool _ignoreCooldown)
 {
-	if (!m_fireTimer.GetShouldCountDown())
+	if (!m_fireTimer.GetShouldCountDown() || _ignoreCooldown)
 	{
 		if (m_ammo > 0 || !_costAmmo)
 		{
@@ -69,10 +74,12 @@ void Weapon::Fire(Vector2 _direction, bool _costAmmo)
 	
 }
 
+
+
 bool Weapon::Interaction(Thing* _thingInitatingInteraction)
 {
-	Player* p = dynamic_cast<Player*>(_thingInitatingInteraction);
-	p->EquipWeapon(this);
+	/*Player* p = dynamic_cast<Player*>(_thingInitatingInteraction);
+	p->EquipWeapon(this);*/
 	return true;
 	
 }

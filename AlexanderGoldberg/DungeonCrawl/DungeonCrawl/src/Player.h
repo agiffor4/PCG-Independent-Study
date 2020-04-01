@@ -51,7 +51,9 @@ protected:
 	void move(Vector2 _direction);
 	World::TileDirection convertVectorToDirection(Vector2& const _toConvert);
 	void setDirectionFromFlagValues(Uint8 _flag);
-	
+	void dropHoldable();
+	bool dropWeapon();
+	Tile* findEmptyAdjacentSpace();
 	std::set<Tile*> getTilesInLineOfSight(Tile* _epicenter);
 	void die() override;
 };

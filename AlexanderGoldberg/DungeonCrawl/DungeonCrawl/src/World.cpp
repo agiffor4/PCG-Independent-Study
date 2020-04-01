@@ -18,12 +18,12 @@
 #include "Bomb.h"
 #include "Ammo.h"
 #include "Weapon.h"
+#include "WeaponTriplicate.h"
+#include "WeaponBasic.h"
 #include "Chest.h"
 /*
 #include "BombDisarmer.h"
 #include "Trap.h"
-
-
 #include "Trap.h"
 #include "TrapPlayer.h"
 
@@ -634,7 +634,8 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 }
 void World::GenerateItems(int _exitLocation, BSP* _bspToUse) {
 	
-	generateTreasure();
+//	generateTreasure();
+	generateWeapon();
 	generateChests();
 
 	int randomTile = m_roomsData[rand() % m_roomsData.size()].GetRandomTile();
@@ -659,11 +660,25 @@ void World::generateTreasure() {
 	}
 }
 
+void World::generateWeapon()
+{
+	for (size_t i = 0; i < m_roomsData.size(); i++)
+	{
+		if (m_roomsData[i].sm_connectedness < 4)
+		{
+			if (rand() % 2 == 0)
+			{
+				createWeaponInRoom(m_roomsData[i].sm_region);
+			}
+		}
+	}
+}
+
 void World::generateChests()
 {
 	for (size_t i = 0; i < m_roomsData.size(); i++)
 	{
-		if ((rand() % (100 - (m_roomsData[i].sm_exitCount * 7))) > 30)
+		if ((rand() % (100 - (m_roomsData[i].sm_exitCount * 7))) > 50)
 		{
 			Chest* c = new Chest(this, m_scene->GetRenderer());
 			c->Init("img/pics/Chest.png", "Chest", m_scene->GetRenderer());
@@ -679,6 +694,14 @@ void World::createTreasureInRoom(int _roomToCreateTreasureIn)
 	Treasure* t = new Treasure();
 	//t->Init("img/Treasure.bmp", "Treasue", m_scene->GetRenderer());	
 	t->Init("img/GemBlue.png", "Treasue", m_scene->GetRenderer());
+	m_tiles[randomTile]->AddItem(t);
+}
+
+void World::createWeaponInRoom(int _roomToCreateTreasureIn)
+{
+#define containedTiles m_roomsData[_roomToCreateTreasureIn].sm_containsTiles
+	int randomTile = containedTiles[rand() % containedTiles.size()];
+	Weapon* t = CreateWeapon();
 	m_tiles[randomTile]->AddItem(t);
 }
 
@@ -816,12 +839,18 @@ Player* World::CreatePlayer()
 		Player* p = new Player();		
 		p->Initalize((*this), "img/Player.bmp", "Player", m_scene->GetRenderer());
 		p->SetScale(m_scale);
-		Weapon* w = new Weapon(m_scene);
-		
-		m_scene->AddRenderable(w);
-		w->SetHolder(p);
-		p->EquipWeapon(w);
 		return p;
+	
+}
+
+Weapon* World::CreateWeapon()
+{
+	Weapon* w = nullptr;
+	w = new WeaponTriplicate();
+	w->Init("img/pics/Weapon03.png", "Triplicate", m_scene->GetRenderer());
+	w->InitializeWeapon(m_scene);
+	m_scene->AddRenderable(w);
+	return w;
 	
 }
 
@@ -835,6 +864,13 @@ void World::PlacePlayer(std::vector<std::vector<int>>* _rooms)
 #if UseCamera == 1
 	centerCameraOnPlayer(t);
 #endif
+	Weapon* w = new WeaponBasic();
+	w->Init("img/pics/Weapon01.png", "Basic Weapon", m_scene->GetRenderer());
+	w->InitializeWeapon(m_scene);
+	m_scene->AddRenderable(w);
+	t = GetAdjacentTile(m_playerStart, World::TileDirection::UP);
+	t->AddItem(w);
+
 }
 
 void World::InvokeKeyUp(SDL_Keycode _key)

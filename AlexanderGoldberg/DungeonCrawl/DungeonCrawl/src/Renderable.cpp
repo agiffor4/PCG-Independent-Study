@@ -134,6 +134,15 @@ void Renderable::setAngle(float _angle)
 {
 	m_currentAngle = _angle;
 }
+float Renderable::vectorToAngle(Vector2 _direction)
+{
+	float angle = (acosf(Vector2::Dot(Vector2(0, -1), _direction)) * rad2Deg);
+	if (_direction.X < 0)
+	{
+		angle = 360 - angle;
+	}
+	return angle;
+}
 bool& Renderable::renderOrderChanged(){
 	static bool s_renderOrderChanged;
 	return s_renderOrderChanged;

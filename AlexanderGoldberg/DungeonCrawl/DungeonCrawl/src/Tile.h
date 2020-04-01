@@ -24,6 +24,7 @@ private:
 	int m_distanceFromSource = -1;
 	int m_roomIn = -1;
 	TextA* m_text = nullptr;
+	int m_lightModifer = 30;
 	enum class TileRenderType {
 		empty,
 		wall4Side, 

@@ -197,6 +197,10 @@
     <ClCompile Include="src\TrapPlayer.cpp" />
     <ClCompile Include="src\Weapon.cpp" />
     <ClCompile Include="src\TrapDisarmer.cpp" />
+    <ClCompile Include="src\WeaponBasic.cpp" />
+    <ClCompile Include="src\WeaponHexShot.cpp" />
+    <ClCompile Include="src\WeaponShotgun.cpp" />
+    <ClCompile Include="src\WeaponTriplicate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\MouseAim.h" />
@@ -326,6 +330,10 @@
     <ClInclude Include="src\TrapPlayer.h" />
     <ClInclude Include="src\Weapon.h" />
     <ClInclude Include="src\TrapDisarmer.h" />
+    <ClInclude Include="src\WeaponBasic.h" />
+    <ClInclude Include="src\WeaponHexShot.h" />
+    <ClInclude Include="src\WeaponShotgun.h" />
+    <ClInclude Include="src\WeaponTriplicate.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL\lib\x64\SDL2.dll" />

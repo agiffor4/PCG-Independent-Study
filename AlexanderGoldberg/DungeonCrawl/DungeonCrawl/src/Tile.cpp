@@ -76,6 +76,7 @@ void Tile::MoveContentsTo(Tile* _newLocation)
 bool Tile::IsPassable(bool _ignoreInteractables) { return m_passable && (_ignoreInteractables ? true : blockingInteractable()); }
 
 bool Tile::blockingInteractable() {
+	
 	for (size_t i = 0; i < m_items.size(); i++)
 	{
 		if (m_items[i]->GetBlocksPassage())
@@ -125,9 +126,12 @@ Interactable* Tile::InteractWithItem()
 }
 void Tile::AddItem(Interactable* _newItem)
 {
-	_newItem->SetScale(GetScale());
-	_newItem->SetLocation(this);
-	m_items.push_back(_newItem);
+	if (_newItem != nullptr)
+	{
+		_newItem->SetScale(GetScale());
+		_newItem->SetLocation(this);
+		m_items.push_back(_newItem);
+	}
 }
 
 void Tile::AddShadow(Shadow* _newShadow)
@@ -207,6 +211,22 @@ void Tile::InvokeKeyUp(SDL_Keycode _key)
 	if (_key == SDLK_BACKQUOTE)
 	{
 		m_clickAble = !m_clickAble;
+	}
+	if (_key == SDLK_COMMA)
+	{
+		m_lightModifer -= 5;
+		if (m_lightModifer < 0)
+			m_lightModifer = 0;
+	}
+	if (_key == SDLK_PERIOD)
+	{
+		m_lightModifer += 5;
+		if (m_lightModifer > 50)
+			m_lightModifer = 50;
+	}
+	if (_key == SDLK_f)
+	{
+		m_renderFogOfWar = !m_renderFogOfWar;
 	}
 }
 
@@ -326,17 +346,17 @@ void Tile::Render(SDL_Renderer* _renderer)
 		}
 		else
 		{
-			int lightModifer = 30;
+			
 			if (m_illuminated)
 			{
-				shade = 255 - (m_distanceFromLightsource * (lightModifer / 2));
+				shade = 255 - (m_distanceFromLightsource * (m_lightModifer / 2));
 				if (shade < fogTint)
 					shade = fogTint;
 				setTextureColorMod({ shade, shade, shade, 100 });
 			}
 			else
 			{
-				shade = 150 - (m_distanceFromSource * lightModifer);
+				shade = 150 - (m_distanceFromSource * m_lightModifer);
 				if (shade < fogTint)
 					shade = fogTint;
 				setTextureColorMod({ shade, shade, shade, 100 });

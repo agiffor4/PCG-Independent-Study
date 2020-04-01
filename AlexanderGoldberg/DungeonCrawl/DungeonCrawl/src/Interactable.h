@@ -12,6 +12,8 @@ public:
 	virtual ~Interactable();
 	virtual bool Interaction(Thing* _thingInitatingInteraction) = 0; //returns false if it should not be added to the player inventory ineteraction
 	virtual void InteractionOnEnteringTile(Thing* _thingInitatingInteraction);
+	virtual void Drop();
+	virtual void PickUp();
 	void SetBlocksPassage(bool _val);
 	bool GetBlocksPassage();
 	bool IsflaggedForDeletion();

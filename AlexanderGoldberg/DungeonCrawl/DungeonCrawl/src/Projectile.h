@@ -6,7 +6,7 @@ class Projectile :
 {
 private:
 	int m_speedMultiplier = 100;
-	float rad2Deg = 180.0f / M_PI;
+
 protected:
 	Vector2 m_direction;
 	int m_damage = 1;
