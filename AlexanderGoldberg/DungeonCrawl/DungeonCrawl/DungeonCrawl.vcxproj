@@ -152,6 +152,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Enemy.cpp" />
+    <ClCompile Include="src\EnemyCombat.cpp" />
+    <ClCompile Include="src\EnemyMovement.cpp" />
     <ClCompile Include="src\MouseAim.cpp" />
     <ClCompile Include="src\Projectile.cpp" />
     <ClCompile Include="src\BombDisarmer.cpp" />
@@ -190,6 +193,7 @@
     <ClCompile Include="src\Vector2.cpp" />
     <ClCompile Include="src\Tile.cpp" />
     <ClCompile Include="src\Thing.cpp" />
+    <ClCompile Include="src\WeaponStructs.cpp" />
     <ClCompile Include="src\World.cpp" />
     <ClCompile Include="src\RoomTreeNode.cpp" />
     <ClCompile Include="src\Treasure.cpp" />
@@ -201,8 +205,12 @@
     <ClCompile Include="src\WeaponHexShot.cpp" />
     <ClCompile Include="src\WeaponShotgun.cpp" />
     <ClCompile Include="src\WeaponTriplicate.cpp" />
+    <ClCompile Include="src\StatusEffectable.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Enemy.h" />
+    <ClInclude Include="src\EnemyCombat.h" />
+    <ClInclude Include="src\EnemyMovement.h" />
     <ClInclude Include="src\MouseAim.h" />
     <ClInclude Include="src\Projectile.h" />
     <ClInclude Include="src\BombDisarmer.h" />
@@ -324,6 +332,7 @@
     <ClInclude Include="src\Vector2.h" />
     <ClInclude Include="src\Tile.h" />
     <ClInclude Include="src\Thing.h" />
+    <ClInclude Include="src\WeaponStructs.h" />
     <ClInclude Include="src\World.h" />
     <ClInclude Include="src\Treasure.h" />
     <ClInclude Include="src\Trap.h" />
@@ -334,6 +343,7 @@
     <ClInclude Include="src\WeaponHexShot.h" />
     <ClInclude Include="src\WeaponShotgun.h" />
     <ClInclude Include="src\WeaponTriplicate.h" />
+    <ClInclude Include="src\StatusEffectable.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL\lib\x64\SDL2.dll" />

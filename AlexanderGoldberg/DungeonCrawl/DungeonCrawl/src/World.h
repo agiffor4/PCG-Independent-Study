@@ -15,6 +15,8 @@ class BSP;
 class AStarSearch;
 class RoomTree;
 class Weapon;
+class Enemy;
+class Thing;
 class World : public IInputHandler
 {
 private:
@@ -53,11 +55,11 @@ protected:
 	int m_keyDoorGenerationType = 0;
 	int m_lastKeyRoom = -1;
 	int m_lastKeyDepth = -1;
-
+	std::vector<Enemy*> m_EnemiesOnLevel;
 	float m_scale = 32.0f / 64.0f;
 	void tileRenderingSetUp();
 public:
-
+	
 	enum class TileDirection
 	{
 		UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT
@@ -103,8 +105,18 @@ public:
 	void InvokeKeyUp(SDL_Keycode _key) override;
 	void centerCameraOnPlayer(Tile* _tileToCenterOn);
 	Vector2 CheckIfCameraShouldMove(Vector2 _cameraMoveDirection);
+	const std::vector<Enemy*>& GetEnemiesOnLevel();
+	
+	Enemy* GetNearestEnemy(Vector2 _referencePoint, float _maximumRange = -1);
+	std::set<Tile*> GetTilesInRadiusFromEpicenter(int _epicenter, int _radius);
+	std::vector<Enemy*> GetEnemiesInTileRadius(int _epicenter, int _radius);
+	std::vector<Enemy*> GetEnemiesInRadius(Vector2 _referencePoint, float _maximumRange = -1);
+	Thing* GetNearestThing(Vector2 _referencePoint, const std::vector<Thing*>& _vectorToCheck, float _maximumRange = -1);
+	Tile* GetNeighborNearestPoint(Vector2 _referancePoint, Tile* _tile, bool _ignoreImpassable, bool _ignoreInteractablesForPassabilityCheck);
+	Tile* GetNeighborNearestPoint(Vector2 _referancePoint, int _tile, bool _ignoreImpassable, bool _ignoreInteractablesForPassabilityCheck);
 	//DEBUGGINg
+	
 	void printRoomData();
-
+	
 };
 

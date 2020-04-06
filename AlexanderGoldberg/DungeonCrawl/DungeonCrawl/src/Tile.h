@@ -25,6 +25,7 @@ private:
 	int m_roomIn = -1;
 	TextA* m_text = nullptr;
 	int m_lightModifer = 30;
+	int m_illuminationStrength = 0;
 	enum class TileRenderType {
 		empty,
 		wall4Side, 
@@ -137,6 +138,7 @@ private:
 
 	};
 	bool m_clickAble = false;
+	
 public:
 
 
@@ -166,9 +168,9 @@ public:
 	void Render(SDL_Renderer* _renderer) override;
 	void Update(float _dt) override;
 	void DetermineTileType(World* _world);
-	void SetIlluminated(bool _illuminated, int _distanceFromLightsource);
+	void SetIlluminated(bool _illuminated, int _distanceFromLightsource, int _illuminationStrength = 0);
 	void SetFogOfWar(bool _inFogOfWar, int _distanceFromSource);
 	const std::vector<Interactable*>& GetItems();
-
+	
 };
 

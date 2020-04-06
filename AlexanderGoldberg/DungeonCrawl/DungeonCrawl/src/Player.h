@@ -1,5 +1,5 @@
 #pragma once
-#include "Damagable.h"
+#include "StatusEffectable.h"
 #include "IInputHandler.h"
 #include "World.h"
 #include "Timer.h"
@@ -9,7 +9,7 @@ class Scene;
 class Interactable;
 class Holdable;
 class Player :
-	public Damagable, public IInputHandler
+	public StatusEffectable, public IInputHandler
 {
 	
 public:	
@@ -26,6 +26,7 @@ public:
 	void EquipWeapon(Weapon* _weapon);
 	int GetAmmo();
 	float GetAmmoAsPercent();
+	Vector2 GetAimDirection();
 protected:
 	//MOVEMENT VARIABLES
 	enum class MovementDirection {
@@ -45,7 +46,7 @@ protected:
 	int m_lineOfSightRadius = 2;
 	Holdable* m_holdables[2];
 	Weapon* m_equipedWeapon = nullptr;
-
+	
 	void InteractWithThingInSpace();
 	void attack(Vector2 _direction);
 	void move(Vector2 _direction);

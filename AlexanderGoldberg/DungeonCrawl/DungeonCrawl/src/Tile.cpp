@@ -349,14 +349,14 @@ void Tile::Render(SDL_Renderer* _renderer)
 			
 			if (m_illuminated)
 			{
-				shade = 255 - (m_distanceFromLightsource * (m_lightModifer / 2));
+				shade = 255 - (m_distanceFromLightsource * ((m_lightModifer - m_illuminationStrength) / 2));
 				if (shade < fogTint)
 					shade = fogTint;
 				setTextureColorMod({ shade, shade, shade, 100 });
 			}
 			else
 			{
-				shade = 150 - (m_distanceFromSource * m_lightModifer);
+				shade = 150 - (m_distanceFromSource * (m_lightModifer - m_illuminationStrength));
 				if (shade < fogTint)
 					shade = fogTint;
 				setTextureColorMod({ shade, shade, shade, 100 });
@@ -633,8 +633,9 @@ void Tile::DetermineTileType(World* _world)
 		}
 }
 
-void Tile::SetIlluminated(bool _illuminated, int _distanceFromLightsource)
+void Tile::SetIlluminated(bool _illuminated, int _distanceFromLightsource, int _illuminationStrength)
 {
+	m_illuminationStrength = _illuminationStrength;
 	m_illuminated = _illuminated;
 	m_distanceFromLightsource = _distanceFromLightsource;
 }
@@ -656,5 +657,7 @@ const std::vector<Interactable*>& Tile::GetItems()
 {
 	return m_items;
 }
+
+
 
 

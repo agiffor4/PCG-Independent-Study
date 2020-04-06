@@ -13,7 +13,7 @@
 #include "Treasure.h"
 #include "Camera.h"
 #include "Light.h"
-
+#include "Thing.h"
 #include "HealthPickUp.h"
 #include "Bomb.h"
 #include "Ammo.h"
@@ -21,6 +21,9 @@
 #include "WeaponTriplicate.h"
 #include "WeaponBasic.h"
 #include "Chest.h"
+
+#include "Enemy.h"
+#include "Thing.h"
 /*
 #include "BombDisarmer.h"
 #include "Trap.h"
@@ -687,9 +690,9 @@ void World::generateChests()
 	}
 }
 
-void World::createTreasureInRoom(int _roomToCreateTreasureIn) 
+void World::createTreasureInRoom(int _roomToCreateTreasureIn)
 {
-	#define containedTiles m_roomsData[_roomToCreateTreasureIn].sm_containsTiles
+#define containedTiles m_roomsData[_roomToCreateTreasureIn].sm_containsTiles
 	int randomTile = containedTiles[rand() % containedTiles.size()];
 	Treasure* t = new Treasure();
 	//t->Init("img/Treasure.bmp", "Treasue", m_scene->GetRenderer());	
@@ -724,34 +727,34 @@ void World::tileRenderingSetUp()
 
 void World::AddRooms(std::vector<std::vector<int>>& const _rooms) {
 	m_roomsData.erase(m_roomsData.begin(), m_roomsData.end());
-	
+
 	for (size_t i = 0; i < _rooms.size(); i++)
 	{
 		m_roomsData.emplace_back(RoomData());
 		for (size_t j = 0; j < _rooms[i].size(); j++)
 		{
-			GetTileAtIndex(_rooms[i][j])->SetPassable(true);	
+			GetTileAtIndex(_rooms[i][j])->SetPassable(true);
 			GetTileAtIndex(_rooms[i][j])->AddRoomNumber(i, m_markRooms, m_scene->GetRenderer());
 			//start filling out the room struct
 			m_roomsData[i].sm_containsTiles.push_back(_rooms[i][j]);
 			m_roomsData[i].sm_region = i;
 		}
-				
+
 	}
-	
+
 }
 
 void World::FillRoomDataStructs(BSP* _bsp) {
 	if (_bsp == nullptr)
 		_bsp = m_bsp;
-	
+
 	if (_bsp != nullptr)
 	{
 		std::vector<int> toRemove;
 		for (size_t i = 0; i < m_roomsData.size(); i++)
 		{
 			_bsp->ExitsFromRoom(m_roomsData[i].sm_region, m_roomsData[i].sm_exitCount, m_roomsData[i].sm_regionsExitingTo, m_roomsData[i].sm_CorridorExits, (*this));
-			
+
 			for (auto j = m_roomsData[i].sm_CorridorExits.begin(); j != m_roomsData[i].sm_CorridorExits.end(); j++)
 			{
 				int exitY = GetTileAtIndex(m_roomsData[i].sm_containsTiles[m_roomsData[i].sm_containsTiles.size() - 1])->GetPositionInGrid().Y;
@@ -760,7 +763,7 @@ void World::FillRoomDataStructs(BSP* _bsp) {
 				int roomX = GetTileAtIndex((*j))->GetPositionInGrid().X;
 				if (roomY == exitY)
 				{
-					
+
 					GetTileAtIndex((*j) - GetMapDimentions().X)->SetCorridor(true);
 					GetTileAtIndex((*j) - GetMapDimentions().X)->SetPassable(true);
 					GetTileAtIndex((*j))->SetCorridor(false);
@@ -796,21 +799,21 @@ void World::FillRoomDataStructs(BSP* _bsp) {
 
 		}
 	}
-	
+
 }
 
 void World::AddPaths(std::vector<int>& const _paths) {
 
 	for (size_t j = 0; j < _paths.size(); j++)
 	{
-		
+
 		if (!GetTileAtIndex(_paths[j])->IsPassable())
 		{
 			GetTileAtIndex(_paths[j])->SetCorridor(true);
 		}
-			
+
 		GetTileAtIndex(_paths[j])->SetPassable(true);
-		
+
 	}
 }
 
@@ -835,12 +838,12 @@ int World::GetPlayerStartLocation(const std::vector<std::vector<int>>& _rooms, i
 
 Player* World::CreatePlayer()
 {
-		m_playerCreated = true;		
-		Player* p = new Player();		
-		p->Initalize((*this), "img/Player.bmp", "Player", m_scene->GetRenderer());
-		p->SetScale(m_scale);
-		return p;
-	
+	m_playerCreated = true;
+	Player* p = new Player();
+	p->Initalize((*this), "img/Player.bmp", "Player", m_scene->GetRenderer());
+	p->SetScale(m_scale);
+	return p;
+
 }
 
 Weapon* World::CreateWeapon()
@@ -848,10 +851,10 @@ Weapon* World::CreateWeapon()
 	Weapon* w = nullptr;
 	w = new WeaponTriplicate();
 	w->Init("img/pics/Weapon03.png", "Triplicate", m_scene->GetRenderer());
-	w->InitializeWeapon(m_scene);
+	w->InitializeWeapon(m_scene, this);
 	m_scene->AddRenderable(w);
 	return w;
-	
+
 }
 
 void World::PlacePlayer(std::vector<std::vector<int>>* _rooms)
@@ -866,7 +869,7 @@ void World::PlacePlayer(std::vector<std::vector<int>>* _rooms)
 #endif
 	Weapon* w = new WeaponBasic();
 	w->Init("img/pics/Weapon01.png", "Basic Weapon", m_scene->GetRenderer());
-	w->InitializeWeapon(m_scene);
+	w->InitializeWeapon(m_scene, this);
 	m_scene->AddRenderable(w);
 	t = GetAdjacentTile(m_playerStart, World::TileDirection::UP);
 	t->AddItem(w);
@@ -875,7 +878,7 @@ void World::PlacePlayer(std::vector<std::vector<int>>* _rooms)
 
 void World::InvokeKeyUp(SDL_Keycode _key)
 {
-	BSP bsp = BSP(1,1);
+	BSP bsp = BSP(1, 1);
 	switch (_key)
 	{
 	case SDLK_r:
@@ -909,7 +912,7 @@ void World::InvokeKeyUp(SDL_Keycode _key)
 	case SDLK_3:
 	case SDLK_4:
 	case SDLK_5:
-		m_pathGenerationType =  ((int)_key) - 49;
+		m_pathGenerationType = ((int)_key) - 49;
 		m_keyDoorGenerationType = ((int)_key) - 49;
 		setWindowTitle();
 		printf("Path generation type set to %s\n", bsp.GetEnumName((BSP::TunnelingType)m_pathGenerationType).c_str());
@@ -926,7 +929,7 @@ void World::InvokeKeyUp(SDL_Keycode _key)
 				tileRenderingSetUp();
 			}
 		}
-			
+
 		break;
 
 	case SDLK_i:
@@ -985,12 +988,12 @@ void World::centerCameraOnPlayer(Tile* _tileToCenterOn)
 Vector2 World::CheckIfCameraShouldMove(Vector2 _cameraMoveDirection)
 {
 	Vector2 tileSize = m_tiles[0]->GetCurrentSize();
-	Tile* lastT  = m_tiles[m_tiles.size() - 1];
+	Tile* lastT = m_tiles[m_tiles.size() - 1];
 	Tile* startT = m_tiles[0];
-	
+
 	if (_cameraMoveDirection.Y == 1)
 	{
-		
+
 		if (startT->GetDestination().y - Camera::Offset().Y >= 0 ||
 			m_player->GetLocation()->GetDestination().y - Camera::Offset().Y > Camera::GetCenter().Y - tileSize.Y
 			)
@@ -998,30 +1001,30 @@ Vector2 World::CheckIfCameraShouldMove(Vector2 _cameraMoveDirection)
 			_cameraMoveDirection.Y = 0;
 		}
 	}
-		
+
 
 	if (_cameraMoveDirection.Y == -1)
 	{
-		
-		if (lastT->GetDestination().y - Camera::Offset().Y <= Camera::GetScreenSize().Y - tileSize.Y || 
+
+		if (lastT->GetDestination().y - Camera::Offset().Y <= Camera::GetScreenSize().Y - tileSize.Y ||
 			m_player->GetLocation()->GetDestination().y < Camera::GetCenter().Y
 			)
 		{
 			_cameraMoveDirection.Y = 0;
 		}
 	}
-		
+
 	//left
 	if (_cameraMoveDirection.X == -1)
-	{				
+	{
 		if (startT->GetDestination().x - Camera::Offset().X >= 0 ||
 			m_player->GetLocation()->GetDestination().x > lastT->GetDestination().x - Camera::GetCenter().X
 			)
-		{			
+		{
 			_cameraMoveDirection.X = 0;
 		}
 	}
-		
+
 	//right
 	if (_cameraMoveDirection.X == 1)
 	{
@@ -1032,9 +1035,156 @@ Vector2 World::CheckIfCameraShouldMove(Vector2 _cameraMoveDirection)
 			_cameraMoveDirection.X = 0;
 		}
 	}
-		
+
 
 	return _cameraMoveDirection;
+}
+
+const std::vector<Enemy*>& World::GetEnemiesOnLevel()
+{
+	return m_EnemiesOnLevel;
+}
+
+std::vector<Enemy*> World::GetEnemiesInRadius(Vector2 _referencePoint, float _maximumRange)
+{
+	return std::vector<Enemy*>();
+}
+
+
+Thing* World::GetNearestThing(Vector2 _referencePoint, const std::vector<Thing*>& _vectorToCheck, float _maximumRange)
+{
+	int index = 0;
+
+	float minDist = Vector2::GetSquareDistance(_vectorToCheck[index]->GetPosition(), _referencePoint);
+
+	for (size_t i = 0; i < _vectorToCheck.size(); i++)
+	{
+		float newDist = Vector2::GetSquareDistance(_vectorToCheck[i]->GetPosition(), _referencePoint);
+		if (newDist <= minDist)
+		{
+			minDist = newDist;
+			index = i;
+		}
+
+	}
+	return (minDist < _maximumRange || _maximumRange < 0 ? _vectorToCheck[index] : nullptr);
+}
+
+Tile* World::GetNeighborNearestPoint(Vector2 _referancePoint, Tile* _tile, bool _ignoreImpassable, bool _includeImpassableIfOnlyDueToItems)
+{
+
+	return GetNeighborNearestPoint(_referancePoint, _tile->GetPositionInVector(), _ignoreImpassable, _includeImpassableIfOnlyDueToItems);
+}
+
+Tile* World::GetNeighborNearestPoint(Vector2 _referancePoint, int _tile, bool _ignoreImpassable, bool _ignoreInteractablesForPassabilityCheck)
+{
+	std::vector<Tile*> neighbors = GetNeighbors(_tile, true);
+	int index = 0;
+	while (!neighbors[index]->IsPassable(_ignoreInteractablesForPassabilityCheck))
+	{
+		index++;
+		if (index >= neighbors.size())
+		{
+			return nullptr;
+		}
+	}
+	float minDist = Vector2::GetSquareDistance(_referancePoint, neighbors[index]->GetPosition());
+
+	for (size_t i = 0; i < neighbors.size(); i++)
+	{
+		if (!_ignoreImpassable || neighbors[i]->IsPassable(_ignoreInteractablesForPassabilityCheck))
+		{
+			float curDist = Vector2::GetSquareDistance(_referancePoint, neighbors[i]->GetPosition());
+			if (curDist < minDist)
+			{
+				minDist = curDist;
+				index = i;
+			}
+		}
+
+	}
+
+	return neighbors[index];
+}
+
+Enemy* World::GetNearestEnemy(Vector2 _referencePoint, float _maximumRange)
+{
+	int index = 0;
+
+	float minDist = Vector2::GetSquareDistance(m_EnemiesOnLevel[index]->GetPosition(), _referencePoint);
+
+	for (size_t i = 0; i < m_EnemiesOnLevel.size(); i++)
+	{
+		if (!m_EnemiesOnLevel[i]->IsDead())
+		{
+			float newDist = Vector2::GetSquareDistance(m_EnemiesOnLevel[i]->GetPosition(), _referencePoint);
+			if (newDist <= minDist)
+			{
+				minDist = newDist;
+				index = i;
+			}
+		}
+	}
+	return (minDist < _maximumRange || _maximumRange < 0 ? m_EnemiesOnLevel[index] : nullptr);
+}
+
+std::set<Tile*> World::GetTilesInRadiusFromEpicenter(int _epicenter, int _radius)
+{
+	std::set<Tile*> inRadius;
+	int center = _epicenter;
+	
+	std::vector<Tile*> neigbors = GetNeighbors(center);
+	for (size_t i = 0; i < neigbors.size(); i++)
+	{
+		inRadius.emplace(neigbors[i]);
+	}
+	std::vector<Tile*> tempNeigbors;
+	
+	for (size_t k = 0; k < _radius; k++)
+	{
+
+		for (size_t i = 0; i < tempNeigbors.size(); i++)
+			inRadius.emplace(tempNeigbors[i]);
+		tempNeigbors.clear();
+		for (auto itt = inRadius.begin(); itt != inRadius.end(); itt++)
+		{
+			std::vector<Tile*> templist = GetNeighbors((*itt)->GetPositionInVector());
+			for (size_t i = 0; i < templist.size(); i++)
+			{
+				if (templist[i]->IsPassable())
+				{
+					tempNeigbors.push_back(templist[i]);
+				}
+
+			}
+
+		}
+	}
+	
+	inRadius.emplace(GetTileAtIndex(_epicenter));
+
+	return inRadius;
+}
+
+
+std::vector<Enemy*> World::GetEnemiesInTileRadius(int _epicenter, int _radius)
+{
+	std::set<Tile*> tilesInRadius = GetTilesInRadiusFromEpicenter(_epicenter, _radius);
+	std::vector<Enemy*> enemiesInRadius;
+	for (auto itt = tilesInRadius.begin(); itt != tilesInRadius.end(); itt++)
+	{
+
+		if ((*itt)->GetContents() != nullptr)
+		{
+			Enemy* e = dynamic_cast<Enemy*>((*itt));
+			if (e != nullptr)
+			{
+				enemiesInRadius.push_back(e);
+			}
+		}
+	}
+
+	return enemiesInRadius;
 }
 
 void World::printRoomData()
@@ -1047,9 +1197,9 @@ void World::printRoomData()
 		printf("Containts tiles: ");
 		auto it = m_roomsData[i].sm_containsTiles.begin();
 		auto itEnd = m_roomsData[i].sm_containsTiles.end();
-		while(it != itEnd)
+		while (it != itEnd)
 		{
-			if(it < itEnd -1)
+			if (it < itEnd - 1)
 				printf("%d, ", (*it));
 			else
 				printf("%d\n", (*it));
@@ -1075,12 +1225,9 @@ void World::printRoomData()
 			it3++;
 		}
 		printf("\n");
-		
+
 		printf("Connectedness value is %d\n", m_roomsData[i].sm_connectedness);
 		printf("Room is %s\n", (m_roomsData[i].sm_Locked ? "inaccessible" : "accessible"));
 		printf("\n\n");
 	}
 }
-	
-
-

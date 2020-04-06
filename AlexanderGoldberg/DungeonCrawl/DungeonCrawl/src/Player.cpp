@@ -39,6 +39,10 @@ void Player::Update(float _dt)
 		move(m_direction);
 		m_moveRate.SetShouldCountDown(true);
 	}
+	if (m_equipedWeapon != nullptr && m_equipedWeapon->ShouldSetLOS())
+	{
+		SetLineOfSight(true);
+	}
 }
 
 void Player::InvokeKeyDown(SDL_Keycode _key)
@@ -357,6 +361,11 @@ int Player::GetAmmo()
 float Player::GetAmmoAsPercent()
 {
 	return m_equipedWeapon != nullptr ? m_equipedWeapon->GetAmmoAsPercent() : 0.0f;
+}
+
+Vector2 Player::GetAimDirection()
+{
+	return m_mouseAim.GetDirection();
 }
 
 

@@ -4,6 +4,8 @@ class WeaponBasic :
 	public Weapon
 {
 public:
+	
+
 	WeaponBasic();
 	~WeaponBasic();
 };

@@ -40,6 +40,9 @@
     <Filter Include="Source Files\Interactables\Pickups">
       <UniqueIdentifier>{9b1397d0-5369-4cb4-9f11-ad8c38a6acc4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Things\Enemy">
+      <UniqueIdentifier>{08d875ee-4c21-48ad-bb54-5cf940f9d8b7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Main.cpp">
@@ -177,16 +180,31 @@
     <ClCompile Include="src\Weapon.cpp">
       <Filter>Source Files\Interactables\Weapons</Filter>
     </ClCompile>
-    <ClCompile Include="src\WeaponBasic.cpp">
+    <ClCompile Include="src\StatusEffectable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\WeaponHexShot.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\EnemyCombat.cpp">
+      <Filter>Source Files\Things\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="src\WeaponShotgun.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\EnemyMovement.cpp">
+      <Filter>Source Files\Things\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Enemy.cpp">
+      <Filter>Source Files\Things\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="src\WeaponTriplicate.cpp">
+      <Filter>Source Files\Interactables\Weapons</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WeaponBasic.cpp">
+      <Filter>Source Files\Interactables\Weapons</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WeaponHexShot.cpp">
+      <Filter>Source Files\Interactables\Weapons</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WeaponShotgun.cpp">
+      <Filter>Source Files\Interactables\Weapons</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WeaponStructs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -582,6 +600,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\WeaponTriplicate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StatusEffectable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EnemyMovement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EnemyCombat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Enemy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WeaponStructs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

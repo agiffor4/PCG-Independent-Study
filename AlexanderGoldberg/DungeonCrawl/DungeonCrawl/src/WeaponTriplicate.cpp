@@ -11,7 +11,8 @@ WeaponTriplicate::~WeaponTriplicate()
 
 void WeaponTriplicate::Fire(Vector2 _direction)
 {
-	if (!m_fireTimer.GetShouldCountDown())
+	
+	if (!m_triggerData.fireTimer.GetShouldCountDown())
 	{
 		double theta = 15.0f * deg2Rad;
 			double cs = cos(theta);
