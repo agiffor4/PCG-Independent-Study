@@ -1,6 +1,7 @@
 #pragma once
 #include "Timer.h"
 #include "Vector2.h"
+#include "Thing.h"
 namespace WeaponStructs 
 {
 
@@ -18,6 +19,8 @@ namespace WeaponStructs
 		float projectileSpeedMultiplier = 1;
 		int knockBackMultiplier = 0;
 		int recoilMultiplier = 0;
+		int piercingCount = 1;
+		Thing* LastThingHit = nullptr;
 	};
 	struct LightStruct {
 
@@ -39,6 +42,10 @@ namespace WeaponStructs
 
 		int AoeRadiusInTiles = 1;
 		float AoePercentageFallOffPerUnitDistance = 0.5f;
+	};
+	struct BounceStruct {
+		int bounceMax = 0;
+
 	};
 	
 	

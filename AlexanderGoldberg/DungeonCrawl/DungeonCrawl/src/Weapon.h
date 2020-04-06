@@ -25,8 +25,8 @@ public:
 		homingLockOnFireDie = 32, //picks target to home to on fire, continues to target's last location if target dies, and then te projectile dies
 		homingLockOnFire = 64, //picks target to home to on fire
 		homingLockOnDifferent = 128, //on fire each missile locks onto a different target, repeating lockon for each fired projectile only if there are no new targets, projectiles will not pick new targets if their original target dies
-/*++*/	bounceExact = 256, //bounces at at an exact angle if it hits a wall
-/*++*/	bounceVariable = 512, //bounces at an angle modifed by a variable amount on hitting a wall
+		bounceExact = 256, //bounces at at an exact angle if it hits a wall
+		bounceVariable = 512, //bounces at an angle modifed by a variable amount on hitting a wall
 		areaOfEffectNoDamage = 1024, //aoe that does not damage originator
 		areaOfEffectDamage = 2048, //aoe that does damage originator		
 /*++*/	mineLayer = 4096, //fires mines instead of projectiles 
@@ -48,7 +48,7 @@ protected:
 	WeaponStructs::LightStruct m_LightData = WeaponStructs::LightStruct();
 	//ProjectileData
 	WeaponStructs::ProjectileStruct m_projectileData = WeaponStructs::ProjectileStruct();
-
+	WeaponStructs::BounceStruct m_bounceData = WeaponStructs::BounceStruct();
 
 	//piercing variables
 	int m_pierceCount = 1;

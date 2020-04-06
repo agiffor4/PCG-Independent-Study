@@ -17,6 +17,7 @@ void Projectile::move(float _dt)
 			if (!HomingTargetIsValid() && Vector2::GetDistanceLessThan(pos, m_homingTarget->GetPosition(), 16))
 			{
 				die();
+				
 			}
 		}
 		else
@@ -56,7 +57,7 @@ void Projectile::die()
 			}
 			if (hasProperty(Property::areaOfEffectDamage))
 			{
-				if (Vector2::GetDistanceLessThan(m_currentTileIn->GetPositionInGrid(), m_owner->GetLocation()->GetPositionInGrid(), m_aoeData.))
+				if (Vector2::GetDistanceLessThan(m_currentTileIn->GetPositionInGrid(), m_owner->GetLocation()->GetPositionInGrid(), m_aoeData.AoeRadiusInTiles))
 				{
 					Damagable* d = dynamic_cast<Damagable*>(m_owner);
 					if (d != nullptr)
@@ -102,12 +103,13 @@ void Projectile::OnSpawn(const Vector2& _spawnPosition, const Vector2& _directio
 	
 }
 
-void Projectile::SetStructData(World* _world, WeaponStructs::ProjectileStruct _projectileData, WeaponStructs::AOEStruct _aoeData, WeaponStructs::LightStruct _lightData)
+void Projectile::SetStructData(World* _world, WeaponStructs::ProjectileStruct _projectileData, WeaponStructs::AOEStruct _aoeData, WeaponStructs::LightStruct _lightData, WeaponStructs::BounceStruct _bounceData)
 {
 	m_world = _world;
 	m_projectileData = _projectileData;
 	m_aoeData = _aoeData;
 	m_lightData = _lightData;
+	m_bounceData = _bounceData;
 }
 
 void Projectile::Update(float _dt) 
@@ -121,11 +123,41 @@ void Projectile::OnCollision(Thing* _other)
 	{
 
 		Damagable* d = dynamic_cast<Damagable*>(_other);
-		if (d != nullptr)
+		if (hasProperty(Property::piercing))
 		{
-			d->TakeDamage(m_damage);
+			if (m_projectileData.LastThingHit != _other)
+			{
+				m_projectileData.piercingCount--;
+				if (m_projectileData.piercingCount < 1)
+				{
+					die();
+				}
+				if (d != nullptr)
+					d->TakeDamage(m_damage);
+				m_projectileData.LastThingHit = _other;
+			}
+			
 		}
-		die();
+		else if (hasProperty(Property::bounceExact) || hasProperty(Property::bounceVariable))
+		{
+			if (hasProperty(Property::bounceExact))
+			{
+				m_direction = rotateDirectionByDegrees(m_direction, m_direction.X > 0 ? 90 : -90);
+			}
+			else
+			{
+
+			}
+		}
+		else
+		{
+
+			if (d != nullptr)
+				d->TakeDamage(m_damage);
+		}
+
+		
+
 	}
 }
 
@@ -195,14 +227,21 @@ void Projectile::Illuminate(bool _lightUp) {
 		}
 	}
 }
-/*
-void Projectile::SetLocation(Tile* _newLocation)
+
+
+Vector2 Projectile::rotateDirectionByDegrees(Vector2 _direction, float _degrees)
 {
-
-	Illuminate(false);
-	Thing::SetLocation(_newLocation);
-	Illuminate(true);
+	while (_degrees < 0)
+		_degrees += 360;
+	while (_degrees > 360)
+		_degrees -= 360;
+	double theta = _degrees * deg2Rad;
+	double cs = cos(theta);
+	double sn = sin(theta);
+	float x = _direction.X * cs - _direction.Y * sn;
+	float y = _direction.X * sn + _direction.Y * cs;
+	_direction.X = x;
+	_direction.Y = y;
+	return _direction;
 }
-*/
-
 

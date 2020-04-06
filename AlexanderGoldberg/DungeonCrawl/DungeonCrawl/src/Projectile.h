@@ -27,19 +27,22 @@ protected:
 	WeaponStructs::ProjectileStruct m_projectileData;
 	WeaponStructs::AOEStruct m_aoeData;
 	WeaponStructs::LightStruct m_lightData;
+	WeaponStructs::BounceStruct m_bounceData;
 	World* m_world = nullptr;
 	void die();
+	Vector2 rotateDirectionByDegrees(Vector2 _direction, float _degrees);
 public:
 	Projectile();
 	~Projectile();
 	void OnSpawn(const Vector2& _spawnPosition, const Vector2& _direction, float _speed, int _damage, Uint32 _weaponProfile,Thing* _owner);
-	void SetStructData(World* _world, WeaponStructs::ProjectileStruct _projectileData, WeaponStructs::AOEStruct _aoeData, WeaponStructs::LightStruct _lightData);
+	void SetStructData(World* _world, WeaponStructs::ProjectileStruct _projectileData, WeaponStructs::AOEStruct _aoeData, WeaponStructs::LightStruct _lightData, WeaponStructs::BounceStruct _bounceData);
 	void Update(float _dt) override;
 	void OnCollision(Thing* _other) override;
 	void SetHomingTarget(Enemy* _toSet);
 	bool HomingTargetIsValid();
 	std::set<Tile*> GetEffectedTiles(Tile* _epicenter);
 	void Illuminate(bool _lightUp);
+	
 };
 
 

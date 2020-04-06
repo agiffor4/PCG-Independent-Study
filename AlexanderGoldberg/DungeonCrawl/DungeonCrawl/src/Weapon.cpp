@@ -33,7 +33,9 @@ Weapon::Weapon()
 	m_burstData.burstTotalTime = 0.25f;
 	m_triggerData.fireRate = 1.0f;*/
 	addPropertyToProfile(weaponProperties::illuminated);
-	m_LightData.lightRadius = 1;
+	m_LightData.lightRadius = 2;
+	addPropertyToProfile(weaponProperties::bounceExact);
+	m_bounceData.bounceMax = 3;
 }
 
 Weapon::~Weapon()
@@ -189,7 +191,7 @@ void Weapon::fire(Vector2 _direction, bool _costAmmo, bool _ignoreCooldown)
 			m_triggerData.fireTimer.SetShouldCountDown(true);
 			Projectile* p = getProjectile();
 			p->OnSpawn(m_holder->GetPosition(), _direction, 3, 5, m_weaponProfile, (Thing*)m_holder);
-			p->SetStructData(m_world, m_projectileData, m_AOEData, m_LightData);
+			p->SetStructData(m_world, m_projectileData, m_AOEData, m_LightData, m_bounceData);
 			if (_costAmmo)
 				m_ammo--;
 		}
