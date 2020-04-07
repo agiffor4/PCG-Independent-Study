@@ -480,7 +480,6 @@ void Weapon::GenerateWeapon(int _weaponLevel)
 
 void Weapon::PrintWeaponInfo()
 {
-	
 	for (auto i = enumLookup.begin(); i != enumLookup.end(); i++)
 	{
 		if (propertyInProfile((weaponProperties)(*i).first))

@@ -76,6 +76,7 @@ void Projectile::die()
 	}
 	m_shouldRender = false;
 	m_checkCollision = false;
+	m_bounceData.ClearLastThingHit();
 }
 
 Projectile::Projectile()
@@ -110,14 +111,16 @@ void Projectile::SetStructData(World* _world, WeaponStructs::ProjectileStruct _p
 	m_aoeData = _aoeData;
 	m_lightData = _lightData;
 	m_bounceData = _bounceData;
-	m_bounceData.initalX = m_direction.X;
-	m_bounceData.initalY = m_direction.Y;
 
 }
 
 void Projectile::Update(float _dt) 
 {
 	move(_dt);
+	if (hasProperty(Property::bounceExact) || hasProperty(Property::bounceVariable))
+	{
+		m_bounceData.bounceCoolDown.CountDownAutoCheckBool(_dt);
+	}
 }
 
 void Projectile::OnCollision(Thing* _other)
@@ -145,32 +148,90 @@ void Projectile::OnCollision(Thing* _other)
 		}
 		else if (hasProperty(Property::bounceExact) || hasProperty(Property::bounceVariable))
 		{
-			if (!m_bounceData.RecentlyHit(_other))
-			{
-				int degreeOffset = 90;
-				if (m_bounceData.bounceMax > 0)
+			
+				if (m_bounceData.bounceMax > 0 && !m_bounceData.RecentlyHit(_other))
 				{
-					if (hasProperty(Property::bounceExact))
-					{
-						getExactBounceDirection(degreeOffset, _other->GetPosition());
-						
-						m_direction = rotateDirectionByDegrees(m_direction, degreeOffset);
-						
-						setAngle(vectorToAngle(m_direction));
-					}
-					else
+					bool result = !m_bounceData.bounceCoolDown.GetShouldCountDown();
+					if (result)
 					{
 
+						Vector2 right = rotateDirectionByDegrees(m_direction, 90);
+						Vector2 OtherPos = _other->GetPosition();
+						float dot = Vector2::Dot(OtherPos.Normalized(), right.Normalized());
+						int degrees = 0;
+						printf("dot is %f\n", dot);
+						if (abs(dot) < 0.6f) //to left or right
+						{
+							m_direction.X *= -1;
+						/*	if (dot > 0)
+							{
+								if (m_direction.Y > 0)
+								{
+									degrees = 90;
+								}
+								else
+								{
+									degrees = -90;
+								}
+							}
+							else
+							{
+								if (m_direction.Y < 0)
+								{
+									degrees = 90;
+								}
+								else
+								{
+									degrees = -90;
+								}
+							}*/
+						}
+						else //above or below
+						{
+							/*if (dot > 0)
+							{
+								if (m_direction.X > 0)
+								{
+									degrees = 90;
+								}
+								else
+								{
+									degrees = -90;
+								}
+							}
+							else
+							{
+								if (m_direction.X < 0)
+								{
+									degrees = 90;
+								}
+								else
+								{
+									degrees = -90;
+								}
+							}*/
+							m_direction.Y *= -1;
+						}
+						
+						if (hasProperty(Property::bounceVariable))
+						{
+							degrees += ((rand() % 30) - 15);
+						}
+						m_direction = rotateDirectionByDegrees(m_direction, degrees);
+						setAngle(vectorToAngle(m_direction));
+						m_bounceData.bounceCoolDown.SetShouldCountDown(true);
 					}
+					
 				}
 				else
 				{
 					die();
 				}
-				m_bounceData.bounceMax--;
+				if (!m_bounceData.RecentlyHit(_other))
+					m_bounceData.bounceMax--;
 				m_bounceData.thisBounce++;
 				m_bounceData.LastThingHit[m_bounceData.Index()] = _other;
-			}
+			
 		}
 		else
 		{

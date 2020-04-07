@@ -90,13 +90,10 @@ namespace WeaponStructs
 		}
 	};
 	struct BounceStruct {
-		int bounceMax = 0;
+		int bounceMax = 2;
 		int thisBounce = 1;
 		Thing* LastThingHit[2] = { nullptr ,nullptr };
-		
-		
-		int initalX = 0;
-		int initalY = 0;
+		Timer bounceCoolDown = Timer(0.5f);
 		void PrintData()
 		{
 
@@ -121,6 +118,13 @@ namespace WeaponStructs
 				return LHTSize - 1;
 			}
 			return LHTIndex - 1;
+		}
+		void ClearLastThingHit() 
+		{
+			for (size_t i = 0; i < LHTSize; i++)
+			{
+				LastThingHit[i] = nullptr;
+			}
 		}
 	private:
 		int LHTIndex = 0;
