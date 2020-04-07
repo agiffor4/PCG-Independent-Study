@@ -543,10 +543,11 @@ void Tile::DetermineTileType(World* _world)
 				s->Init("img/Shadow_South.png", "Shadow North East 2", m_rendererRef);
 				break;
 			case Tile::TileRenderType::wall2SideBottomL:
-				s = new Shadow();
-				s->Init("img/Shadow_West.png", "Shadow South West 1", m_rendererRef);
+				
 				if (_world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::RIGHT)->IsPassable())
 				{
+					s = new Shadow();
+					s->Init("img/Shadow_West.png", "Shadow South West 1", m_rendererRef);
 					AddShadow(s);
 					s = new Shadow();
 					s->Init("img/Shadow_North.png", "Shadow South West 2", m_rendererRef);
