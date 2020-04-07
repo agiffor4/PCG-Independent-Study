@@ -18,8 +18,6 @@
 #include "Bomb.h"
 #include "Ammo.h"
 #include "Weapon.h"
-#include "WeaponTriplicate.h"
-#include "WeaponBasic.h"
 #include "Chest.h"
 
 #include "Enemy.h"
@@ -638,14 +636,14 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 void World::GenerateItems(int _exitLocation, BSP* _bspToUse) {
 	
 //	generateTreasure();
-	generateWeapon();
+	
 	generateChests();
 
 	int randomTile = m_roomsData[rand() % m_roomsData.size()].GetRandomTile();
 	Light* l = new Light();
 	l->Init("img/Torch.png", "Light", m_scene->GetRenderer(), this);
 	m_tiles[randomTile]->AddItem(l);
-	
+	generateWeapon();
 
 	
 }
@@ -849,9 +847,10 @@ Player* World::CreatePlayer()
 Weapon* World::CreateWeapon()
 {
 	Weapon* w = nullptr;
-	w = new WeaponTriplicate();
+	w = new Weapon();	
 	w->Init("img/pics/Weapon03.png", "Triplicate", m_scene->GetRenderer());
 	w->InitializeWeapon(m_scene, this);
+	w->GenerateWeapon(1);
 	m_scene->AddRenderable(w);
 	return w;
 
@@ -867,9 +866,10 @@ void World::PlacePlayer(std::vector<std::vector<int>>* _rooms)
 #if UseCamera == 1
 	centerCameraOnPlayer(t);
 #endif
-	Weapon* w = new WeaponBasic();
+	Weapon* w = new Weapon();
 	w->Init("img/pics/Weapon01.png", "Basic Weapon", m_scene->GetRenderer());
 	w->InitializeWeapon(m_scene, this);
+	w->GenerateWeapon(1);
 	m_scene->AddRenderable(w);
 	t = GetAdjacentTile(m_playerStart, World::TileDirection::UP);
 	t->AddItem(w);
@@ -1105,6 +1105,11 @@ Tile* World::GetNeighborNearestPoint(Vector2 _referancePoint, int _tile, bool _i
 	}
 
 	return neighbors[index];
+}
+
+int World::GetLevel()
+{
+	return m_generationNumber;
 }
 
 Enemy* World::GetNearestEnemy(Vector2 _referencePoint, float _maximumRange)

@@ -1,6 +1,7 @@
 #pragma once
 #include "Interactable.h"
 #include <vector>
+#include <map>
 #include "Timer.h"
 #include "WeaponStructs.h"
 class Player;
@@ -19,8 +20,8 @@ public:
 	enum class weaponProperties {
 		spreadRandom = 1, //weapon has a variable spread per trigger pull
 		spreadConstant = 2, //weapon has a consistent spread per trigger pull 
-/*++*/	piercing = 4, //projectile goes through multipule enemies before dieing
-/*++*/	beamWeapon = 8, //
+		symetricalSpread = 4, //no mechanical effect but flagged so it can be known for naming reasons
+		piercing = 8, //projectile goes through multipule enemies before dieing
 		homingClosest = 16, //homes to nearest target, target is always closest enemy
 		homingLockOnFireDie = 32, //picks target to home to on fire, continues to target's last location if target dies, and then te projectile dies
 		homingLockOnFire = 64, //picks target to home to on fire
@@ -33,8 +34,10 @@ public:
 		everyShotCosts = 8192, //in cases where the weapon fires multipule projectiles in a trigger pull does every shot drain the ammo amount or only one
 		illuminated = 16384, //provideslightsource
 		burstConstant = 32768, //+if a weapon is burst it fires x number of projectiles per trigger pull with a delay between each shot
-		burstVariable = 32768, //+if a weapon is burst variable it fires x to y number of projectiles per trigger pull with a delay between each shot
+		burstVariable = 65536, //+if a weapon is burst variable it fires x to y number of projectiles per trigger pull with a delay between each shot
+/*++*/	beamWeapon = 131072 //
 	};
+	std::map<int, std::string> enumLookup;
 protected:
 
 
@@ -65,7 +68,7 @@ protected:
 	//AOE damage
 	WeaponStructs::AOEStruct m_AOEData = WeaponStructs::AOEStruct();
 	
-
+	int m_weaponLevel = 1;
 
 	Projectile* getProjectile();
 	std::vector<Projectile*> m_projectiles;
@@ -81,6 +84,17 @@ protected:
 	void addPropertyToProfile(weaponProperties _property);
 	void removePropertyFromProfile(weaponProperties _property);
 	Vector2 rotateDirectionByDegrees(Vector2 _direction, float _degrees);
+	
+	void generateTriggerPullData();
+	void generateProjectileData();
+	void generateSpreadData();
+	void generateBurstData();
+	void generateHomingData();
+	void generateAOEData();
+	void generateBounceData();
+	bool getChance(int _percentChance);
+
+
 public:
 	enum class damageType {
 
@@ -100,7 +114,8 @@ public:
 	int GetAmmo();
 	float GetAmmoAsPercent();
 	bool ShouldSetLOS();
-	void GenerateWeapon();
+	void GenerateWeapon(int _weaponLevel);
+	void PrintWeaponInfo();
 };
 
 

@@ -114,6 +114,7 @@ public:
 	Thing* GetNearestThing(Vector2 _referencePoint, const std::vector<Thing*>& _vectorToCheck, float _maximumRange = -1);
 	Tile* GetNeighborNearestPoint(Vector2 _referancePoint, Tile* _tile, bool _ignoreImpassable, bool _ignoreInteractablesForPassabilityCheck);
 	Tile* GetNeighborNearestPoint(Vector2 _referancePoint, int _tile, bool _ignoreImpassable, bool _ignoreInteractablesForPassabilityCheck);
+	int GetLevel();
 	//DEBUGGINg
 	
 	void printRoomData();

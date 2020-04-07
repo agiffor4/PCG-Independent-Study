@@ -22,20 +22,38 @@ Projectile* Weapon::getProjectile()
 
 Weapon::Weapon()
 {
-	//shotgun
-	addPropertyToProfile(weaponProperties::spreadRandom);
+	/*addPropertyToProfile(weaponProperties::spreadRandom);
 	
 	m_SpreadData.spreadRangeDeg.X = -15;
 	m_SpreadData.spreadRangeDeg.Y = 15;
-	/*addPropertyToProfile(weaponProperties::burstConstant);
+	addPropertyToProfile(weaponProperties::burstConstant);
 	m_triggerData.shotsFiredperTriggerPull = 2;
 	m_burstData.burstShotsVariable.X = 3;
 	m_burstData.burstTotalTime = 0.25f;
-	m_triggerData.fireRate = 1.0f;*/
+	m_triggerData.fireRate = 1.0f;
 	addPropertyToProfile(weaponProperties::illuminated);
-	m_LightData.lightRadius = 2;
+	m_LightData.lightRadius = 1;
+	m_LightData.lightIntensity = -5;
 	addPropertyToProfile(weaponProperties::bounceExact);
-	m_bounceData.bounceMax = 3;
+	m_bounceData.bounceMax = 12;*/
+		enumLookup.emplace(std::make_pair((int)weaponProperties::spreadRandom,   " Spread Random")); 
+		enumLookup.emplace(std::make_pair((int)weaponProperties::spreadConstant,  "Spread Constant")); 
+		enumLookup.emplace(std::make_pair((int)weaponProperties::symetricalSpread, "Symetrical spread")); 
+		enumLookup.emplace(std::make_pair((int)weaponProperties::piercing,         "Piercing")); 
+		enumLookup.emplace(std::make_pair((int)weaponProperties::homingClosest,    "homing closest"));
+		enumLookup.emplace(std::make_pair((int)weaponProperties::homingLockOnFireDie, "homing LOFD")); 
+		enumLookup.emplace(std::make_pair((int)weaponProperties::homingLockOnFire, "homing LOF")); 
+		enumLookup.emplace(std::make_pair((int)weaponProperties::homingLockOnDifferent, "homing Lock on different"));
+		enumLookup.emplace(std::make_pair((int)weaponProperties::bounceExact, "Bounce exact"));
+		enumLookup.emplace(std::make_pair((int)weaponProperties::bounceVariable, "Bounce Variable"));
+		enumLookup.emplace(std::make_pair((int)weaponProperties::areaOfEffectNoDamage, "AOE No damage")); 
+		enumLookup.emplace(std::make_pair((int)weaponProperties::areaOfEffectDamage, "AOE"));
+		enumLookup.emplace(std::make_pair((int)weaponProperties::mineLayer, "Mine Layer")); 
+		enumLookup.emplace(std::make_pair((int)weaponProperties::everyShotCosts, "Every shot costs")); 
+		enumLookup.emplace(std::make_pair((int)weaponProperties::illuminated, "illuminated"));   
+		enumLookup.emplace(std::make_pair((int)weaponProperties::burstConstant, "Burst constant")); 
+		enumLookup.emplace(std::make_pair((int)weaponProperties::burstVariable, "Burst Variable")); 
+		enumLookup.emplace(std::make_pair((int)weaponProperties::beamWeapon, "Beam weapon")); 
 }
 
 Weapon::~Weapon()
@@ -83,9 +101,10 @@ void Weapon::Fire(Vector2 _direction) {
 				{
 					m_burstData.burstShotsForCurrentBurst = getRandomInRange(m_burstData.burstShotsVariable.X, m_burstData.burstShotsVariable.Y); //sets the number of shot for this trigger pull to a number in the range
 				}
+				
 				m_burstData.burstShotsRemaining = m_burstData.burstShotsForCurrentBurst;
 				m_burstData.burstTimer.SetTimer(m_burstData.burstTotalTime / (float)m_burstData.burstShotsRemaining);
-				m_triggerData.fireTimer.SetTimer(m_burstData.burstTotalTime + m_triggerData.fireRate);
+				m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate < m_burstData.burstTotalTime ? (m_burstData.burstTotalTime + m_triggerData.fireRate) : m_triggerData.fireRate);
 			}
 			
 		}
@@ -190,7 +209,7 @@ void Weapon::fire(Vector2 _direction, bool _costAmmo, bool _ignoreCooldown)
 		{
 			m_triggerData.fireTimer.SetShouldCountDown(true);
 			Projectile* p = getProjectile();
-			p->OnSpawn(m_holder->GetPosition(), _direction, 3, 5, m_weaponProfile, (Thing*)m_holder);
+			p->OnSpawn(m_holder->GetPosition(), _direction, 3, m_projectileData.DamageAmount, m_weaponProfile, (Thing*)m_holder);
 			p->SetStructData(m_world, m_projectileData, m_AOEData, m_LightData, m_bounceData);
 			if (_costAmmo)
 				m_ammo--;
@@ -212,17 +231,17 @@ int Weapon::getRandomInRange(int _min, int _max)
 
 bool Weapon::propertyInProfile(weaponProperties _property)
 {
-	return (m_weaponProfile & (int)_property);
+	return (m_weaponProfile & (Uint32)_property);
 }
 
 void Weapon::addPropertyToProfile(weaponProperties _property)
 {
-	m_weaponProfile |= (int)_property;
+	m_weaponProfile |= (Uint32)_property;
 }
 
 void Weapon::removePropertyFromProfile(weaponProperties _property)
 {
-	m_weaponProfile ^= (int)_property;
+	m_weaponProfile &= ~(Uint32)_property;
 }
 
 Vector2 Weapon::rotateDirectionByDegrees(Vector2 _direction, float _degrees)
@@ -239,6 +258,155 @@ Vector2 Weapon::rotateDirectionByDegrees(Vector2 _direction, float _degrees)
 	_direction.X = x;
 	_direction.Y = y;
 	return _direction;
+}
+
+void Weapon::generateTriggerPullData()
+{
+	//higher level weapons will tend towards faster fire rates
+	int upperLimit = 300 - ((m_weaponLevel * 20) < 200 ? (m_weaponLevel * 5) : 200);
+	m_triggerData.fireRate = getRandomInRange(25, upperLimit) * 0.01f;
+	m_triggerData.shotsFiredperTriggerPull = floor(2 * m_triggerData.fireRate);
+	if (m_triggerData.shotsFiredperTriggerPull < 1)
+		m_triggerData.shotsFiredperTriggerPull = 1;
+}
+
+void Weapon::generateProjectileData()
+{
+	m_projectileData.projectileSpeedMultiplier = 1;
+	int shotPerPull = (m_triggerData.shotsFiredperTriggerPull * m_burstData.burstShotsVariable.X);
+	m_projectileData.DamageAmount = getRandomInRange(5, m_weaponLevel*5) / 2;
+	m_projectileData.piercingCount = getChance(75) ? 1 : getRandomInRange(1, (m_weaponLevel / 2) + 1);
+	if (m_projectileData.piercingCount > 1)
+		addPropertyToProfile(weaponProperties::piercing);
+}
+
+void Weapon::generateSpreadData()
+{
+	if (getChance(50))
+	{
+		if (getChance(75))
+		{
+			addPropertyToProfile(weaponProperties::spreadRandom);
+
+		}
+		else
+		{
+			addPropertyToProfile(weaponProperties::spreadConstant);
+			if (getChance(50))//symetrical
+			{
+				bool around360 = getChance(50);
+				addPropertyToProfile(weaponProperties::symetricalSpread);
+				for (size_t i = 0; i < m_triggerData.shotsFiredperTriggerPull / 2; i++)
+				{
+					if (around360)
+						m_SpreadData.constSpreadInDegreesPerProjectile.push_back(rand() % 360);
+					else
+						m_SpreadData.constSpreadInDegreesPerProjectile.push_back(rand() % 180);
+				}
+				for (size_t i = 0; i < m_triggerData.shotsFiredperTriggerPull / 2; i++)
+				{
+					m_SpreadData.constSpreadInDegreesPerProjectile.push_back(m_SpreadData.constSpreadInDegreesPerProjectile[i] * -1);
+				}
+				if (m_triggerData.shotsFiredperTriggerPull % 2 != 0)
+				{
+					m_SpreadData.constSpreadInDegreesPerProjectile.push_back(0);
+				}
+
+			}
+			else
+			{
+				for (size_t i = 0; i < m_triggerData.shotsFiredperTriggerPull; i++)
+				{
+					m_SpreadData.constSpreadInDegreesPerProjectile.push_back(rand() % 360);
+				}
+			}
+		}
+	}
+}
+
+void Weapon::generateBurstData()
+{
+	//higher fire rates reduce chance to add burst property higher weapon levels are more likely to have burst chances
+	if (getChance(40 - m_triggerData.fireRate * 7  + m_weaponLevel))
+	{
+		int upperLimit = (m_weaponLevel < 4 ? 4 : m_weaponLevel);
+		if (getChance(50))
+		{
+			addPropertyToProfile(weaponProperties::burstConstant);
+			m_burstData.burstShotsVariable.X = getRandomInRange(1, upperLimit);
+		}
+		else
+		{
+			addPropertyToProfile(weaponProperties::burstVariable);
+			m_burstData.burstShotsVariable.X = getRandomInRange(1, upperLimit);
+			m_burstData.burstShotsVariable.Y = getRandomInRange(m_burstData.burstShotsVariable.X + 2, m_burstData.burstShotsVariable.X + upperLimit);
+		}
+		m_burstData.burstTotalTime = getRandomInRange(5, 50) * 0.01f;
+	}
+}
+
+void Weapon::generateHomingData()
+{
+	if (getChance(5 + m_weaponLevel * 5))
+	{
+		int chance = rand() % 100;
+		if (chance > 80)
+		{
+			addPropertyToProfile(weaponProperties::homingLockOnDifferent);
+		}
+		else if (chance > 60)
+		{
+			addPropertyToProfile(weaponProperties::homingClosest);
+		}
+		else
+		{
+			if (getChance(50))
+			{
+				addPropertyToProfile(weaponProperties::homingLockOnFireDie);
+			}
+			else
+			{
+				addPropertyToProfile(weaponProperties::homingLockOnFire);
+			}
+		}
+	}
+}
+
+void Weapon::generateAOEData()
+{
+	if (getChance(15))
+	{
+		if (getChance(75))
+		{
+			addPropertyToProfile(weaponProperties::areaOfEffectDamage);
+		}
+		else
+		{
+			addPropertyToProfile(weaponProperties::areaOfEffectNoDamage);
+		}
+		m_AOEData.AoeRadiusInTiles = getRandomInRange(1, m_weaponLevel);
+	}
+}
+
+void Weapon::generateBounceData()
+{
+	if (getChance(15))
+	{
+		if (getChance(40))
+		{
+			addPropertyToProfile(weaponProperties::bounceExact);
+		}
+		else
+		{
+			addPropertyToProfile(weaponProperties::bounceVariable);
+		}
+	}
+	m_bounceData.bounceMax = getRandomInRange(1, 1 + m_weaponLevel);
+}
+
+bool Weapon::getChance(int _percentChance)
+{
+	return (rand() % 100) < _percentChance;
 }
 
 
@@ -282,9 +450,63 @@ float Weapon::GetAmmoAsPercent()
 
 bool Weapon::ShouldSetLOS()
 {
-	return propertyInProfile(weaponProperties::illuminated) && m_triggerData.fireTimer.GetShouldCountDown();
+	return propertyInProfile(weaponProperties::illuminated);
 }
 
-void Weapon::GenerateWeapon()
+void Weapon::GenerateWeapon(int _weaponLevel)
 {
+	m_weaponLevel = _weaponLevel;
+	if (getChance(m_weaponLevel * 3))
+	{
+		addPropertyToProfile(weaponProperties::everyShotCosts);
+	}
+	if (getChance(30))
+	{
+		addPropertyToProfile(weaponProperties::illuminated);
+		m_LightData.lightRadius = getRandomInRange(1, 3);
+		m_LightData.lightIntensity = m_projectileData.DamageAmount * 1.5f;
+	}
+	generateTriggerPullData();
+	generateBurstData();
+	generateProjectileData();
+	generateSpreadData();
+	generateHomingData();
+	generateAOEData();
+	/*generateBounceData();*/
+	
+
+
+}
+
+void Weapon::PrintWeaponInfo()
+{
+	
+	for (auto i = enumLookup.begin(); i != enumLookup.end(); i++)
+	{
+		if (propertyInProfile((weaponProperties)(*i).first))
+			printf("Weapon has %s property\n", (*i).second.c_str());
+	}
+	m_triggerData.PrintData();
+	m_projectileData.PrintData();
+	if (propertyInProfile(weaponProperties::spreadConstant) || propertyInProfile(weaponProperties::spreadRandom))
+	{
+		m_SpreadData.PrintData();
+	}
+	if (propertyInProfile(weaponProperties::burstConstant) || propertyInProfile(weaponProperties::burstVariable))
+	{
+		m_burstData.PrintData();
+	}
+	if (propertyInProfile(weaponProperties::illuminated))
+	{
+		
+		m_LightData.PrintData();
+	}
+	if (propertyInProfile(weaponProperties::areaOfEffectDamage) || propertyInProfile(weaponProperties::areaOfEffectNoDamage))
+	{
+		m_AOEData.PrintData();
+	}
+	if (propertyInProfile(weaponProperties::bounceExact) || propertyInProfile(weaponProperties::bounceVariable))
+	{
+		m_bounceData.PrintData();
+	}
 }

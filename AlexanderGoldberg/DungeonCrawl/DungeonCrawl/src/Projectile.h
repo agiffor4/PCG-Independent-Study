@@ -31,6 +31,7 @@ protected:
 	World* m_world = nullptr;
 	void die();
 	Vector2 rotateDirectionByDegrees(Vector2 _direction, float _degrees);
+	void getExactBounceDirection(int& _degreeOffset, const Vector2& _surfacePosition);
 public:
 	Projectile();
 	~Projectile();

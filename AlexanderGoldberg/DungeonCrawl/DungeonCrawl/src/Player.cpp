@@ -351,6 +351,12 @@ void Player::Render(SDL_Renderer* _renderer)
 void Player::EquipWeapon(Weapon* _weapon)
 {
 	m_equipedWeapon = _weapon;
+	if (m_equipedWeapon != nullptr)
+	{
+		printf("\n\n\n");
+		m_equipedWeapon->PrintWeaponInfo();
+		printf("\n\n\n");
+	}
 }
 
 int Player::GetAmmo()

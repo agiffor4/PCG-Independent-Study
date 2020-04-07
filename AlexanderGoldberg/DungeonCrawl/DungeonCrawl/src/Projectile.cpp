@@ -110,6 +110,9 @@ void Projectile::SetStructData(World* _world, WeaponStructs::ProjectileStruct _p
 	m_aoeData = _aoeData;
 	m_lightData = _lightData;
 	m_bounceData = _bounceData;
+	m_bounceData.initalX = m_direction.X;
+	m_bounceData.initalY = m_direction.Y;
+
 }
 
 void Projectile::Update(float _dt) 
@@ -134,19 +137,39 @@ void Projectile::OnCollision(Thing* _other)
 				}
 				if (d != nullptr)
 					d->TakeDamage(m_damage);
+				else
+					die();
 				m_projectileData.LastThingHit = _other;
 			}
 			
 		}
 		else if (hasProperty(Property::bounceExact) || hasProperty(Property::bounceVariable))
 		{
-			if (hasProperty(Property::bounceExact))
+			if (!m_bounceData.RecentlyHit(_other))
 			{
-				m_direction = rotateDirectionByDegrees(m_direction, m_direction.X > 0 ? 90 : -90);
-			}
-			else
-			{
+				int degreeOffset = 90;
+				if (m_bounceData.bounceMax > 0)
+				{
+					if (hasProperty(Property::bounceExact))
+					{
+						getExactBounceDirection(degreeOffset, _other->GetPosition());
+						
+						m_direction = rotateDirectionByDegrees(m_direction, degreeOffset);
+						
+						setAngle(vectorToAngle(m_direction));
+					}
+					else
+					{
 
+					}
+				}
+				else
+				{
+					die();
+				}
+				m_bounceData.bounceMax--;
+				m_bounceData.thisBounce++;
+				m_bounceData.LastThingHit[m_bounceData.Index()] = _other;
 			}
 		}
 		else
@@ -154,6 +177,7 @@ void Projectile::OnCollision(Thing* _other)
 
 			if (d != nullptr)
 				d->TakeDamage(m_damage);
+			die();
 		}
 
 		
@@ -243,5 +267,19 @@ Vector2 Projectile::rotateDirectionByDegrees(Vector2 _direction, float _degrees)
 	_direction.X = x;
 	_direction.Y = y;
 	return _direction;
+}
+
+void Projectile::getExactBounceDirection(int& _degreeOffset, const Vector2& _surfacePosition)
+{
+	float currentDistance = Vector2::GetMagnitude(GetPosition(), _surfacePosition);
+	Vector2 direction1 = rotateDirectionByDegrees(m_direction, _degreeOffset);
+	Vector2 aproxNextPos1 = GetPosition() + (direction1 * m_speed * m_speedMultiplier * 0.0166667f * m_projectileData.projectileSpeedMultiplier);
+	//Vector2 direction2 = rotateDirectionByDegrees(m_direction, _degreeOffset * -1);
+	//Vector2 aproxNextPos2 = GetPosition() + (direction2 * m_speed * m_speedMultiplier * 0.0166667f * m_projectileData.projectileSpeedMultiplier);
+	float distance1 = Vector2::GetMagnitude(aproxNextPos1, _surfacePosition);
+	if (distance1 < currentDistance)
+	{
+		_degreeOffset *= -1;
+	}
 }
 
