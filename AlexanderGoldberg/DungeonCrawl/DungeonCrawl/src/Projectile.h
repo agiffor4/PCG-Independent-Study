@@ -43,6 +43,7 @@ public:
 	bool HomingTargetIsValid();
 	std::set<Tile*> GetEffectedTiles(Tile* _epicenter);
 	void Illuminate(bool _lightUp);
+	void Render(SDL_Renderer* _renderer) override;
 	
 };
 

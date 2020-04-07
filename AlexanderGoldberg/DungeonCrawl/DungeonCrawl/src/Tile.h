@@ -171,6 +171,6 @@ public:
 	void SetIlluminated(bool _illuminated, int _distanceFromLightsource, int _illuminationStrength = 0);
 	void SetFogOfWar(bool _inFogOfWar, int _distanceFromSource);
 	const std::vector<Interactable*>& GetItems();
-	
+	SDL_Color GetIllumination();
 };
 

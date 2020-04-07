@@ -313,6 +313,23 @@ void Projectile::Illuminate(bool _lightUp) {
 	}
 }
 
+void Projectile::Render(SDL_Renderer* _renderer)
+{
+	if (m_shouldRender)
+	{
+		if (m_currentTileIn != nullptr)
+		{
+			storeTextureColorMod();
+			setTextureColorMod(m_currentTileIn->GetIllumination());
+		}
+		
+		Renderable::Render(_renderer);
+		if (m_currentTileIn != nullptr)
+			revertTextureColorMod();
+	}
+	
+}
+
 
 Vector2 Projectile::rotateDirectionByDegrees(Vector2 _direction, float _degrees)
 {

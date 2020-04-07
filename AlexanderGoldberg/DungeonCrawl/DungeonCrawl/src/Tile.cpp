@@ -10,7 +10,7 @@
 Tile::Tile() {
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::MOUSEUP);
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::UP);
-	//m_renderFogOfWar = false;
+	
 }
 Tile::~Tile() {
 	Renderable::CleanUp();
@@ -346,7 +346,7 @@ void Tile::Render(SDL_Renderer* _renderer)
 		}
 		else
 		{
-			
+
 			if (m_illuminated)
 			{
 				shade = 255 - (m_distanceFromLightsource * ((m_lightModifer - m_illuminationStrength) / 2));
@@ -363,8 +363,6 @@ void Tile::Render(SDL_Renderer* _renderer)
 			}
 		}
 	}
-	
-	
 	Renderable::Render(_renderer);
 
 	if (!m_renderFogOfWar || !m_inFogOfWar)
@@ -656,6 +654,37 @@ void Tile::SetFogOfWar(bool _inFogOfWar, int _distanceFromSource)
 const std::vector<Interactable*>& Tile::GetItems()
 {
 	return m_items;
+}
+
+SDL_Color Tile::GetIllumination()
+{
+
+	if (m_renderFogOfWar)
+	{
+		Uint8 fogTint = 50;
+		Uint8 shade = 255;
+		if (m_inFogOfWar)
+		{
+			
+			return { fogTint , fogTint , fogTint , 100};
+		}
+		else
+		{
+
+			if (m_illuminated)
+			{
+				shade = 255 - (m_distanceFromLightsource * ((m_lightModifer - m_illuminationStrength) / 2));
+				if (shade < fogTint)
+					shade = fogTint;
+				return { shade, shade, shade, 100 };
+			}
+			else
+			{
+				return { shade, shade, shade, 100 };
+			}
+		}
+	}
+	return { 255, 255, 255, 255 };
 }
 
 
