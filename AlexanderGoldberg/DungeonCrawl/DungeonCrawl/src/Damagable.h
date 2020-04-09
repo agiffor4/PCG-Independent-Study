@@ -1,6 +1,9 @@
 #pragma once
 #include "Thing.h"
 #include "Timer.h"
+#include <vector>
+#include "Enums.h"
+using namespace Enums;
 class Damagable :
 	public Thing
 {
@@ -10,6 +13,9 @@ protected:
 	Timer m_regenTimer = Timer(0.5f);
 	int m_regenRate = 0;
 	int m_regenAmount = 0;
+	std::vector<DamageType> m_vulnarabilites;
+	std::vector<DamageType> m_resitances;
+	bool vectorContainsDamageType(const std::vector<DamageType>& _vectorToCheck, DamageType _damageTypeToCheckFor);
 	virtual void die();
 public:
 	void SetHealthMax(int _healthMax, bool _effectcurrentHealth = true);
@@ -18,8 +24,8 @@ public:
 	void SetRegenAmount(int _regenAmount);
 	Damagable();
 	~Damagable();
-	bool TakeDamage(int _amount); //returns true if damage reduces health to 0 or less
-	bool Heal(int _amount); // returns true if already at max health
+	virtual bool TakeDamage(int _amount, DamageType _type); //returns true if damage reduces health to 0 or less
+	virtual bool Heal(int _amount); // returns true if already at max health
 	bool IsDead();
 	float GetHealth();
 	float GetHealthAsPercent();

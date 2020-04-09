@@ -2,6 +2,7 @@
 #include "Timer.h"
 #include "Vector2.h"
 #include "Thing.h"
+#include "Enums.h"
 namespace WeaponStructs 
 {
 
@@ -26,6 +27,7 @@ namespace WeaponStructs
 		int recoilMultiplier = 0;
 		int piercingCount = 1;
 		int DamageAmount = 5;
+		Enums::DamageType KindOfDamage = Enums::DamageType::Piercing;
 		Thing* LastThingHit = nullptr;
 		void PrintData()
 		{

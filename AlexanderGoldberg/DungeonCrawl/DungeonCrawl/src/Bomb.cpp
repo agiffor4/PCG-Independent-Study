@@ -2,6 +2,7 @@
 #include "Tile.h"
 #include "World.h"
 #include "Damagable.h"
+#include "Enums.h"
 Bomb::Bomb(World* _world)
 {
 	m_world = _world;
@@ -35,7 +36,7 @@ void Bomb::Detonate()
 				Damagable* d = dynamic_cast<Damagable*>(t->GetContents());
 				if (d != nullptr)
 				{
-					d->TakeDamage(m_damageInflicted);
+					d->TakeDamage(m_damageInflicted, Enums::DamageType::Concussive);
 				}
 			}
 		}
@@ -44,7 +45,7 @@ void Bomb::Detonate()
 			Damagable* d = dynamic_cast<Damagable*>(t->GetItems()[i]);
 			if (d != nullptr)
 			{
-				d->TakeDamage(m_damageInflicted);
+				d->TakeDamage(m_damageInflicted, Enums::DamageType::Concussive);
 			}
 		}
 	}

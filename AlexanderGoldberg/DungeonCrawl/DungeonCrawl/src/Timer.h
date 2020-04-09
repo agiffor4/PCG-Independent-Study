@@ -13,6 +13,8 @@ public:
 	void SetShouldCountDown(bool val);
 	void SetTimer(float time);
 	void SetCurrentTime(float time);
+	float GetResetTime();
+	float GetCurrentTime();
 	Timer(float startTime);
 	~Timer();
 };

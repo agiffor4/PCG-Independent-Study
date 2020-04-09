@@ -207,6 +207,9 @@
     <ClCompile Include="src\WeaponStructs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\StatusEffect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\DeltaTime.h">
@@ -615,6 +618,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\WeaponStructs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EnemyDataStructs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Enums.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StatusEffect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

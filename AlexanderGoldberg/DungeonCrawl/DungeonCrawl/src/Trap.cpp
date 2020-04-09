@@ -19,7 +19,7 @@ void Trap::InteractionOnEnteringTile(Thing* _thingInitatingInteraction)
 		Player* p = dynamic_cast<Player*>(_thingInitatingInteraction);
 		if (p != nullptr)
 		{
-			p->TakeDamage(m_damageInfliction);
+			p->TakeDamage(m_damageInfliction, Enums::DamageType::Concussive);
 		}
 		if (m_trapCharges != -1)
 		{

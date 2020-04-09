@@ -53,7 +53,7 @@ void Projectile::die()
 			std::vector<Enemy*> enemiesInRange = m_world->GetEnemiesInTileRadius(m_currentTileIn->GetPositionInVector(), m_aoeData.AoeRadiusInTiles);	
 			for (size_t i = 0; i < enemiesInRange.size(); i++)
 			{
-				enemiesInRange[i]->TakeDamage(m_damage * m_aoeData.AoePercentageFallOffPerUnitDistance);
+				enemiesInRange[i]->TakeDamage(m_damage * m_aoeData.AoePercentageFallOffPerUnitDistance, m_projectileData.KindOfDamage);
 			}
 			if (hasProperty(Property::areaOfEffectDamage))
 			{
@@ -62,7 +62,7 @@ void Projectile::die()
 					Damagable* d = dynamic_cast<Damagable*>(m_owner);
 					if (d != nullptr)
 					{
-						d->TakeDamage(m_damage * m_aoeData.AoePercentageFallOffPerUnitDistance);
+						d->TakeDamage(m_damage * m_aoeData.AoePercentageFallOffPerUnitDistance, m_projectileData.KindOfDamage);
 					}
 				}
 				
@@ -139,7 +139,7 @@ void Projectile::OnCollision(Thing* _other)
 					die();
 				}
 				if (d != nullptr)
-					d->TakeDamage(m_damage);
+					d->TakeDamage(m_damage, m_projectileData.KindOfDamage);
 				else
 					die();
 				m_projectileData.LastThingHit = _other;
@@ -237,7 +237,7 @@ void Projectile::OnCollision(Thing* _other)
 		{
 
 			if (d != nullptr)
-				d->TakeDamage(m_damage);
+				d->TakeDamage(m_damage, m_projectileData.KindOfDamage);
 			die();
 		}
 

@@ -1,5 +1,17 @@
 #include "Damagable.h"
 
+bool Damagable::vectorContainsDamageType(const std::vector<DamageType>& _vectorToCheck, DamageType _damageTypeToCheckFor)
+{
+	for (size_t i = 0; i < _vectorToCheck.size(); i++)
+	{
+		if (_vectorToCheck[i] == _damageTypeToCheckFor)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void Damagable::die()
 {
 }
@@ -45,8 +57,12 @@ Damagable::~Damagable()
 {
 }
 
-bool Damagable::TakeDamage(int _amount)
+bool Damagable::TakeDamage(int _amount, DamageType _type)
 {
+	if (vectorContainsDamageType(m_vulnarabilites, _type))
+		_amount *= 2;
+	if (vectorContainsDamageType(m_resitances, _type))
+		_amount *= 0.5f;
 	m_health -= _amount;
 	if (m_health < 0)
 		m_health = 0;

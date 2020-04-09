@@ -284,7 +284,7 @@ void Weapon::generateSpreadData()
 {
 	if (getChance(50))
 	{
-		if (getChance(75))
+		if (getChance(75) || m_triggerData.shotsFiredperTriggerPull < 2)
 		{
 			addPropertyToProfile(weaponProperties::spreadRandom);
 

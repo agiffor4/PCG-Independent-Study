@@ -206,11 +206,14 @@
     <ClCompile Include="src\WeaponShotgun.cpp" />
     <ClCompile Include="src\WeaponTriplicate.cpp" />
     <ClCompile Include="src\StatusEffectable.cpp" />
+    <ClCompile Include="src\StatusEffect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Enemy.h" />
     <ClInclude Include="src\EnemyCombat.h" />
+    <ClInclude Include="src\EnemyDataStructs.h" />
     <ClInclude Include="src\EnemyMovement.h" />
+    <ClInclude Include="src\Enums.h" />
     <ClInclude Include="src\MouseAim.h" />
     <ClInclude Include="src\Projectile.h" />
     <ClInclude Include="src\BombDisarmer.h" />
@@ -344,6 +347,7 @@
     <ClInclude Include="src\WeaponShotgun.h" />
     <ClInclude Include="src\WeaponTriplicate.h" />
     <ClInclude Include="src\StatusEffectable.h" />
+    <ClInclude Include="src\StatusEffect.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL\lib\x64\SDL2.dll" />

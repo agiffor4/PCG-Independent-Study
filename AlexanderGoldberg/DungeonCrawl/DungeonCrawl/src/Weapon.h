@@ -79,6 +79,7 @@ protected:
 	void applyHomingAsApplicable();
 	void setProjectileHomeTargetsToNearest(float _maxDistance);
 
+	//UTILITY
 	int getRandomInRange(int _min, int _max);
 	bool propertyInProfile(weaponProperties _property);
 	void addPropertyToProfile(weaponProperties _property);

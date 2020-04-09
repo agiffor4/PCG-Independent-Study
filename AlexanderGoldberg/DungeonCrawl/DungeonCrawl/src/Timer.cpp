@@ -44,3 +44,13 @@ void Timer::SetTimer(float time) {
 void Timer::SetCurrentTime(float time) {
 	m_time = time;
 }
+
+float Timer::GetResetTime()
+{
+	return m_resetTime;
+}
+
+float Timer::GetCurrentTime()
+{
+	return m_time;
+}
