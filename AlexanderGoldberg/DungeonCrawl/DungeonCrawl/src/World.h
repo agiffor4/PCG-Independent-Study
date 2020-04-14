@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include <set>
+#include <stack>
 #include <string>
 #include "Vector2.h"
 #include "IInputHandler.h"
@@ -49,6 +50,7 @@ protected:
 	void setWindowTitle();
 	void generateTreasure();
 	void generateWeapon();
+	void generateFoes();
 	void generateChests();
 	void createTreasureInRoom(int _roomToCreateTreasureIn);
 	void createWeaponInRoom(int _roomToCreateTreasureIn);
@@ -68,19 +70,30 @@ public:
 	~World();
 	bool IsViableDirectionToMoveIn(int _currentTileIndex, TileDirection _direction);
 	Tile* GetAdjacentTile(int _currentTileIndex, TileDirection _direction);
+	bool TileIsAdajcent(Tile* _tileOrigin, Tile* _toCheck);
+	bool TileIsAdajcent(int _tileOrigin, int _toCheck);
 	Tile* GetTileAtIndex(int _index);
 	Tile* GetTileAtPosition(int _x, int _y);
 	Tile* GetTile(Tile& _tile);
 	Vector2 GetMapDimentions();
 	void SetWindowRef(SDL_Window* _window);
 	std::vector<Tile*> GetNeighbors(Tile* _tileToFindNeighborsFor, bool _getDiagonals = true);
+	Tile* GetNeigborNearestTarget(Tile* _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals = true);
+	Tile* GetNeigborNearestTarget(Tile* _tileToFindNeighborsFor, int _target, bool _getDiagonals = true);
+	Tile* GetNeigborNearestTarget(int _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals = true);
+	Tile* GetNeigborNearestTarget(int _tileToFindNeighborsFor, int _target, bool _getDiagonals = true);
+	Tile* GetNeigborFurthestFromTarget(Tile* _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals = true);
+	Tile* GetNeigborFurthestFromTarget(Tile* _tileToFindNeighborsFor, int _target, bool _getDiagonals = true);
+	Tile* GetNeigborFurthestFromTarget(int _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals = true);
+	Tile* GetNeigborFurthestFromTarget(int _tileToFindNeighborsFor, int _target, bool _getDiagonals = true);
+	Player* GetPlayer();
 	std::vector<Tile*> GetNeighbors(int _tileToFindNeighborsFor, bool _getDiagonals = true);
 	std::vector<Tile*> GetTiles();
 	int GetRandomTileInRoom(int _roomIndexToGetRandomTileFrom);
 	void AddTile(Tile* _renderable);
 	int GetTileCount();	
 	Vector2 GetTileSize();
-	
+	std::stack<int> FindPathFrom(Tile* _start, Tile* _end);
 	void GenerateTiles(int _screenWidth, int _screenHeight);
 	void Generate();
 	void GenerateLevel();

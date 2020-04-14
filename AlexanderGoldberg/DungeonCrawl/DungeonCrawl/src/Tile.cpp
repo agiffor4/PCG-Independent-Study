@@ -49,13 +49,13 @@ bool Tile::IsCorridor()
 }
 void Tile::SetContents(Thing* _newContents)
 {
-	if (m_contents != nullptr)
+	/*if (m_contents != nullptr)
 	{
 		if (m_contents->ShouldDelete())
 			delete(m_contents);
 		else
 			m_contents->SetLocation(nullptr);
-	}
+	}*/
 	
 	m_contents = _newContents;
 	for (size_t i = 0; i < m_items.size(); i++)
@@ -71,9 +71,10 @@ Thing* Tile::GetContents()
 void Tile::MoveContentsTo(Tile* _newLocation)
 {
 	_newLocation->SetContents(m_contents);
+	m_contents->SetLocation(_newLocation);
 	SetContents(nullptr);
 }
-bool Tile::IsPassable(bool _ignoreInteractables) { return m_passable && (_ignoreInteractables ? true : blockingInteractable()); }
+bool Tile::IsPassable(bool _ignoreInteractables) { return m_passable && (_ignoreInteractables ? true : blockingInteractable()) && m_contents == nullptr; }
 
 bool Tile::blockingInteractable() {
 	
@@ -438,28 +439,28 @@ void Tile::DetermineTileType(World* _world)
 	m_tilerRenderType = TileRenderType::empty;
 	Uint8 flag = 0;
 	Tile* t = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::UP);
-	if(t == nullptr || !t->IsPassable(true))
+	if(t == nullptr || !t->m_passable)
 		flag |= (Uint8)WallNeigbors::above;
 	t = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::DOWN);
-	if (t == nullptr || !t->IsPassable(true))
+	if (t == nullptr || !t->m_passable)
 		flag |= (Uint8)WallNeigbors::below;
 	t = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::LEFT);
-	if (t == nullptr || !t->IsPassable(true))
+	if (t == nullptr || !t->m_passable)
 		flag |= (Uint8)WallNeigbors::left;
 	t = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::RIGHT);
-	if (t == nullptr || !t->IsPassable(true))
+	if (t == nullptr || !t->m_passable)
 		flag |= (Uint8)WallNeigbors::right;
 	t = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::UPRIGHT);
-	if (t == nullptr || !t->IsPassable(true))
+	if (t == nullptr || !t->m_passable)
 		flag |= (Uint8)WallNeigbors::northeast;
 	t = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::UPLEFT);
-	if (t == nullptr || !t->IsPassable(true))
+	if (t == nullptr || !t->m_passable)
 		flag |= (Uint8)WallNeigbors::northwest;
 	t = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::DOWNRIGHT);
-	if (t == nullptr || !t->IsPassable(true))
+	if (t == nullptr || !t->m_passable)
 		flag |= (Uint8)WallNeigbors::southeast;
 	t = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::DOWNLEFT);
-	if (t == nullptr || !t->IsPassable(true))
+	if (t == nullptr || !t->m_passable)
 		flag |= (Uint8)WallNeigbors::southwest;
 
 	if (flag & (Uint8)WallNeigbors::below && (flag ^ (Uint8)WallNeigbors::above) && (flag ^ (Uint8)WallNeigbors::right) && (flag ^ (Uint8)WallNeigbors::left))
@@ -496,14 +497,14 @@ void Tile::DetermineTileType(World* _world)
 		Tile* adj = _world->GetAdjacentTile(GetPositionInVector(), World::TileDirection::UP);
 		if (adj != nullptr)
 		{
-			if (IsPassable(true) == adj->IsPassable(true))// if tile above has the same passailty as this one
+			if (m_passable == adj->m_passable)// if tile above has the same passailty as this one
 			{
 				
 				SetPosition(Vector2(adj->GetPosition().X, adj->GetPosition().Y + GetDestination().w));
 			}
 			else
 			{ 
-				if (IsPassable(true))// if not a wall
+				if (m_passable)// if not a wall
 				{
 					SetPosition(Vector2(adj->GetPosition().X, adj->GetPosition().Y + GetDestination().w + 12));
 				}
@@ -515,7 +516,7 @@ void Tile::DetermineTileType(World* _world)
 			}
 		}
 		
-		if (IsPassable(true))
+		if (m_passable)
 		{
 			Shadow* s = nullptr;
 			switch (m_tilerRenderType)

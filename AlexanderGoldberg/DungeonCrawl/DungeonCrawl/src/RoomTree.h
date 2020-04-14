@@ -12,6 +12,7 @@ private:
 	void unlockRooms(int _roomToUnlock, int _originLockRoom, std::vector<bool>& _alreadyUnlocked);
 	void lockRooms(int _roomToLock);
 	int m_deepestDepth = -1;
+	int m_root = -1;
 public:	
 	RoomTree();
 	~RoomTree();
@@ -25,8 +26,9 @@ public:
 	bool IsRoomDepthGreaterOrEqual(int _roomToCheck, int _depthToCheck);
 	bool IsRoomDepthInRange(int _roomToCheck, int _depthToCheckMin, int _depthToCheckMax);
 	int GetRandomParentWithinRange(int _maxNumberOfparents, int _startingRoomIndex);
-
+	int GetFirstChildOfRoomWithTreePosition(int _parentRoom);
 	int GetRoomDepth(int _room);
+	int GetRootIndexInTree();
 	void PrintTree();
 	void PrintBranch(std::vector<RoomTreeNode*> _children, int _parentIndex, std::vector<bool>& _printedAlready);
 };

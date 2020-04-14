@@ -19,6 +19,16 @@ Tile* Thing::GetLocation()
 	return m_location;
 }
 
+Vector2 Thing::GetPositionInGrid()
+{
+	return m_location->GetPositionInGrid();
+}
+
+int Thing::GetPositionInVector()
+{
+	return m_location->GetPositionInVector();
+}
+
 bool Thing::ShouldDelete() {
 	return m_shouldDelete;
 }

@@ -16,6 +16,9 @@ public:
 	~Thing();
 	virtual void SetLocation(Tile* _newLocation);
 	Tile* GetLocation();
+
+	Vector2 GetPositionInGrid();
+	int GetPositionInVector();
 	bool ShouldDelete();
 	bool IsSolid();
 	bool ShouldCheckCollision();

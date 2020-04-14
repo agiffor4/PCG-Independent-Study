@@ -219,6 +219,7 @@ void Weapon::fire(Vector2 _direction, bool _costAmmo, bool _ignoreCooldown)
 	
 }
 
+
 int Weapon::getRandomInRange(int _min, int _max)
 {
 	if (_max < _min)

@@ -258,6 +258,25 @@ Tile* World::GetAdjacentTile(int _currentTileIndex, TileDirection _direction)
 	
 }
 
+bool World::TileIsAdajcent(Tile* _tileOrigin, Tile* _toCheck)
+{
+	return TileIsAdajcent(_tileOrigin->GetPositionInVector(), _toCheck->GetPositionInVector());
+}
+
+bool World::TileIsAdajcent(int _tileOrigin, int _toCheck)
+{
+	std::vector<Tile*> neighbors = GetNeighbors(_tileOrigin);
+	for (size_t i = 0; i < neighbors.size(); i++)
+	{
+		if (neighbors[i]->GetPositionInVector() == _toCheck)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 Tile* World::GetTileAtIndex(int _index) 
 {
 	return _index > -1 && _index < m_tiles.size() ? m_tiles[_index] : nullptr;
@@ -311,6 +330,79 @@ std::vector<Tile*> World::GetNeighbors(Tile* _tileToFindNeighborsFor, bool _getD
 	return GetNeighbors(_tileToFindNeighborsFor->GetPositionInVector());
 }
 
+Tile* World::GetNeigborNearestTarget(Tile* _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals)
+{
+	return GetNeigborNearestTarget(_tileToFindNeighborsFor->GetPositionInVector(), _target->GetPositionInVector());
+}
+
+Tile* World::GetNeigborNearestTarget(Tile* _tileToFindNeighborsFor, int _target, bool _getDiagonals)
+{
+	return GetNeigborNearestTarget(_tileToFindNeighborsFor->GetPositionInVector(), _target);
+}
+
+Tile* World::GetNeigborNearestTarget(int _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals)
+{
+	return GetNeigborNearestTarget(_tileToFindNeighborsFor, _target->GetPositionInVector());
+}
+
+Tile* World::GetNeigborNearestTarget(int _tileToFindNeighborsFor, int _target, bool _getDiagonals)
+{
+	std::vector<Tile*> neighbors = GetNeighbors(_tileToFindNeighborsFor, _getDiagonals);
+	Tile* target = GetTileAtIndex(_target);
+	float minDist = Vector2::GetSquareDistance(neighbors[0]->GetPositionInGrid(), GetTileAtIndex(_target)->GetPositionInGrid());
+	float currDist = minDist;
+	int index = 0;
+	for (size_t i = 1; i < neighbors.size(); i++)
+	{
+		currDist = Vector2::GetSquareDistance(neighbors[i]->GetPositionInGrid(), GetTileAtIndex(_target)->GetPositionInGrid());
+		if (currDist < minDist)
+		{
+			index = i;
+		}
+	}
+
+	return neighbors[index];
+}
+
+Tile* World::GetNeigborFurthestFromTarget(Tile* _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals)
+{
+	return GetNeigborFurthestFromTarget(_tileToFindNeighborsFor->GetPositionInVector(), _target->GetPositionInVector());
+}
+
+Tile* World::GetNeigborFurthestFromTarget(Tile* _tileToFindNeighborsFor, int _target, bool _getDiagonals)
+{
+	return GetNeigborFurthestFromTarget(_tileToFindNeighborsFor->GetPositionInVector(), _target);
+}
+
+Tile* World::GetNeigborFurthestFromTarget(int _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals)
+{
+	return GetNeigborFurthestFromTarget(_tileToFindNeighborsFor, _target->GetPositionInVector());
+}
+
+Tile* World::GetNeigborFurthestFromTarget(int _tileToFindNeighborsFor, int _target, bool _getDiagonals)
+{
+	std::vector<Tile*> neighbors = GetNeighbors(_tileToFindNeighborsFor, _getDiagonals);
+	Tile* target = GetTileAtIndex(_target);
+	float maxDist = Vector2::GetSquareDistance(neighbors[0]->GetPositionInGrid(), GetTileAtIndex(_target)->GetPositionInGrid());
+	float currDist = maxDist;
+	int index = 0;
+	for (size_t i = 1; i < neighbors.size(); i++)
+	{
+		currDist = Vector2::GetSquareDistance(neighbors[i]->GetPositionInGrid(), GetTileAtIndex(_target)->GetPositionInGrid());
+		if (currDist > maxDist)
+		{
+			index = i;
+		}
+	}
+
+	return neighbors[index];
+}
+
+Player* World::GetPlayer()
+{
+	return m_player;
+}
+
 std::vector<Tile*> World::GetNeighbors(int _tileToFindNeighborsFor, bool _getDiagonals)
 {
 	std::vector<Tile*> neighbors;
@@ -338,6 +430,16 @@ int World::GetRandomTileInRoom(int _roomIndexToGetRandomTileFrom)
 
 Vector2 World::GetTileSize(){
 	return m_tiles[0]->GetCurrentSize();
+}
+
+std::stack<int> World::FindPathFrom(Tile* _start, Tile* _end)
+{
+
+	AStarSearch astar = AStarSearch();
+	astar.Initialize(GetMapDimentions(), m_tiles.size(), false);
+	astar.CastTilesToAStarNodes((*this), false);
+	std::stack<int> path = astar.BeginSearch(_start->GetPositionInVector(), _end->GetPositionInVector(), false);
+	return path;
 }
 
 void World::GenerateTiles(int _screenWidth, int _screenHeight) {
@@ -644,7 +746,7 @@ void World::GenerateItems(int _exitLocation, BSP* _bspToUse) {
 	l->Init("img/Torch.png", "Light", m_scene->GetRenderer(), this);
 	m_tiles[randomTile]->AddItem(l);
 	generateWeapon();
-
+	generateFoes();
 	
 }
 
@@ -673,6 +775,25 @@ void World::generateWeapon()
 			}
 		}
 	}
+}
+
+void World::generateFoes()
+{
+	RoomTree roomTree = RoomTree();
+	roomTree.GenerateRoomTree(m_roomsData, GetIndexOfRoomTileIsIn(m_playerStart));
+	
+	int roomIndex = roomTree.GetFirstChildOfRoomWithTreePosition(roomTree.GetRootIndexInTree());
+	if (roomIndex != -1)
+	{
+		Enemy* e = new Enemy();
+		e->Init("img/pics/coin.png", "Enemy", m_scene->GetRenderer());
+		e->GenerateEnemy(1, this, m_roomsData[roomIndex]);
+		Tile* t = GetTileAtIndex(m_roomsData[roomIndex].GetRandomTile());
+		e->SetScale(m_tiles[0]->GetScale());
+		e->SetLocation(t);
+		t->SetContents(e);
+	}
+
 }
 
 void World::generateChests()

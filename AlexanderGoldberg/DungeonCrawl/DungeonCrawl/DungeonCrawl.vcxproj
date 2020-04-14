@@ -154,7 +154,6 @@
   <ItemGroup>
     <ClCompile Include="src\Enemy.cpp" />
     <ClCompile Include="src\EnemyCombat.cpp" />
-    <ClCompile Include="src\EnemyMovement.cpp" />
     <ClCompile Include="src\MouseAim.cpp" />
     <ClCompile Include="src\Projectile.cpp" />
     <ClCompile Include="src\BombDisarmer.cpp" />
@@ -212,7 +211,6 @@
     <ClInclude Include="src\Enemy.h" />
     <ClInclude Include="src\EnemyCombat.h" />
     <ClInclude Include="src\EnemyDataStructs.h" />
-    <ClInclude Include="src\EnemyMovement.h" />
     <ClInclude Include="src\Enums.h" />
     <ClInclude Include="src\MouseAim.h" />
     <ClInclude Include="src\Projectile.h" />

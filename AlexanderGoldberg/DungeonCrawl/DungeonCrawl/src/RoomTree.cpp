@@ -20,6 +20,7 @@ void RoomTree::Clear() {
 }
 void RoomTree::GenerateRoomTree(const std::vector<RoomData>& _roomData, int _playerStartRoom)
 {
+	m_root = _playerStartRoom;
 	Clear();
 	for (size_t i = 0; i < _roomData.size(); i++)
 	{
@@ -102,9 +103,21 @@ int RoomTree::GetRandomParentWithinRange(int _maxNumberOfparents, int _startingR
 	}
 	return toReturn;
 }
+int RoomTree::GetFirstChildOfRoomWithTreePosition(int _parentRoom)
+{
+	if (_parentRoom > m_nodesInTree.size() - 1)
+		return -1;
+	if (m_nodesInTree[_parentRoom]->ChildCount() < 1)
+		return -1;
+	return m_nodesInTree[_parentRoom]->GetChild(0)->m_Index;
+}
 int RoomTree::GetRoomDepth(int _room)
 {
 	return m_nodesInTree[_room]->GetDepth();
+}
+int RoomTree::GetRootIndexInTree()
+{
+	return m_root;
 }
 void RoomTree::PrintTree()
 {

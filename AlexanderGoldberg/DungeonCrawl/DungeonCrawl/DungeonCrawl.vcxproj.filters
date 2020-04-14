@@ -186,9 +186,6 @@
     <ClCompile Include="src\EnemyCombat.cpp">
       <Filter>Source Files\Things\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="src\EnemyMovement.cpp">
-      <Filter>Source Files\Things\Enemy</Filter>
-    </ClCompile>
     <ClCompile Include="src\Enemy.cpp">
       <Filter>Source Files\Things\Enemy</Filter>
     </ClCompile>
@@ -606,9 +603,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\StatusEffectable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\EnemyMovement.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\EnemyCombat.h">
