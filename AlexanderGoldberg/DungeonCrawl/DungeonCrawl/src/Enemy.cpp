@@ -233,6 +233,7 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 	addPropertyToProfile(EnemyProperty::movemetMoves);
 	addPropertyToProfile(EnemyProperty::behaviorCharge);
 	m_movementData.RoomBound = true;
+	m_chargeData.MinDistance = 2;
 	
 }
 
@@ -354,17 +355,17 @@ Enemy::Direction Enemy::IsInLine1RelativeTo2(int _point1, int _point2, int world
 	{
 		if (t1X < t2X)
 		{
-			if ((_point1 - _point2) % (worldWdith + 1) == 0)
+			if ((_point1 - _point2) % (worldWdith - 1) == 0)
 			{
-				return Enemy::Direction::UPLEFT;
+				return Enemy::Direction::UPRIGHT;
 			}
 		}
 		else
 		{
 			
-			if ((_point1 - _point2) % (worldWdith - 1) == 0)
+			if ((_point1 - _point2) % (worldWdith + 1) == 0)
 			{
-				return Enemy::Direction::UPRIGHT;
+				return Enemy::Direction::UPLEFT;
 			}
 		}
 	}
