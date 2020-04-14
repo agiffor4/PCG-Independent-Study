@@ -46,14 +46,25 @@ namespace  EnemyDataStructs
 		int ShieldMax = 10;
 		int ShieldCurrent = 10;
 	};
-
-	struct HealthStruct {
-		int HealthRegenRate = 1;
-		int HealthMax = 100;
-		int Health = 100;
-	};
 	struct VisibilityStruct
 	{
+		//Flicker
+		enum class VisibleStatus{
+			Visible,
+			Invisible,
+			Flickering
+		};
+		bool ConstTimes = true;
+		VisibleStatus Status = VisibleStatus::Visible;
+		VisibleStatus LastStatus = VisibleStatus::Visible;
+		int RandomnessPrecision = 1000;
+		Vector2 MinMaxInvisibleTime = Vector2(2, 2);
+		Vector2 MinMaxVisibleTime = Vector2(2, 2);
+		Vector2 MinMaxFlickerTime = Vector2(2, 2);
+		Timer TimeInvisible = Timer(1.0f);
+		Timer TimeVisible = Timer(1.0f);
+		Timer TimeFlickering = Timer(1.0f);
+		Timer FlickerRate = Timer(0.1f);
 
 	};
 

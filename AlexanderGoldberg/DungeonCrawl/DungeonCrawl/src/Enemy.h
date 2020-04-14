@@ -18,7 +18,7 @@ public:
 /*+05+*/		defenseShieldTimed = 16,
 /*+06+*/		defenseShieldBreakable = 32,
 /*+07+*/		defenseLeaveBarricades = 64,
-/*+08+*/		healthRegen = 128,
+				healthRegen = 128,
 /*+09+*/		contactAgressive = 256,
 /*+10+*/		visibilityInvisible = 512,
 /*+11+*/		visibilityFlicker = 1024,
@@ -26,8 +26,8 @@ public:
 /*+13+*/		mineLayer = 4096,
 				behaviorSeekout = 8192,
 				behaviorKeepDistance = 16384,
-/*+16+*/		behaviorCharge = 32768,
-/*+17+*/		behaviorPatrol = 65536,
+				behaviorCharge = 32768,
+				behaviorPatrol = 65536,
 /*+18+*/		// = 131072,
 /*+19+*/		// = 262144,
 /*+20+*/		// = 524288
@@ -49,6 +49,7 @@ protected:
 	RoomData m_roomSpawnedIn = RoomData();
 	//UTILITY
 	int getRandomInRange(int _min, int _max);
+	float getRandominRange(float _min, float _max, int _placesToRight);
 	bool propertyInProfile(EnemyProperty _property);
 	void addPropertyToProfile(EnemyProperty _property);
 	void removePropertyFromProfile(EnemyProperty _property);
@@ -61,7 +62,6 @@ protected:
 	EnemyDataStructs::MovementStruct m_movementData = EnemyDataStructs::MovementStruct();
 	EnemyDataStructs::ChargeStruct m_chargeData = EnemyDataStructs::ChargeStruct();
 	EnemyDataStructs::ShieldStruct m_shieldData = EnemyDataStructs::ShieldStruct();
-	EnemyDataStructs::HealthStruct m_healthData = EnemyDataStructs::HealthStruct();
 	EnemyDataStructs::VisibilityStruct m_visibilityData = EnemyDataStructs::VisibilityStruct();
 	EnemyDataStructs::BehaviorStruct m_behaviorData = EnemyDataStructs::BehaviorStruct();
 	EnemyDataStructs::ContactStruct	m_contactData = EnemyDataStructs::ContactStruct();
@@ -73,6 +73,7 @@ protected:
 	void charge(float _dt);
 	void detect();
 	void chargeMovement();
+	void visible(float _dt);
 public:
 	Enemy();
 	~Enemy();

@@ -207,6 +207,56 @@ void Enemy::chargeMovement()
 	
 }
 
+void Enemy::visible(float _dt)
+{
+	switch (m_visibilityData.Status)
+	{
+	case EnemyDataStructs::VisibilityStruct::VisibleStatus::Visible:
+		if (m_visibilityData.TimeVisible.CountDown(_dt))
+		{
+			m_visibilityData.LastStatus = EnemyDataStructs::VisibilityStruct::VisibleStatus::Visible;
+			m_visibilityData.Status = EnemyDataStructs::VisibilityStruct::VisibleStatus::Flickering;
+			if (!m_visibilityData.ConstTimes)
+				m_visibilityData.TimeVisible.SetTimer(getRandominRange(m_visibilityData.MinMaxVisibleTime.X, m_visibilityData.MinMaxVisibleTime.Y, m_visibilityData.RandomnessPrecision));
+		}
+		break;
+	case EnemyDataStructs::VisibilityStruct::VisibleStatus::Invisible:
+		if (m_visibilityData.TimeInvisible.CountDown(_dt))
+		{
+			m_visibilityData.LastStatus = EnemyDataStructs::VisibilityStruct::VisibleStatus::Invisible;
+			m_visibilityData.Status = EnemyDataStructs::VisibilityStruct::VisibleStatus::Flickering;
+			if (!m_visibilityData.ConstTimes)
+				m_visibilityData.TimeInvisible.SetTimer(getRandominRange(m_visibilityData.MinMaxInvisibleTime.X, m_visibilityData.MinMaxInvisibleTime.Y, m_visibilityData.RandomnessPrecision));
+		}
+		break;
+	case EnemyDataStructs::VisibilityStruct::VisibleStatus::Flickering:
+		if (m_visibilityData.FlickerRate.CountDown(_dt))
+		{
+			m_shouldRender = !m_shouldRender;
+		}
+		if (m_visibilityData.TimeFlickering.CountDown(_dt))
+		{
+			if (m_visibilityData.LastStatus == EnemyDataStructs::VisibilityStruct::VisibleStatus::Invisible)
+			{
+				m_shouldRender = true;
+				m_visibilityData.Status = EnemyDataStructs::VisibilityStruct::VisibleStatus::Visible;
+			}
+			else
+			{
+				m_shouldRender = false;
+				m_visibilityData.Status = EnemyDataStructs::VisibilityStruct::VisibleStatus::Invisible;
+			}
+			m_visibilityData.LastStatus = EnemyDataStructs::VisibilityStruct::VisibleStatus::Flickering;
+			if (!m_visibilityData.ConstTimes)
+				m_visibilityData.TimeFlickering.SetTimer(getRandominRange(m_visibilityData.MinMaxFlickerTime.X, m_visibilityData.MinMaxFlickerTime.Y, m_visibilityData.RandomnessPrecision));
+		}
+		break;
+	default:
+		break;
+	}
+
+}
+
 
 
 void Enemy::Update(float _dt)
@@ -224,15 +274,21 @@ void Enemy::Update(float _dt)
 		}
 	}
 
+	if (propertyInProfile(EnemyProperty::visibilityFlicker))
+	{
+		visible(_dt);
+	}
+
 }
 
 void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawnedIn)
 {
 	m_world = _world;
 	m_roomSpawnedIn = _roomSpawnedIn;
-	addPropertyToProfile(EnemyProperty::movemetMoves);
-	addPropertyToProfile(EnemyProperty::behaviorCharge);
-	m_movementData.RoomBound = true;
+	//addPropertyToProfile(EnemyProperty::movemetMoves);
+	//addPropertyToProfile(EnemyProperty::behaviorSeekout);
+	addPropertyToProfile(EnemyProperty::visibilityFlicker);
+	m_movementData.RoomBound = false;
 	m_chargeData.MinDistance = 2;
 	
 }
@@ -248,6 +304,13 @@ int Enemy::getRandomInRange(int _min, int _max)
 	}
 	return (rand() % (_max + 1 - _min)) + _min;
 }
+
+float Enemy::getRandominRange(float _min, float _max, int _placesToRight)
+{
+	
+	return getRandomInRange(_min * _placesToRight, _max * _placesToRight) / _placesToRight;
+}
+
 
 bool Enemy::propertyInProfile(EnemyProperty _property)
 {
