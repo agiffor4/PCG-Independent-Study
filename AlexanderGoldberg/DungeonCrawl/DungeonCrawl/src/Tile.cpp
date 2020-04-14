@@ -76,6 +76,11 @@ void Tile::MoveContentsTo(Tile* _newLocation)
 }
 bool Tile::IsPassable(bool _ignoreInteractables) { return m_passable && (_ignoreInteractables ? true : blockingInteractable()) && m_contents == nullptr; }
 
+bool Tile::IsIlluminatable(bool _ignoreInteractables)
+{
+	return m_passable && (_ignoreInteractables ? true : blockingInteractable());
+}
+
 bool Tile::blockingInteractable() {
 	
 	for (size_t i = 0; i < m_items.size(); i++)
@@ -292,6 +297,9 @@ void Tile::PrintTileData()
 			printf("%s, ", m_shadows[i]->GetName().c_str());
 		printf("\n");
 	}
+	printf("In fog of war %s\n", (m_inFogOfWar ? "true" : "false"));
+	printf("In illuminated %s\n ", (m_illuminated ? "true" : "false"));
+	printf("In light source strength %d\n", m_illuminationStrength);
 }
 
 void Tile::ClearTileContents() {

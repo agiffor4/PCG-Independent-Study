@@ -397,7 +397,7 @@ std::set<Tile*> Player::getTilesInLineOfSight(Tile* _epicenter)
 			std::vector<Tile*> templist = m_world->GetNeighbors((*itt)->GetPositionInVector());
 			for (size_t i = 0; i < templist.size(); i++)
 			{
-				if (templist[i]->IsPassable())
+				if (templist[i]->IsIlluminatable())
 				{
 					tempNeigbors.push_back(templist[i]);
 				}

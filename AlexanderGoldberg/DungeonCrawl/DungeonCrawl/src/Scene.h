@@ -22,6 +22,7 @@ public:
 	void AddRenderable(const std::string _path, const std::string _name, float _x = 0, float _y = 0, float _renderDist = 0);
 	void AddRenderable(const std::string _path, const std::string _name, Vector2 _position, float _renderDist = 0);
 	void AddRenderable(Renderable* _renderable, float _renderDist = 0);
+	void AddCollidable(Renderable* _renderable);
 	void RemoveRenderable(Renderable* _renderable);
 	void ClearCollidables();
 	//int AddSound(AudioFileA& _sound, bool _playOnCreate);

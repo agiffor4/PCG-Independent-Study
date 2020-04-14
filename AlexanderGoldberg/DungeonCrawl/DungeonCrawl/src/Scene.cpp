@@ -27,6 +27,11 @@ void Scene::AddRenderable(Renderable* _renderable, float _renderDist)
 	
 }
 
+void Scene::AddCollidable(Renderable* _renderable)
+{
+	addCollidable(_renderable);
+}
+
 void Scene::RemoveRenderable(Renderable* _renderable)
 {
 	removeCollidable(_renderable);

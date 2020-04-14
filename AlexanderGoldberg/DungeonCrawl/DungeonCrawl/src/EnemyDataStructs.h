@@ -33,18 +33,24 @@ namespace  EnemyDataStructs
 	struct ShieldStruct 
 	{
 		//timer shield
-		Timer TimeOff = Timer(1.0f);
-		Timer TimeOn = Timer(1.0f);
-		float TimeShieldOn = 1.0f;
-		float TimeShieldOff = 1.0f;
+		Timer TimeOff = Timer(1.0f);// Timer for how long the timed shield should be on
+		Timer TimeOn = Timer(1.0f);	// Timer for how long the timed shield should be off
+		bool VariableTimes = false;
+		Vector2 MinMaxTimeOff = Vector2(1, 1);
+		Vector2 MinMaxTimeOn = Vector2(1, 1);
 
 		//breakable shield
-		bool Regens = false;
-		Timer RechargeTimerSec = Timer(1.0f);
-		float RechargeRate = 1.0f;
-		int RechargeAmount = 1;
-		int ShieldMax = 10;
-		int ShieldCurrent = 10;
+		bool Regens = false; //should the shield regenerate
+		Timer RechargeTimerSec = Timer(1.0f); //timer for shield regeneration
+		int RechargeAmount = 1; //amount to recharge per recharge increment
+		int ShieldMax = 10; //max shield strength
+		int ShieldCurrent = 10; // amount of shield strength left, for timed shields > 0 is on <= 0 is off
+		void Recharge() 
+		{
+			ShieldCurrent += RechargeAmount;
+			if (ShieldCurrent > ShieldMax)
+				ShieldCurrent = ShieldMax;
+		}
 	};
 	struct VisibilityStruct
 	{
@@ -56,15 +62,14 @@ namespace  EnemyDataStructs
 		};
 		bool ConstTimes = true;
 		VisibleStatus Status = VisibleStatus::Visible;
-		VisibleStatus LastStatus = VisibleStatus::Visible;
-		int RandomnessPrecision = 1000;
-		Vector2 MinMaxInvisibleTime = Vector2(2, 2);
-		Vector2 MinMaxVisibleTime = Vector2(2, 2);
-		Vector2 MinMaxFlickerTime = Vector2(2, 2);
-		Timer TimeInvisible = Timer(1.0f);
+		VisibleStatus LastStatus = VisibleStatus::Visible;	
+		Vector2 MinMaxInvisibleTime = Vector2(2, 2); //for the time to remain invisible if const times are false picks a random floating point number (of precision RandomPrecision) between teh X and Y value
+		Vector2 MinMaxVisibleTime = Vector2(2, 2);//for the time to remain visible if const times are false picks a random floating point number (of precision RandomPrecision) between teh X and Y value
+		Vector2 MinMaxFlickerTime = Vector2(2, 2);//for the time to flickering invisible if const times are false picks a random floating point number (of precision RandomPrecision) between teh X and Y value
+		Timer TimeInvisible = Timer(1.0f); 
 		Timer TimeVisible = Timer(1.0f);
 		Timer TimeFlickering = Timer(1.0f);
-		Timer FlickerRate = Timer(0.1f);
+		Timer FlickerRate = Timer(0.05f); //flicker rate while flickering
 
 	};
 

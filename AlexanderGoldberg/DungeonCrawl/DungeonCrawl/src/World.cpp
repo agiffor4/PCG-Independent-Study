@@ -787,11 +787,12 @@ void World::generateFoes()
 	{
 		Enemy* e = new Enemy();
 		e->Init("img/pics/coin.png", "Enemy", m_scene->GetRenderer());
-		e->GenerateEnemy(1, this, m_roomsData[roomIndex]);
 		Tile* t = GetTileAtIndex(m_roomsData[roomIndex].GetRandomTile());
 		e->SetScale(m_tiles[0]->GetScale());
+		e->GenerateEnemy(1, this, m_roomsData[roomIndex]);
 		e->SetLocation(t);
 		t->SetContents(e);
+		m_scene->AddCollidable(e);
 	}
 
 }

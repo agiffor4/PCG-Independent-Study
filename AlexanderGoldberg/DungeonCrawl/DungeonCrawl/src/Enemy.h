@@ -14,15 +14,15 @@ public:
 /*+01+*/		combatRanged = 1, //ranged combat exclusive with melee combat
 /*+02+*/		combatMelee = 2, //melee combat exclusive with ranged combat
 /*+03+*/		combatSummon = 4, //summons other enemies, not exclusive with other combat properties
-/*+04+*/		movemetMoves = 8, //if true allows movement, if false stationary
+				movemetMoves = 8, //if true allows movement, if false stationary
 /*+05+*/		defenseShieldTimed = 16,
 /*+06+*/		defenseShieldBreakable = 32,
 /*+07+*/		defenseLeaveBarricades = 64,
 				healthRegen = 128,
 /*+09+*/		contactAgressive = 256,
-/*+10+*/		visibilityInvisible = 512,
-/*+11+*/		visibilityFlicker = 1024,
-/*+12+*/		visibilityVisible = 2048,
+				visibilityInvisible = 512,
+				visibilityFlicker = 1024,
+				visibilityVisible = 2048,
 /*+13+*/		mineLayer = 4096,
 				behaviorSeekout = 8192,
 				behaviorKeepDistance = 16384,
@@ -46,10 +46,11 @@ protected:
 	Uint32 m_EnemyProfile = 0;
 	World* m_world = nullptr;
 	Player* m_player = nullptr;
+	Renderable* m_shieldImage = nullptr;
 	RoomData m_roomSpawnedIn = RoomData();
 	//UTILITY
 	int getRandomInRange(int _min, int _max);
-	float getRandominRange(float _min, float _max, int _placesToRight);
+	float getRandominRange(float _min, float _max);
 	bool propertyInProfile(EnemyProperty _property);
 	void addPropertyToProfile(EnemyProperty _property);
 	void removePropertyFromProfile(EnemyProperty _property);
@@ -74,11 +75,16 @@ protected:
 	void detect();
 	void chargeMovement();
 	void visible(float _dt);
+	void shield(float _dt);
+	void loadShieldImage();
+	void die() override;
 public:
 	Enemy();
 	~Enemy();
 	
 	void Update(float _dt) override;
 	void GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawnedIn);
+	bool TakeDamage(int _amount, DamageType _type) override;
+	void Render(SDL_Renderer* _renderer) override;
 };
 

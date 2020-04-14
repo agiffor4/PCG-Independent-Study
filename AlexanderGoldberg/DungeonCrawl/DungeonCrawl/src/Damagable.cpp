@@ -14,6 +14,8 @@ bool Damagable::vectorContainsDamageType(const std::vector<DamageType>& _vectorT
 
 void Damagable::die()
 {
+		
+	printf("%s died\n", m_name.c_str());
 }
 
 void Damagable::SetHealthMax(int _healthMax, bool _effectcurrentHealt)

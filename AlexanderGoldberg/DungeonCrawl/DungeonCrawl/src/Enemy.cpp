@@ -5,12 +5,16 @@
 #include <stack>
 Enemy::Enemy()
 {
-	m_shouldDelete = false;
+	m_solid = true;
 	
 }
 
 Enemy::~Enemy()
 {
+	if (m_shieldImage != nullptr)
+	{
+		delete(m_shieldImage);
+	}
 }
 
 void Enemy::move()
@@ -97,11 +101,7 @@ void Enemy::move()
 				}
 			}
 		}
-		
-		/*
-		behaviorChargeDamage = 3
-		behaviorChargeNoDamage =
-		*/
+	
 	}
 }
 
@@ -217,7 +217,7 @@ void Enemy::visible(float _dt)
 			m_visibilityData.LastStatus = EnemyDataStructs::VisibilityStruct::VisibleStatus::Visible;
 			m_visibilityData.Status = EnemyDataStructs::VisibilityStruct::VisibleStatus::Flickering;
 			if (!m_visibilityData.ConstTimes)
-				m_visibilityData.TimeVisible.SetTimer(getRandominRange(m_visibilityData.MinMaxVisibleTime.X, m_visibilityData.MinMaxVisibleTime.Y, m_visibilityData.RandomnessPrecision));
+				m_visibilityData.TimeVisible.SetTimer(getRandominRange(m_visibilityData.MinMaxVisibleTime.X, m_visibilityData.MinMaxVisibleTime.Y));
 		}
 		break;
 	case EnemyDataStructs::VisibilityStruct::VisibleStatus::Invisible:
@@ -226,7 +226,7 @@ void Enemy::visible(float _dt)
 			m_visibilityData.LastStatus = EnemyDataStructs::VisibilityStruct::VisibleStatus::Invisible;
 			m_visibilityData.Status = EnemyDataStructs::VisibilityStruct::VisibleStatus::Flickering;
 			if (!m_visibilityData.ConstTimes)
-				m_visibilityData.TimeInvisible.SetTimer(getRandominRange(m_visibilityData.MinMaxInvisibleTime.X, m_visibilityData.MinMaxInvisibleTime.Y, m_visibilityData.RandomnessPrecision));
+				m_visibilityData.TimeInvisible.SetTimer(getRandominRange(m_visibilityData.MinMaxInvisibleTime.X, m_visibilityData.MinMaxInvisibleTime.Y));
 		}
 		break;
 	case EnemyDataStructs::VisibilityStruct::VisibleStatus::Flickering:
@@ -248,13 +248,62 @@ void Enemy::visible(float _dt)
 			}
 			m_visibilityData.LastStatus = EnemyDataStructs::VisibilityStruct::VisibleStatus::Flickering;
 			if (!m_visibilityData.ConstTimes)
-				m_visibilityData.TimeFlickering.SetTimer(getRandominRange(m_visibilityData.MinMaxFlickerTime.X, m_visibilityData.MinMaxFlickerTime.Y, m_visibilityData.RandomnessPrecision));
+				m_visibilityData.TimeFlickering.SetTimer(getRandominRange(m_visibilityData.MinMaxFlickerTime.X, m_visibilityData.MinMaxFlickerTime.Y));
 		}
 		break;
 	default:
 		break;
 	}
 
+}
+
+void Enemy::shield(float _dt)
+{
+	if (propertyInProfile(EnemyProperty::defenseShieldBreakable))
+	{
+		if (m_shieldData.Regens)
+		{
+			if (m_shieldData.RechargeTimerSec.CountDown(_dt))
+			{
+				m_shieldData.Recharge();
+
+			}
+		}
+	}
+
+	if (propertyInProfile(EnemyProperty::defenseShieldTimed))
+	{
+		if (m_shieldData.TimeOn.CountDownAutoCheckBool(_dt))
+		{
+			m_shieldData.ShieldCurrent = 0;
+			m_shieldData.TimeOff.SetShouldCountDown(true);
+			if (m_shieldData.VariableTimes)
+				m_shieldData.TimeOff.SetTimer(getRandominRange(m_shieldData.MinMaxTimeOff.X, m_shieldData.MinMaxTimeOff.Y));
+		}
+		if (m_shieldData.TimeOff.CountDownAutoCheckBool(_dt))
+		{
+			m_shieldData.ShieldCurrent = 1;
+			m_shieldData.TimeOn.SetShouldCountDown(true);
+			if (m_shieldData.VariableTimes)
+				m_shieldData.TimeOn.SetTimer(getRandominRange(m_shieldData.MinMaxTimeOn.X, m_shieldData.MinMaxTimeOn.Y));
+		}
+	}
+}
+
+void Enemy::loadShieldImage()
+{
+	if (m_shieldImage == nullptr)
+	{
+		m_shieldImage = new Renderable();
+		m_shieldImage->Init("img/pics/shield.png", "Shield", m_rendererRef);
+		m_shieldImage->SetScale(GetScale());
+	}
+}
+
+void Enemy::die()
+{
+	m_shouldRender = false;
+	m_solid = false;
 }
 
 
@@ -279,6 +328,7 @@ void Enemy::Update(float _dt)
 		visible(_dt);
 	}
 
+	shield(_dt);
 }
 
 void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawnedIn)
@@ -287,10 +337,49 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 	m_roomSpawnedIn = _roomSpawnedIn;
 	//addPropertyToProfile(EnemyProperty::movemetMoves);
 	//addPropertyToProfile(EnemyProperty::behaviorSeekout);
-	addPropertyToProfile(EnemyProperty::visibilityFlicker);
+	//addPropertyToProfile(EnemyProperty::visibilityFlicker);
 	m_movementData.RoomBound = false;
 	m_chargeData.MinDistance = 2;
+	addPropertyToProfile(EnemyProperty::defenseShieldTimed);
+	m_shieldData.TimeOff.SetShouldCountDown(true);
+	loadShieldImage();
 	
+}
+
+bool Enemy::TakeDamage(int _amount, DamageType _type)
+{
+	if (propertyInProfile(EnemyProperty::defenseShieldBreakable))
+	{
+		
+		if (m_shieldData.ShieldCurrent <= 0)
+		{
+			m_shieldData.ShieldCurrent = 0;
+			return Damagable::TakeDamage(_amount, _type);
+		}
+		m_shieldData.ShieldCurrent -= _amount;
+		return false;
+	}
+	
+	if (propertyInProfile(EnemyProperty::defenseShieldTimed))
+	{
+		if (m_shieldData.ShieldCurrent < 1)
+			return Damagable::TakeDamage(_amount, _type);
+		return false;
+	}
+
+}
+
+void Enemy::Render(SDL_Renderer* _renderer)
+{
+	Renderable::Render(_renderer);
+	if ((propertyInProfile(EnemyProperty::defenseShieldBreakable) || propertyInProfile(EnemyProperty::defenseShieldTimed)) && m_shieldData.ShieldCurrent > 0)
+	{
+		if (m_shieldImage != nullptr)
+		{
+			m_shieldImage->SetPosition(GetPosition());
+			m_shieldImage->Render(_renderer);
+		}
+	}
 }
 
 
@@ -305,10 +394,10 @@ int Enemy::getRandomInRange(int _min, int _max)
 	return (rand() % (_max + 1 - _min)) + _min;
 }
 
-float Enemy::getRandominRange(float _min, float _max, int _placesToRight)
+float Enemy::getRandominRange(float _min, float _max)
 {
 	
-	return getRandomInRange(_min * _placesToRight, _max * _placesToRight) / _placesToRight;
+	return ((getRandomInRange(_min * 1000, (_max-1) * 1000) - _min) / 1000) + _min;
 }
 
 
