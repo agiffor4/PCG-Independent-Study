@@ -330,30 +330,42 @@ std::vector<Tile*> World::GetNeighbors(Tile* _tileToFindNeighborsFor, bool _getD
 	return GetNeighbors(_tileToFindNeighborsFor->GetPositionInVector());
 }
 
-Tile* World::GetNeigborNearestTarget(Tile* _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals)
+Tile* World::GetNeigborNearestTarget(Tile* _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals, bool _onlyCheckPassabe, std::vector<int>* _nonViableTiles)
 {
-	return GetNeigborNearestTarget(_tileToFindNeighborsFor->GetPositionInVector(), _target->GetPositionInVector());
+	return GetNeigborNearestTarget(_tileToFindNeighborsFor->GetPositionInVector(), _target->GetPositionInVector(), _getDiagonals, _onlyCheckPassabe, _nonViableTiles);
 }
 
-Tile* World::GetNeigborNearestTarget(Tile* _tileToFindNeighborsFor, int _target, bool _getDiagonals)
+Tile* World::GetNeigborNearestTarget(Tile* _tileToFindNeighborsFor, int _target, bool _getDiagonals, bool _onlyCheckPassabe, std::vector<int>* _nonViableTiles)
 {
-	return GetNeigborNearestTarget(_tileToFindNeighborsFor->GetPositionInVector(), _target);
+	return GetNeigborNearestTarget(_tileToFindNeighborsFor->GetPositionInVector(), _target, _getDiagonals, _onlyCheckPassabe, _nonViableTiles);
 }
 
-Tile* World::GetNeigborNearestTarget(int _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals)
+Tile* World::GetNeigborNearestTarget(int _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals, bool _onlyCheckPassabe, std::vector<int>* _nonViableTiles)
 {
-	return GetNeigborNearestTarget(_tileToFindNeighborsFor, _target->GetPositionInVector());
+	return GetNeigborNearestTarget(_tileToFindNeighborsFor, _target->GetPositionInVector(), _getDiagonals, _onlyCheckPassabe);
 }
 
-Tile* World::GetNeigborNearestTarget(int _tileToFindNeighborsFor, int _target, bool _getDiagonals)
+Tile* World::GetNeigborNearestTarget(int _tileToFindNeighborsFor, int _target, bool _getDiagonals, bool _onlyCheckPassabe, std::vector<int>* _nonViableTiles)
 {
 	std::vector<Tile*> neighbors = GetNeighbors(_tileToFindNeighborsFor, _getDiagonals);
 	Tile* target = GetTileAtIndex(_target);
-	float minDist = Vector2::GetSquareDistance(neighbors[0]->GetPositionInGrid(), GetTileAtIndex(_target)->GetPositionInGrid());
-	float currDist = minDist;
 	int index = 0;
-	for (size_t i = 1; i < neighbors.size(); i++)
+	if (_onlyCheckPassabe)
 	{
+		do
+		{
+			index++;
+		} while (index < neighbors.size() -1 && neighbors[index]->IsPassable());
+	}
+	float minDist = Vector2::GetSquareDistance(neighbors[index]->GetPositionInGrid(), GetTileAtIndex(_target)->GetPositionInGrid());
+	float currDist = minDist;
+	
+	for (size_t i = index + 1; i < neighbors.size(); i++)
+	{
+		if (_onlyCheckPassabe && !neighbors[i]->IsPassable() || (_nonViableTiles != nullptr && std::find((*_nonViableTiles).begin(), (*_nonViableTiles).end(), i) != (*_nonViableTiles).end()))
+		{
+			continue;
+		}
 		currDist = Vector2::GetSquareDistance(neighbors[i]->GetPositionInGrid(), GetTileAtIndex(_target)->GetPositionInGrid());
 		if (currDist < minDist)
 		{
@@ -364,22 +376,22 @@ Tile* World::GetNeigborNearestTarget(int _tileToFindNeighborsFor, int _target, b
 	return neighbors[index];
 }
 
-Tile* World::GetNeigborFurthestFromTarget(Tile* _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals)
+Tile* World::GetNeigborFurthestFromTarget(Tile* _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals, bool _onlyCheckPassabe, std::vector<int>* _nonViableTiles)
 {
-	return GetNeigborFurthestFromTarget(_tileToFindNeighborsFor->GetPositionInVector(), _target->GetPositionInVector());
+	return GetNeigborFurthestFromTarget(_tileToFindNeighborsFor->GetPositionInVector(), _target->GetPositionInVector(), _getDiagonals, _onlyCheckPassabe, _nonViableTiles);
 }
 
-Tile* World::GetNeigborFurthestFromTarget(Tile* _tileToFindNeighborsFor, int _target, bool _getDiagonals)
+Tile* World::GetNeigborFurthestFromTarget(Tile* _tileToFindNeighborsFor, int _target, bool _getDiagonals, bool _onlyCheckPassabe, std::vector<int>* _nonViableTiles)
 {
-	return GetNeigborFurthestFromTarget(_tileToFindNeighborsFor->GetPositionInVector(), _target);
+	return GetNeigborFurthestFromTarget(_tileToFindNeighborsFor->GetPositionInVector(), _target,  _getDiagonals, _onlyCheckPassabe, _nonViableTiles);
 }
 
-Tile* World::GetNeigborFurthestFromTarget(int _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals)
+Tile* World::GetNeigborFurthestFromTarget(int _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals, bool _onlyCheckPassabe, std::vector<int>* _nonViableTiles)
 {
-	return GetNeigborFurthestFromTarget(_tileToFindNeighborsFor, _target->GetPositionInVector());
+	return GetNeigborFurthestFromTarget(_tileToFindNeighborsFor, _target->GetPositionInVector(), _getDiagonals, _onlyCheckPassabe, _nonViableTiles);
 }
 
-Tile* World::GetNeigborFurthestFromTarget(int _tileToFindNeighborsFor, int _target, bool _getDiagonals)
+Tile* World::GetNeigborFurthestFromTarget(int _tileToFindNeighborsFor, int _target, bool _getDiagonals, bool _onlyCheckPassabe, std::vector<int>* _nonViableTiles)
 {
 	std::vector<Tile*> neighbors = GetNeighbors(_tileToFindNeighborsFor, _getDiagonals);
 	Tile* target = GetTileAtIndex(_target);
@@ -388,6 +400,10 @@ Tile* World::GetNeigborFurthestFromTarget(int _tileToFindNeighborsFor, int _targ
 	int index = 0;
 	for (size_t i = 1; i < neighbors.size(); i++)
 	{
+		if (_onlyCheckPassabe && !neighbors[i]->IsPassable())
+		{
+			continue;
+		}
 		currDist = Vector2::GetSquareDistance(neighbors[i]->GetPositionInGrid(), GetTileAtIndex(_target)->GetPositionInGrid());
 		if (currDist > maxDist)
 		{

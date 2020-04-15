@@ -3,10 +3,11 @@
 #include "EnemyCombat.h"
 #include "EnemyDataStructs.h"
 #include "RoomData.h"
+#include "IInputHandler.h"
 class World;
 class Player;
 class Enemy :
-	public StatusEffectable
+	public StatusEffectable, public IInputHandler
 {
 public:
 	enum class EnemyProperty
@@ -80,6 +81,7 @@ protected:
 	void mineLaying(float _dt);
 	void spawnMine();
 	void die() override;
+	void generatePatrolPath(std::vector<int> _corners);
 public:
 	Enemy();
 	~Enemy();
@@ -88,5 +90,6 @@ public:
 	void GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawnedIn);
 	bool TakeDamage(int _amount, DamageType _type) override;
 	void Render(SDL_Renderer* _renderer) override;
+	void InvokeKeyUp(SDL_Keycode _key) override;
 };
 

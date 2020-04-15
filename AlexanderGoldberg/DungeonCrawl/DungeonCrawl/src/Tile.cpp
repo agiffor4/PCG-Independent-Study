@@ -70,9 +70,12 @@ Thing* Tile::GetContents()
 }
 void Tile::MoveContentsTo(Tile* _newLocation)
 {
-	_newLocation->SetContents(m_contents);
-	m_contents->SetLocation(_newLocation);
-	SetContents(nullptr);
+	if (_newLocation != this)
+	{
+		_newLocation->SetContents(m_contents);
+		m_contents->SetLocation(_newLocation);
+		SetContents(nullptr);
+	}
 }
 bool Tile::IsPassable(bool _ignoreInteractables) { return m_passable && (_ignoreInteractables ? true : blockingInteractable()) && m_contents == nullptr; }
 

@@ -3,10 +3,13 @@
 #include "Tile.h"
 #include "Player.h"
 #include "Trap.h"
+#include "AStarSearch.h"
+#include "InputManager.h"
 #include <stack>
 Enemy::Enemy()
 {
 	m_solid = true;
+	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::UP);
 }
 
 Enemy::~Enemy()
@@ -27,11 +30,13 @@ void Enemy::move()
 	{
 		if (propertyInProfile(EnemyProperty::behaviorPatrol))
 		{
-			int targetIndex = m_behaviorData.PartolPointsAsIndexes[m_behaviorData.currentIndex];
-			Tile* nearerTile = m_world->GetNeigborNearestTarget(GetLocation(), targetIndex, m_behaviorData.UseDiagonals);
-			GetLocation()->MoveContentsTo(nearerTile);
-			if (nearerTile->GetPositionInVector() == targetIndex)
+			int targetIndex = m_behaviorData.GetTarget();
+			GetLocation()->MoveContentsTo(m_world->GetTileAtIndex(targetIndex));
+			m_behaviorData.IncrementIndex();
+			if (GetPositionInVector() == targetIndex)
 			{
+				targetIndex = m_behaviorData.GetTarget();
+				GetLocation()->MoveContentsTo(m_world->GetTileAtIndex(targetIndex));
 				m_behaviorData.IncrementIndex();
 			}
 		}
@@ -347,6 +352,31 @@ void Enemy::die()
 	m_solid = false;
 }
 
+void Enemy::generatePatrolPath(std::vector<int> _corners)
+{
+	AStarSearch pathFinder = AStarSearch();
+	pathFinder.Initialize(m_world->GetMapDimentions(), m_world->GetTiles().size(), m_behaviorData.UseDiagonals);
+	pathFinder.CastTilesToAStarNodes((*m_world), false);
+	for (size_t i = 0; i < _corners.size() - 1; i++)
+	{
+		std::stack<int> pathsegment = pathFinder.BeginSearch(_corners[i], _corners[i + 1], false);
+		int size = pathsegment.size();
+		for (size_t j = 0; j < size; j++)
+		{
+			m_behaviorData.PartolPointsAsIndexes.push_back(pathsegment.top());
+			pathsegment.pop();
+		}
+	}
+
+	std::stack<int> pathsegment = pathFinder.BeginSearch(_corners[_corners.size()-1], _corners[0], false);
+	int size = pathsegment.size();
+	for (size_t j = 0; j < size-1; j++)
+	{
+		m_behaviorData.PartolPointsAsIndexes.push_back(pathsegment.top());
+		pathsegment.pop();
+	}
+}
+
 
 
 void Enemy::Update(float _dt)
@@ -354,7 +384,6 @@ void Enemy::Update(float _dt)
 	
 	if (propertyInProfile(EnemyProperty::contactPassive) && !m_contactData.Aggroded)
 	{
-
 		return;
 	}
 	detect();
@@ -377,6 +406,7 @@ void Enemy::Update(float _dt)
 	}
 
 	shield(_dt);
+	mineLaying(_dt);
 }
 
 void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawnedIn)
@@ -385,14 +415,15 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 	m_roomSpawnedIn = _roomSpawnedIn;
 	addPropertyToProfile(EnemyProperty::movemetMoves);
 	addPropertyToProfile(EnemyProperty::behaviorPatrol);
-	addPropertyToProfile(EnemyProperty::contactPassive);
-	m_movementData.RoomBound = true;
-	m_behaviorData.PartolPointsAsIndexes.push_back(m_roomSpawnedIn.sm_containsTiles[0]);
-	m_behaviorData.PartolPointsAsIndexes.push_back(m_roomSpawnedIn.sm_containsTiles[m_behaviorData.PartolPointsAsIndexes.size()-1]);
 
-	addPropertyToProfile(EnemyProperty::mineLayer);
-	m_shieldData.TimeOff.SetShouldCountDown(true);
-	loadShieldImage();
+
+	m_movementData.RoomBound = true;
+	m_movementData.MoveTimerSec.SetTimer(0.25f);
+	std::vector<int> corners;
+	corners.push_back(m_roomSpawnedIn.sm_containsTiles[0]);
+	corners.push_back(m_roomSpawnedIn.sm_containsTiles[m_roomSpawnedIn.sm_containsTiles.size()-1]);
+	generatePatrolPath(corners);
+
 	
 }
 
@@ -401,7 +432,6 @@ bool Enemy::TakeDamage(int _amount, DamageType _type)
 	m_contactData.Aggroded = true;
 	if (propertyInProfile(EnemyProperty::defenseShieldBreakable))
 	{
-		
 		if (m_shieldData.ShieldCurrent <= 0)
 		{
 			m_shieldData.ShieldCurrent = 0;
@@ -433,6 +463,14 @@ void Enemy::Render(SDL_Renderer* _renderer)
 				m_shieldImage->Render(_renderer);
 			}
 		}
+	}
+}
+
+void Enemy::InvokeKeyUp(SDL_Keycode _key)
+{ 
+	if (_key == SDLK_8)
+	{
+		GetLocation()->PrintTileData();
 	}
 }
 

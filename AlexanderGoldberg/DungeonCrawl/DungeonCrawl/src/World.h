@@ -78,14 +78,14 @@ public:
 	Vector2 GetMapDimentions();
 	void SetWindowRef(SDL_Window* _window);
 	std::vector<Tile*> GetNeighbors(Tile* _tileToFindNeighborsFor, bool _getDiagonals = true);
-	Tile* GetNeigborNearestTarget(Tile* _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals = true);
-	Tile* GetNeigborNearestTarget(Tile* _tileToFindNeighborsFor, int _target, bool _getDiagonals = true);
-	Tile* GetNeigborNearestTarget(int _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals = true);
-	Tile* GetNeigborNearestTarget(int _tileToFindNeighborsFor, int _target, bool _getDiagonals = true);
-	Tile* GetNeigborFurthestFromTarget(Tile* _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals = true);
-	Tile* GetNeigborFurthestFromTarget(Tile* _tileToFindNeighborsFor, int _target, bool _getDiagonals = true);
-	Tile* GetNeigborFurthestFromTarget(int _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals = true);
-	Tile* GetNeigborFurthestFromTarget(int _tileToFindNeighborsFor, int _target, bool _getDiagonals = true);
+	Tile* GetNeigborNearestTarget(Tile* _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals = true, bool _onlyCheckPassabe = false, std::vector<int>* _nonViableTiles = nullptr);
+	Tile* GetNeigborNearestTarget(Tile* _tileToFindNeighborsFor, int _target, bool _getDiagonals = true, bool _onlyCheckPassabe = false, std::vector<int>* _nonViableTiles = nullptr);
+	Tile* GetNeigborNearestTarget(int _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals = true, bool _onlyCheckPassabe = false, std::vector<int>* _nonViableTiles = nullptr);
+	Tile* GetNeigborNearestTarget(int _tileToFindNeighborsFor, int _target, bool _getDiagonals = true, bool _onlyCheckPassabe = false, std::vector<int>* _nonViableTiles = nullptr);
+	Tile* GetNeigborFurthestFromTarget(Tile* _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals = true, bool _onlyCheckPassabe = false, std::vector<int>* _nonViableTiles = nullptr);
+	Tile* GetNeigborFurthestFromTarget(Tile* _tileToFindNeighborsFor, int _target, bool _getDiagonals = true, bool _onlyCheckPassabe = false, std::vector<int>* _nonViableTiles = nullptr);
+	Tile* GetNeigborFurthestFromTarget(int _tileToFindNeighborsFor, Tile* _target, bool _getDiagonals = true, bool _onlyCheckPassabe = false, std::vector<int>* _nonViableTiles = nullptr);
+	Tile* GetNeigborFurthestFromTarget(int _tileToFindNeighborsFor, int _target, bool _getDiagonals = true, bool _onlyCheckPassabe = false, std::vector<int>* _nonViableTiles = nullptr);
 	Player* GetPlayer();
 	std::vector<Tile*> GetNeighbors(int _tileToFindNeighborsFor, bool _getDiagonals = true);
 	std::vector<Tile*> GetTiles();
@@ -131,6 +131,5 @@ public:
 	//DEBUGGINg
 	
 	void printRoomData();
-	
 };
 

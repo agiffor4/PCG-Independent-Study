@@ -82,16 +82,19 @@ namespace  EnemyDataStructs
 		//patrol variables
 		std::vector<int>  PartolPointsAsIndexes;
 		int currentIndex = 0;
+		int GetTarget() {
+			return PartolPointsAsIndexes[currentIndex];
+		}
 		void IncrementIndex() 
 		{
 			currentIndex++;
-			if (currentIndex > PartolPointsAsIndexes.size() -1)
+			if (currentIndex > PartolPointsAsIndexes.size()-1)
 			{
 				currentIndex = 0;
 			}
 		}
 		bool UseDiagonals = false;
-
+		std::vector<int> Path;
 		
 		//seek out variables
 		bool pursueBeyondRoom = false;
