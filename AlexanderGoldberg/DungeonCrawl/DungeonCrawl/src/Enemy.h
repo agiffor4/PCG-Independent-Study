@@ -29,7 +29,7 @@ public:
 				behaviorKeepDistance = 16384,
 				behaviorCharge = 32768,
 				behaviorPatrol = 65536,
-/*+18+*/		// = 131072,
+/*+18+*/		defenseDodge = 131072,
 /*+19+*/		// = 262144,
 /*+20+*/		// = 524288
 		

@@ -413,16 +413,153 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 {
 	m_world = _world;
 	m_roomSpawnedIn = _roomSpawnedIn;
-	addPropertyToProfile(EnemyProperty::movemetMoves);
-	addPropertyToProfile(EnemyProperty::behaviorPatrol);
+	SetHealthMax(_difficulty * getRandomInRange(10, 30));
+	bool generateCustom = false;
+	if (generateCustom)
+	{
+		addPropertyToProfile(EnemyProperty::movemetMoves);
+		addPropertyToProfile(EnemyProperty::behaviorPatrol);
 
 
-	m_movementData.RoomBound = true;
-	m_movementData.MoveTimerSec.SetTimer(0.25f);
-	std::vector<int> corners;
-	corners.push_back(m_roomSpawnedIn.sm_containsTiles[0]);
-	corners.push_back(m_roomSpawnedIn.sm_containsTiles[m_roomSpawnedIn.sm_containsTiles.size()-1]);
-	generatePatrolPath(corners);
+		m_movementData.RoomBound = true;
+		m_movementData.MoveTimerSec.SetTimer(0.25f);
+		std::vector<int> corners;
+		corners.push_back(m_roomSpawnedIn.sm_containsTiles[0]);
+		corners.push_back(m_roomSpawnedIn.sm_containsTiles[m_roomSpawnedIn.sm_containsTiles.size() - 1]);
+		generatePatrolPath(corners);
+	}
+	else
+	{
+		m_detectionData.DetectionRadius = _difficulty < 5 ? 5 : _difficulty * 1.5f;
+		m_detectionData.DetectionRadiusLost = m_detectionData.DetectionRadius * (_difficulty < 5 ?  2 : 3);
+		if (getChance(90))
+		{
+			addPropertyToProfile(EnemyProperty::movemetMoves);
+			if (getChance(70) || true)
+			{
+				m_behaviorData.pursueBeyondRoom = getChance((_difficulty * 7));
+				if (getChance(50))
+				{
+					addPropertyToProfile(EnemyProperty::behaviorSeekout);
+				}
+				else
+				{
+					addPropertyToProfile(EnemyProperty::behaviorKeepDistance);
+					m_behaviorData.MinMaxDist.X = getRandomInRange(1, 3);
+					m_behaviorData.MinMaxDist.Y = getRandomInRange(m_behaviorData.MinMaxDist.X + 1, (m_behaviorData.MinMaxDist.X + 1) * 2);
+				}
+				if (getChance(15))
+				{
+					addPropertyToProfile(EnemyProperty::behaviorCharge);
+					m_chargeData.ChargeDamage = _difficulty * 5;
+					m_chargeData.MinDistance = getRandomInRange(3, 5);
+					m_chargeData.ChanceToCarge = 10 * _difficulty;
+					m_chargeData.ShouldChargeCheckIntervals.SetTimer(getRandominRange(0.25f, 1.5f));
+					m_chargeData.ChargeWindUpSec.SetTimer(2.0f / _difficulty);
+					m_chargeData.StunnedOnImpact = getChance(100 - (_difficulty - 1) * 5);
+					m_chargeData.ChargeMovementIntervals = m_movementData.MoveTimerSec.GetResetTime() * 0.1f;
+					m_chargeData.DoesDamage = true;
+					m_chargeData.StopAtTarget = false;
+				}
+			}
+			else
+			{
+				addPropertyToProfile(EnemyProperty::behaviorPatrol);
+			}
+
+			if (getChance(20 + (propertyInProfile(EnemyProperty::behaviorPatrol) ? 40 : 0)))
+			{
+				addPropertyToProfile(EnemyProperty::mineLayer);
+				m_mineLayerData.MineCharges = getChance(50) ? 1 : getRandomInRange(3, 5);
+				m_mineLayerData.MineDamage = _difficulty * 2;
+				m_mineLayerData.TimeToDropMine.SetTimer(3 / _difficulty);
+				m_mineLayerData.MineDropFrequency.SetTimer(m_movementData.MoveTimerSec.GetResetTime());
+				m_mineLayerData.MineDropChance = (3 * (_difficulty * 10));
+			}
+
+			
+		}
+		if (getChance(10))
+		{
+			addPropertyToProfile(EnemyProperty::contactPassive);
+		}
+		if (getChance(30 + _difficulty * 5))
+		{
+			addPropertyToProfile(EnemyProperty::healthRegen);
+			m_regenAmount = 1;
+			m_regenRate = getRandominRange((5.0f - _difficulty < 1 ? 1 : 5.0f - _difficulty), 15.0f - _difficulty);
+			m_regenTimer.SetTimer(m_regenRate);
+		}
+		if (getChance(15))
+		{
+			if (getChance(5))
+			{
+				addPropertyToProfile(EnemyProperty::visibilityInvisible);
+				m_shouldRender = false;
+			}
+			else
+			{
+				if (getChance(50))
+				{
+					addPropertyToProfile(EnemyProperty::visibilityVisible);
+				}
+				else
+				{
+					addPropertyToProfile(EnemyProperty::visibilityFlicker);
+					m_visibilityData.ConstTimes = getChance(50);
+					m_visibilityData.MinMaxInvisibleTime.X = 2;
+					m_visibilityData.MinMaxVisibleTime.X = 2;
+					m_visibilityData.MinMaxFlickerTime.X = 0.5;
+					m_visibilityData.MinMaxInvisibleTime.Y = 4;
+					m_visibilityData.MinMaxVisibleTime.Y = 4;
+					m_visibilityData.MinMaxFlickerTime.Y = 1;
+					m_visibilityData.TimeInvisible.SetShouldCountDown(true);
+				}					
+			}
+		}
+		if (getChance(15 + _difficulty * 5))
+		{
+
+			if (getChance(50))
+			{
+				addPropertyToProfile(EnemyProperty::defenseShieldTimed);
+				bool VariableTimes = getChance(50);
+
+				m_shieldData.MinMaxTimeOff.X = getRandomInRange(1, 3);
+				m_shieldData.MinMaxTimeOn.X = getRandomInRange(1, 3);
+				m_shieldData.MinMaxTimeOff.Y = getRandomInRange(m_shieldData.MinMaxTimeOff.X, m_shieldData.MinMaxTimeOff.X* 2);
+				m_shieldData.MinMaxTimeOn.Y = getRandomInRange(m_shieldData.MinMaxTimeOn.X, m_shieldData.MinMaxTimeOn.X * 1.5f);
+				m_shieldData.TimeOff.SetTimer(m_shieldData.MinMaxTimeOff.X);
+				m_shieldData.TimeOn.SetTimer(m_shieldData.MinMaxTimeOn.X);
+			}
+			else				
+			{
+				addPropertyToProfile(EnemyProperty::defenseShieldBreakable);
+				m_shieldData.Regens = getChance(_difficulty * 8);
+				Timer RechargeTimerSec = Timer(getRandominRange(10.f / _difficulty, 30.0f / _difficulty)); 
+				m_shieldData.RechargeAmount = 1 * _difficulty / 2; 
+				if (m_shieldData.RechargeAmount < 1)
+					m_shieldData.RechargeAmount = 1;
+				m_shieldData.ShieldMax = 10 * _difficulty; 
+				m_shieldData.ShieldCurrent = m_shieldData.ShieldMax;
+
+			}
+		}
+		if (getChance(15 + _difficulty * 2))
+		{
+			addPropertyToProfile(EnemyProperty::defenseLeaveBarricades);
+		}
+		if (propertyInProfile(EnemyProperty::movemetMoves))
+		{
+			if (getChance(20  + 2 * _difficulty))
+			{
+				addPropertyToProfile(EnemyProperty::defenseDodge);
+			}
+		}
+
+
+}
+	
 
 	
 }
@@ -489,7 +626,7 @@ int Enemy::getRandomInRange(int _min, int _max)
 float Enemy::getRandominRange(float _min, float _max)
 {
 	
-	return ((getRandomInRange(_min * 1000, (_max-1) * 1000) - _min) / 1000) + _min;
+	return ((getRandomInRange(_min * 1000, (_max) * 1000) - _min) / 1000) + _min;
 }
 
 

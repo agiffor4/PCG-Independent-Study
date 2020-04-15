@@ -51,6 +51,7 @@ protected:
 	void generateTreasure();
 	void generateWeapon();
 	void generateFoes();
+	void CreateEnemy(int _roomIndex);
 	void generateChests();
 	void createTreasureInRoom(int _roomToCreateTreasureIn);
 	void createWeaponInRoom(int _roomToCreateTreasureIn);

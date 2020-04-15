@@ -71,6 +71,7 @@ namespace  EnemyDataStructs
 		Timer TimeVisible = Timer(1.0f);
 		Timer TimeFlickering = Timer(1.0f);
 		Timer FlickerRate = Timer(0.05f); //flicker rate while flickering
+		
 
 	};
 

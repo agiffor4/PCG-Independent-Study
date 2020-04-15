@@ -797,20 +797,30 @@ void World::generateFoes()
 {
 	RoomTree roomTree = RoomTree();
 	roomTree.GenerateRoomTree(m_roomsData, GetIndexOfRoomTileIsIn(m_playerStart));
-	
-	int roomIndex = roomTree.GetFirstChildOfRoomWithTreePosition(roomTree.GetRootIndexInTree());
-	if (roomIndex != -1)
+	/*int roomIndex = roomTree.GetFirstChildOfRoomWithTreePosition(roomTree.GetRootIndexInTree());
+	CreateEne(roomIndex);*/
+	int deepest = roomTree.GetDeepestDepth();
+	for (size_t i = 0; i < m_roomsData.size(); i++)
 	{
-		Enemy* e = new Enemy();
-		e->Init("img/pics/coin.png", "Enemy", m_scene->GetRenderer());
-		Tile* t = GetTileAtIndex(m_roomsData[roomIndex].GetRandomTile());
-		e->SetScale(m_tiles[0]->GetScale());
-		e->GenerateEnemy(1, this, m_roomsData[roomIndex]);
-		e->SetLocation(t);
-		t->SetContents(e);
-		m_scene->AddCollidable(e);
+		int enemiesToSpawn = roomTree.GetRoomDepth(i) / 2;
+		for (size_t j = 0; j < roomTree.GetRoomDepth(i) && j < 4; j++)
+		{
+			CreateEnemy(i);
+		}
 	}
 
+}
+
+void World::CreateEnemy(int _roomIndex)
+{
+	Enemy* e = new Enemy();
+	e->Init("img/pics/coin.png", "Enemy", m_scene->GetRenderer());
+	Tile* t = GetTileAtIndex(m_roomsData[_roomIndex].GetRandomTile());
+	e->SetScale(m_tiles[0]->GetScale());
+	e->GenerateEnemy(1, this, m_roomsData[_roomIndex]);
+	e->SetLocation(t);
+	t->SetContents(e);
+	m_scene->AddCollidable(e);
 }
 
 void World::generateChests()
