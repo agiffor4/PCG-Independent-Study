@@ -11,6 +11,8 @@ public:
 	void SetTrapCharges(int _trapCharges);
 	void SetTrapDamage(int _damageInfliction);
 	bool Interaction(Thing* _thingInitatingInteraction) override;
+	void ResetTrap();
+	void MoveTrapTo(Tile* _newTile);
 	void InteractionOnEnteringTile(Thing* _thingInitatingInteraction) override;
 	
 };

@@ -1,4 +1,5 @@
 #include "Trap.h"
+#include "Tile.h"
 #include "Player.h"
 Trap::Trap()
 {
@@ -12,6 +13,16 @@ void Trap::SetTrapDamage(int _damageInfliction)
 	m_damageInfliction = _damageInfliction;
 }
 bool Trap::Interaction(Thing* _thingInitatingInteraction) { return false; }
+void Trap::ResetTrap()
+{
+	m_shouldRender = true;
+}
+void Trap::MoveTrapTo(Tile* _newTile)
+{
+	GetLocation()->RemoveItem(this, false);
+	_newTile->AddItem(this);
+	SetLocation(_newTile);
+}
 void Trap::InteractionOnEnteringTile(Thing* _thingInitatingInteraction)
 {
 	if (m_allowInteraction)

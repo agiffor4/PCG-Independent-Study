@@ -2,11 +2,11 @@
 #include "World.h"
 #include "Tile.h"
 #include "Player.h"
+#include "Trap.h"
 #include <stack>
 Enemy::Enemy()
 {
 	m_solid = true;
-	
 }
 
 Enemy::~Enemy()
@@ -23,7 +23,7 @@ void Enemy::move()
 	{
 		m_player = m_world->GetPlayer();
 	}
-	if (propertyInProfile(EnemyProperty::movemetMoves))
+	if (propertyInProfile(EnemyProperty::movemetMoves) && m_movementData.CanMove)
 	{
 		if (propertyInProfile(EnemyProperty::behaviorPatrol))
 		{
@@ -289,6 +289,47 @@ void Enemy::shield(float _dt)
 		}
 	}
 }
+void Enemy::mineLaying(float _dt) 
+{
+	if (propertyInProfile(EnemyProperty::mineLayer))
+	{
+		if (!m_mineLayerData.TimeToDropMine.GetShouldCountDown() && m_mineLayerData.MineDropFrequency.CountDown(_dt))
+		{
+			if (getChance(m_mineLayerData.MineDropChance))
+			{
+				m_movementData.CanMove = false;
+				m_mineLayerData.TimeToDropMine.SetShouldCountDown(true);
+			}
+			
+		}
+		if (m_mineLayerData.TimeToDropMine.CountDownAutoCheckBool(_dt))
+		{
+			spawnMine();
+			m_movementData.CanMove = true;
+		}
+	}
+}
+
+void Enemy::spawnMine()
+{
+	Trap* t = dynamic_cast<Trap*>(m_mineLayerData.GetMine());
+	if (t == nullptr)
+	{
+		t = new Trap();
+		t->Init("img/pics/bomb.png", "Mine", m_rendererRef);
+		t->SetScale(GetScale());
+		t->SetLocation(GetLocation());
+		GetLocation()->AddItem(t);
+	}
+	else
+	{
+		t->MoveTrapTo(GetLocation());
+	}
+	t->ResetTrap();
+	t->SetTrapDamage(m_mineLayerData.MineDamage);
+	t->SetTrapCharges(m_mineLayerData.MineCharges);
+	
+}
 
 void Enemy::loadShieldImage()
 {
@@ -310,7 +351,14 @@ void Enemy::die()
 
 void Enemy::Update(float _dt)
 {
+	
+	if (propertyInProfile(EnemyProperty::contactPassive) && !m_contactData.Aggroded)
+	{
+
+		return;
+	}
 	detect();
+	
 	if (!m_chargeData.Charging && !m_chargeData.ChargeWindUpSec.GetShouldCountDown() && m_movementData.MoveTimerSec.CountDown(_dt))
 	{
 		move();
@@ -335,12 +383,14 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 {
 	m_world = _world;
 	m_roomSpawnedIn = _roomSpawnedIn;
-	//addPropertyToProfile(EnemyProperty::movemetMoves);
-	//addPropertyToProfile(EnemyProperty::behaviorSeekout);
-	//addPropertyToProfile(EnemyProperty::visibilityFlicker);
-	m_movementData.RoomBound = false;
-	m_chargeData.MinDistance = 2;
-	addPropertyToProfile(EnemyProperty::defenseShieldTimed);
+	addPropertyToProfile(EnemyProperty::movemetMoves);
+	addPropertyToProfile(EnemyProperty::behaviorPatrol);
+	addPropertyToProfile(EnemyProperty::contactPassive);
+	m_movementData.RoomBound = true;
+	m_behaviorData.PartolPointsAsIndexes.push_back(m_roomSpawnedIn.sm_containsTiles[0]);
+	m_behaviorData.PartolPointsAsIndexes.push_back(m_roomSpawnedIn.sm_containsTiles[m_behaviorData.PartolPointsAsIndexes.size()-1]);
+
+	addPropertyToProfile(EnemyProperty::mineLayer);
 	m_shieldData.TimeOff.SetShouldCountDown(true);
 	loadShieldImage();
 	
@@ -348,6 +398,7 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 
 bool Enemy::TakeDamage(int _amount, DamageType _type)
 {
+	m_contactData.Aggroded = true;
 	if (propertyInProfile(EnemyProperty::defenseShieldBreakable))
 	{
 		
@@ -372,12 +423,15 @@ bool Enemy::TakeDamage(int _amount, DamageType _type)
 void Enemy::Render(SDL_Renderer* _renderer)
 {
 	Renderable::Render(_renderer);
-	if ((propertyInProfile(EnemyProperty::defenseShieldBreakable) || propertyInProfile(EnemyProperty::defenseShieldTimed)) && m_shieldData.ShieldCurrent > 0)
+	if (m_shouldRender)
 	{
-		if (m_shieldImage != nullptr)
+		if ((propertyInProfile(EnemyProperty::defenseShieldBreakable) || propertyInProfile(EnemyProperty::defenseShieldTimed)) && m_shieldData.ShieldCurrent > 0)
 		{
-			m_shieldImage->SetPosition(GetPosition());
-			m_shieldImage->Render(_renderer);
+			if (m_shieldImage != nullptr)
+			{
+				m_shieldImage->SetPosition(GetPosition());
+				m_shieldImage->Render(_renderer);
+			}
 		}
 	}
 }

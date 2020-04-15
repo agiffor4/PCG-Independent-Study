@@ -7,6 +7,7 @@ namespace  EnemyDataStructs
 	struct MovementStruct {
 		bool Moved = false;
 		bool RoomBound = false;
+		bool CanMove = true;
 		Timer MoveTimerSec = Timer(1.0f);
 		
 		
@@ -104,12 +105,33 @@ namespace  EnemyDataStructs
 
 	struct ContactStruct
 	{
-
+		bool Aggroded = false;
 	};
 
 
 	struct MineLayerStruct
 	{
+		Timer MineDropFrequency = Timer(2.0f); //how frequently to drop mines
+		Timer TimeToDropMine = Timer(0.02f);
+		int MineDropChance = 100;
+		int MineDamage = 3;
+		int MineCharges = 3;
+		std::vector<Thing*> AvailableMines;
+		void AddMine(Thing* _newMine) 
+		{
+			AvailableMines.push_back(_newMine);
+		}
+		Thing* GetMine() 
+		{
+			for (size_t i = 0; i < AvailableMines.size(); i++)
+			{
+				if (!AvailableMines[i]->ShouldCheckCollision())
+				{
+					return AvailableMines[i];
+				}
+			}
+			return nullptr;
+		}
 
 	};
 

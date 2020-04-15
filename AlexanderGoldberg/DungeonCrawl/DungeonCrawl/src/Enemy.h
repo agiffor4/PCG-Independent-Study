@@ -15,15 +15,15 @@ public:
 /*+02+*/		combatMelee = 2, //melee combat exclusive with ranged combat
 /*+03+*/		combatSummon = 4, //summons other enemies, not exclusive with other combat properties
 				movemetMoves = 8, //if true allows movement, if false stationary
-/*+05+*/		defenseShieldTimed = 16,
-/*+06+*/		defenseShieldBreakable = 32,
+				defenseShieldTimed = 16,
+				defenseShieldBreakable = 32,
 /*+07+*/		defenseLeaveBarricades = 64,
 				healthRegen = 128,
-/*+09+*/		contactAgressive = 256,
+				contactPassive = 256,
 				visibilityInvisible = 512,
 				visibilityFlicker = 1024,
 				visibilityVisible = 2048,
-/*+13+*/		mineLayer = 4096,
+				mineLayer = 4096,
 				behaviorSeekout = 8192,
 				behaviorKeepDistance = 16384,
 				behaviorCharge = 32768,
@@ -77,6 +77,8 @@ protected:
 	void visible(float _dt);
 	void shield(float _dt);
 	void loadShieldImage();
+	void mineLaying(float _dt);
+	void spawnMine();
 	void die() override;
 public:
 	Enemy();
