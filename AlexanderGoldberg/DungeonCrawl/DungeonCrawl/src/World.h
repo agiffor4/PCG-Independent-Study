@@ -51,7 +51,7 @@ protected:
 	void generateTreasure();
 	void generateWeapon();
 	void generateFoes();
-	void CreateEnemy(int _roomIndex);
+	
 	void generateChests();
 	void createTreasureInRoom(int _roomToCreateTreasureIn);
 	void createWeaponInRoom(int _roomToCreateTreasureIn);
@@ -89,6 +89,7 @@ public:
 	Tile* GetNeigborFurthestFromTarget(int _tileToFindNeighborsFor, int _target, bool _getDiagonals = true, bool _onlyCheckPassabe = false, std::vector<int>* _nonViableTiles = nullptr);
 	Player* GetPlayer();
 	std::vector<Tile*> GetNeighbors(int _tileToFindNeighborsFor, bool _getDiagonals = true);
+	std::vector<Tile*> GetTilesInRadius(int _tileToFindNeighborsFor, int _radius, bool _getDiagonals);
 	std::vector<Tile*> GetTiles();
 	int GetRandomTileInRoom(int _roomIndexToGetRandomTileFrom);
 	void AddTile(Tile* _renderable);
@@ -119,16 +120,25 @@ public:
 	void InvokeKeyUp(SDL_Keycode _key) override;
 	void centerCameraOnPlayer(Tile* _tileToCenterOn);
 	Vector2 CheckIfCameraShouldMove(Vector2 _cameraMoveDirection);
-	const std::vector<Enemy*>& GetEnemiesOnLevel();
 	
+	//ENEMIES
+	void CreateEnemy(int _roomIndex, int _enemyLevel);
+	void CreateEnemyAtIndex(int _tileIndex, int _enemyLevel);
+	const std::vector<Enemy*>& GetEnemiesOnLevel();
 	Enemy* GetNearestEnemy(Vector2 _referencePoint, float _maximumRange = -1);
 	std::set<Tile*> GetTilesInRadiusFromEpicenter(int _epicenter, int _radius);
 	std::vector<Enemy*> GetEnemiesInTileRadius(int _epicenter, int _radius);
 	std::vector<Enemy*> GetEnemiesInRadius(Vector2 _referencePoint, float _maximumRange = -1);
+
+
 	Thing* GetNearestThing(Vector2 _referencePoint, const std::vector<Thing*>& _vectorToCheck, float _maximumRange = -1);
 	Tile* GetNeighborNearestPoint(Vector2 _referancePoint, Tile* _tile, bool _ignoreImpassable, bool _ignoreInteractablesForPassabilityCheck);
 	Tile* GetNeighborNearestPoint(Vector2 _referancePoint, int _tile, bool _ignoreImpassable, bool _ignoreInteractablesForPassabilityCheck);
 	int GetLevel();
+
+
+
+
 	//DEBUGGINg
 	
 	void printRoomData();

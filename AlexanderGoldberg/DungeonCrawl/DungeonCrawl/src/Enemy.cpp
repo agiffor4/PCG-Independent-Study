@@ -223,7 +223,7 @@ void Enemy::visible(float _dt)
 			m_visibilityData.LastStatus = EnemyDataStructs::VisibilityStruct::VisibleStatus::Visible;
 			m_visibilityData.Status = EnemyDataStructs::VisibilityStruct::VisibleStatus::Flickering;
 			if (!m_visibilityData.ConstTimes)
-				m_visibilityData.TimeVisible.SetTimer(getRandominRange(m_visibilityData.MinMaxVisibleTime.X, m_visibilityData.MinMaxVisibleTime.Y));
+				m_visibilityData.TimeVisible.SetTimer(getRandomInRange(m_visibilityData.MinMaxVisibleTime.X, m_visibilityData.MinMaxVisibleTime.Y));
 		}
 		break;
 	case EnemyDataStructs::VisibilityStruct::VisibleStatus::Invisible:
@@ -232,7 +232,7 @@ void Enemy::visible(float _dt)
 			m_visibilityData.LastStatus = EnemyDataStructs::VisibilityStruct::VisibleStatus::Invisible;
 			m_visibilityData.Status = EnemyDataStructs::VisibilityStruct::VisibleStatus::Flickering;
 			if (!m_visibilityData.ConstTimes)
-				m_visibilityData.TimeInvisible.SetTimer(getRandominRange(m_visibilityData.MinMaxInvisibleTime.X, m_visibilityData.MinMaxInvisibleTime.Y));
+				m_visibilityData.TimeInvisible.SetTimer(getRandomInRange(m_visibilityData.MinMaxInvisibleTime.X, m_visibilityData.MinMaxInvisibleTime.Y));
 		}
 		break;
 	case EnemyDataStructs::VisibilityStruct::VisibleStatus::Flickering:
@@ -254,7 +254,7 @@ void Enemy::visible(float _dt)
 			}
 			m_visibilityData.LastStatus = EnemyDataStructs::VisibilityStruct::VisibleStatus::Flickering;
 			if (!m_visibilityData.ConstTimes)
-				m_visibilityData.TimeFlickering.SetTimer(getRandominRange(m_visibilityData.MinMaxFlickerTime.X, m_visibilityData.MinMaxFlickerTime.Y));
+				m_visibilityData.TimeFlickering.SetTimer(getRandomInRange(m_visibilityData.MinMaxFlickerTime.X, m_visibilityData.MinMaxFlickerTime.Y));
 		}
 		break;
 	default:
@@ -284,14 +284,14 @@ void Enemy::shield(float _dt)
 			m_shieldData.ShieldCurrent = 0;
 			m_shieldData.TimeOff.SetShouldCountDown(true);
 			if (m_shieldData.VariableTimes)
-				m_shieldData.TimeOff.SetTimer(getRandominRange(m_shieldData.MinMaxTimeOff.X, m_shieldData.MinMaxTimeOff.Y));
+				m_shieldData.TimeOff.SetTimer(getRandomInRange(m_shieldData.MinMaxTimeOff.X, m_shieldData.MinMaxTimeOff.Y));
 		}
 		if (m_shieldData.TimeOff.CountDownAutoCheckBool(_dt))
 		{
 			m_shieldData.ShieldCurrent = 1;
 			m_shieldData.TimeOn.SetShouldCountDown(true);
 			if (m_shieldData.VariableTimes)
-				m_shieldData.TimeOn.SetTimer(getRandominRange(m_shieldData.MinMaxTimeOn.X, m_shieldData.MinMaxTimeOn.Y));
+				m_shieldData.TimeOn.SetTimer(getRandomInRange(m_shieldData.MinMaxTimeOn.X, m_shieldData.MinMaxTimeOn.Y));
 		}
 	}
 }
@@ -322,7 +322,7 @@ void Enemy::blockLaying(float _dt)
 	{
 		if (!m_barrierData.TimeToDropBlock.GetShouldCountDown() && m_barrierData.PlaceBlockInterval.CountDown(_dt))
 		{
-			m_barrierData.PlaceBlockInterval.SetTimer(getRandominRange(m_barrierData.PlaceBlockTimeRange.X, m_barrierData.PlaceBlockTimeRange.Y));
+			m_barrierData.PlaceBlockInterval.SetTimer(getRandomInRange(m_barrierData.PlaceBlockTimeRange.X, m_barrierData.PlaceBlockTimeRange.Y));
 			if (getChance(m_barrierData.BlockDropChance))
 			{
 				m_movementData.CanMove = false;
@@ -340,37 +340,15 @@ void Enemy::blockLaying(float _dt)
 
 void Enemy::spawnBlock()
 {
-	std::vector<Tile*> neighbors = m_world->GetNeighbors(m_location);
-	bool checked[8] = { false, false, false, false, false, false, false, false };
-	auto allTrue = [](bool _array[])
-	{
-		int size = sizeof(_array) / sizeof(_array[0]);
-		for (size_t i = 0; i < size; i++)
-		{
-			if (_array[i] == false)
-			{
-				return false;
-			}
-		}
-		return true;
-	};
-	int index = 0;
-	bool valid = false;
-	do
-	{
-		index = rand() % neighbors.size();
-		if (neighbors[index]->IsPassable())
-			valid = true;
-
-	} while (!valid && !allTrue(checked));
+	Tile* t = getFreeTileInRaidus(1);
 	
-	if (valid)
+	if (t != nullptr)
 	{
 		Blockade* blockade = new Blockade();
 		blockade->Init("img/blank_tile_orig.bmp", "Blockage", m_rendererRef);
 		blockade->Initialize();
 		blockade->SetLifeTime(m_barrierData.BarrierLifeTimeRange.X, m_barrierData.BarrierLifeTimeRange.Y);
-		neighbors[index]->AddItem(blockade);
+		t->AddItem(blockade);
 
 	}
 }
@@ -437,6 +415,98 @@ void Enemy::generatePatrolPath(std::vector<int> _corners)
 	}
 }
 
+void Enemy::attack(float _dt)
+{
+	if (propertyInProfile(EnemyProperty::combatSummon))
+		summon(_dt);
+	if (propertyInProfile(EnemyProperty::combatMelee))
+		melee(_dt);
+	if (propertyInProfile(EnemyProperty::combatRanged))
+		ranged(_dt);
+}
+
+void Enemy::summon(float _dt)
+{
+	if (!m_summonData.SummonTime.GetShouldCountDown() && m_summonData.SummonIntervals.CountDown(_dt))
+	{
+		
+		m_summonData.SummonIntervals.SetTimer(getRandomInRange(m_summonData.SummonIntervalsRange.X, m_summonData.SummonIntervalsRange.Y));
+		if (getChance(m_summonData.SummonChance))
+		{
+			m_summonData.SpawnTarget = nullptr;
+			do
+			{
+				m_summonData.SpawnTarget = getFreeTileInRaidus(m_summonData.SummonRange);
+			} while ((m_summonData.SpawnTarget != nullptr && m_summonData.SpawnTarget->IsCorridor()));
+			if (m_summonData.SpawnTarget != nullptr)
+			{
+				m_movementData.CanMove = false;
+				m_summonData.SummonTime.SetTimer(getRandomInRange(m_summonData.SummonTimeRange.X, m_summonData.SummonTimeRange.Y));
+				m_summonData.SummonTime.SetShouldCountDown(true);
+			}
+		}
+	}
+
+
+	if (m_summonData.SummonTime.CountDownAutoCheckBool(_dt))
+	{
+		m_movementData.CanMove = true;
+		m_world->CreateEnemyAtIndex(m_summonData.SpawnTarget->GetPositionInVector(), 1);
+		
+	}
+
+}
+
+void Enemy::melee(float _dt)
+{
+	if (m_meleeData.AttackFrequency.CountDown(_dt))
+	{
+		if (Vector2::GetDistanceLessThan(GetPositionInGrid(), m_player->GetPositionInGrid(), m_meleeData.Range))
+		{
+			m_player->TakeDamage(m_meleeData.Damage);
+		}
+	}
+
+}
+
+void Enemy::ranged(float _dt)
+{
+}
+
+Tile* Enemy::getFreeTileInRaidus(int _radius)
+{
+	Tile* t = nullptr;
+	std::vector<Tile*> neighbors = m_world->GetTilesInRadius(m_location->GetPositionInVector(), _radius, true);
+	bool* checked = new bool[neighbors.size()];//{ false, false, false, false, false, false, false, false };
+	for (size_t i = 0; i < neighbors.size(); i++)
+		checked[i] = false;
+	auto allTrue = [](bool _array[], int _size)
+	{
+		
+		for (size_t i = 0; i < _size; i++)
+		{
+			if (_array[i] == false)
+			{
+				return false;
+			}
+		}
+		return true;
+	};
+	int index = 0;
+	bool valid = false;
+	do
+	{
+		index = rand() % neighbors.size();
+		if (neighbors[index]->IsPassable())
+			valid = true;
+		checked[index] = true;
+
+	} while (!valid && !allTrue(checked, neighbors.size()));
+	t = neighbors[index];
+	delete[] checked;
+	return t;
+}
+
 
 
 void Enemy::Update(float _dt)
@@ -494,8 +564,8 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 		m_barrierData.BarrierLifeTimeRange.Y = 5;
 		m_barrierData.PlaceBlockTimeRange.X = 1;
 		m_barrierData.PlaceBlockTimeRange.Y = 1;
-		m_barrierData.PlaceBlockInterval.SetTimer(getRandominRange(m_barrierData.PlaceBlockTimeRange.X, m_barrierData.PlaceBlockTimeRange.Y));
-		m_barrierData.TimeToDropBlock.SetTimer(getRandominRange(m_barrierData.BarrierLifeTimeRange.X, m_barrierData.BarrierLifeTimeRange.Y));
+		m_barrierData.PlaceBlockInterval.SetTimer(getRandomInRange(m_barrierData.PlaceBlockTimeRange.X, m_barrierData.PlaceBlockTimeRange.Y));
+		m_barrierData.TimeToDropBlock.SetTimer(getRandomInRange(m_barrierData.BarrierLifeTimeRange.X, m_barrierData.BarrierLifeTimeRange.Y));
 
 	}
 	else
@@ -516,7 +586,7 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 				{
 					addPropertyToProfile(EnemyProperty::behaviorKeepDistance);
 					m_behaviorData.MinMaxDist.X = getRandomInRange(1, 3);
-					m_behaviorData.MinMaxDist.Y = getRandomInRange(m_behaviorData.MinMaxDist.X + 1, (m_behaviorData.MinMaxDist.X + 1) * 2);
+					m_behaviorData.MinMaxDist.Y = getRandomInRange((int)m_behaviorData.MinMaxDist.X + 1, (int)(m_behaviorData.MinMaxDist.X + 1) * 2);
 				}
 				if (getChance(15))
 				{
@@ -524,7 +594,7 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 					m_chargeData.ChargeDamage = _difficulty * 5;
 					m_chargeData.MinDistance = getRandomInRange(3, 5);
 					m_chargeData.ChanceToCarge = 10 * _difficulty;
-					m_chargeData.ShouldChargeCheckIntervals.SetTimer(getRandominRange(0.25f, 1.5f));
+					m_chargeData.ShouldChargeCheckIntervals.SetTimer(getRandomInRange(0.25f, 1.5f));
 					m_chargeData.ChargeWindUpSec.SetTimer(2.0f / _difficulty);
 					m_chargeData.StunnedOnImpact = getChance(100 - (_difficulty - 1) * 5);
 					m_chargeData.ChargeMovementIntervals = m_movementData.MoveTimerSec.GetResetTime() * 0.1f;
@@ -557,7 +627,7 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 		{
 			addPropertyToProfile(EnemyProperty::healthRegen);
 			m_regenAmount = 1;
-			m_regenRate = getRandominRange((5.0f - _difficulty < 1 ? 1 : 5.0f - _difficulty), 15.0f - _difficulty);
+			m_regenRate = getRandomInRange((5.0f - _difficulty < 1 ? 1 : 5.0f - _difficulty), 15.0f - _difficulty);
 			m_regenTimer.SetTimer(m_regenRate);
 		}
 		if (getChance(15))
@@ -606,7 +676,7 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 			{
 				addPropertyToProfile(EnemyProperty::defenseShieldBreakable);
 				m_shieldData.Regens = getChance(_difficulty * 8);
-				Timer RechargeTimerSec = Timer(getRandominRange(10.f / _difficulty, 30.0f / _difficulty)); 
+				Timer RechargeTimerSec = Timer(getRandomInRange(10.f / _difficulty, 30.0f / _difficulty));
 				m_shieldData.RechargeAmount = 1 * _difficulty / 2; 
 				if (m_shieldData.RechargeAmount < 1)
 					m_shieldData.RechargeAmount = 1;
@@ -622,8 +692,8 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 			m_barrierData.BarrierLifeTimeRange.Y = 5;
 			m_barrierData.PlaceBlockTimeRange.X = 1;
 			m_barrierData.PlaceBlockTimeRange.Y = 1;
-			m_barrierData.PlaceBlockInterval.SetTimer(getRandominRange(m_barrierData.PlaceBlockTimeRange.X, m_barrierData.PlaceBlockTimeRange.Y));
-			m_barrierData.TimeToDropBlock.SetTimer(getRandominRange(m_barrierData.BarrierLifeTimeRange.X, m_barrierData.BarrierLifeTimeRange.Y));
+			m_barrierData.PlaceBlockInterval.SetTimer(getRandomInRange(m_barrierData.PlaceBlockTimeRange.X, m_barrierData.PlaceBlockTimeRange.Y));
+			m_barrierData.TimeToDropBlock.SetTimer(getRandomInRange(m_barrierData.BarrierLifeTimeRange.X, m_barrierData.BarrierLifeTimeRange.Y));
 			
 		}
 		if (propertyInProfile(EnemyProperty::movemetMoves))
@@ -700,12 +770,16 @@ int Enemy::getRandomInRange(int _min, int _max)
 	return (rand() % (_max + 1 - _min)) + _min;
 }
 
-float Enemy::getRandominRange(float _min, float _max)
+float Enemy::getRandomInRange(float _min, float _max)
 {
 	
 	return ((float)rand() / (float)RAND_MAX) * (_max - _min) + _min;
 }
+float Enemy::getRandomInRange(double _min, double _max)
+{
 
+	return ((float)rand() / (float)RAND_MAX) * (_max - _min) + _min;
+}
 
 bool Enemy::propertyInProfile(EnemyProperty _property)
 {

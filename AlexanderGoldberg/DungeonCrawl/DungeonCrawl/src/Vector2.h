@@ -28,7 +28,9 @@ public:
 	Vector2(int x, int y);
 	Vector2(double x, double y);
 	~Vector2();
-
+	void Set(float x, float y);
+	void Set(int x, int y);
+	void Set(double x, double y);
 	static Vector2 Lerp(const Vector2& currentVector, const Vector2& targetVector, const float lerpAmount, float minDist)
 	{
 		Vector2 newVector = Vector2(0, 0);

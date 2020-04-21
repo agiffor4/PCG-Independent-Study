@@ -18,7 +18,7 @@ public:
 				movemetMoves = 8, //if true allows movement, if false stationary
 				defenseShieldTimed = 16,
 				defenseShieldBreakable = 32,
-/*+07+*/		defenseLeaveBarricades = 64,
+				defenseLeaveBarricades = 64,
 				healthRegen = 128,
 				contactPassive = 256,
 				visibilityInvisible = 512,
@@ -51,7 +51,8 @@ protected:
 	RoomData m_roomSpawnedIn = RoomData();
 	//UTILITY
 	int getRandomInRange(int _min, int _max);
-	float getRandominRange(float _min, float _max);
+	float getRandomInRange(float _min, float _max);
+	float getRandomInRange(double _min, double _max);
 	bool propertyInProfile(EnemyProperty _property);
 	void addPropertyToProfile(EnemyProperty _property);
 	void removePropertyFromProfile(EnemyProperty _property);
@@ -71,6 +72,9 @@ protected:
 	EnemyDataStructs::DodgeStruct m_dodgeData = EnemyDataStructs::DodgeStruct();
 	EnemyDataStructs::BarrierStruct	m_barrierData = EnemyDataStructs::BarrierStruct();
 	EnemyDataStructs::DetectionStruct m_detectionData = EnemyDataStructs::DetectionStruct();
+	EnemyDataStructs::SummonStruct m_summonData = EnemyDataStructs::SummonStruct();
+	EnemyDataStructs::MeleeStruct m_meleeData = EnemyDataStructs::MeleeStruct();
+	EnemyDataStructs::RangedStruct m_rangedData = EnemyDataStructs::RangedStruct();
 	void move();
 	void charge(float _dt);
 	void detect();
@@ -84,6 +88,11 @@ protected:
 	void spawnMine();
 	void die() override;
 	void generatePatrolPath(std::vector<int> _corners);
+	void attack(float _dt);
+	void summon(float _dt);
+	void melee(float _dt);
+	void ranged(float _dt);
+	Tile* getFreeTileInRaidus(int _radius);
 public:
 	Enemy();
 	~Enemy();

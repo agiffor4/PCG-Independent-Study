@@ -433,6 +433,44 @@ std::vector<Tile*> World::GetNeighbors(int _tileToFindNeighborsFor, bool _getDia
 	return neighbors;
 }
 
+std::vector<Tile*> World::GetTilesInRadius(int _tileToFindNeighborsFor, int _radius, bool _getDiagonals)
+{
+	std::set<Tile*> inRadius;
+	std::vector<Tile*> nextCheck;
+	for (size_t i = 0; i < (_getDiagonals ? 8 : 4); i++)
+	{
+		Tile* currentCheck = GetAdjacentTile(_tileToFindNeighborsFor, (TileDirection)i);
+		if (currentCheck != nullptr)
+		{
+			inRadius.emplace(currentCheck);
+		}
+	}
+	for (size_t r = 0; r < _radius-1; r++)
+	{
+		for (auto k = inRadius.begin(); k != inRadius.end(); k++)
+			nextCheck.push_back((*k));
+		for (size_t j = 0; j < nextCheck.size(); j++)
+		{
+			for (size_t i = 0; i < (_getDiagonals ? 8 : 4); i++)
+			{
+				Tile* currentCheck = GetAdjacentTile(nextCheck[j]->GetPositionInVector(), (TileDirection)i);
+				if (currentCheck != nullptr)
+				{
+					inRadius.emplace(currentCheck);
+				}
+			}
+			
+		}
+		nextCheck.clear();
+	}
+	std::vector<Tile*> neighbors;
+	for (auto i = inRadius.begin(); i != inRadius.end(); i++)
+	{
+		neighbors.push_back((*i));
+	}
+	return neighbors;
+}
+
 std::vector<Tile*> World::GetTiles()
 {
 	return m_tiles;;
@@ -807,25 +845,13 @@ void World::generateFoes()
 			int enemiesToSpawn = roomTree.GetRoomDepth(i) / 2;
 			for (size_t j = 0; j < enemiesToSpawn && j < 4; j++)
 			{
-				CreateEnemy(i);
+				CreateEnemy(i, 1);
 			}
 
 		}
 		
 	}
 
-}
-
-void World::CreateEnemy(int _roomIndex)
-{
-	Enemy* e = new Enemy();
-	e->Init("img/pics/coin.png", "Enemy", m_scene->GetRenderer());
-	Tile* t = GetTileAtIndex(m_roomsData[_roomIndex].GetRandomTile());
-	e->SetScale(m_tiles[0]->GetScale());
-	e->GenerateEnemy(1, this, m_roomsData[_roomIndex]);
-	e->SetLocation(t);
-	t->SetContents(e);
-	m_scene->AddCollidable(e);
 }
 
 void World::generateChests()
@@ -1191,6 +1217,30 @@ Vector2 World::CheckIfCameraShouldMove(Vector2 _cameraMoveDirection)
 
 
 	return _cameraMoveDirection;
+}
+
+void World::CreateEnemy(int _roomIndex, int _enemyLevel)
+{
+	Enemy* e = new Enemy();
+	e->Init("img/pics/coin.png", "Enemy", m_scene->GetRenderer());
+	Tile* t = GetTileAtIndex(m_roomsData[_roomIndex].GetRandomTile());
+	e->SetScale(m_tiles[0]->GetScale());
+	e->GenerateEnemy(_enemyLevel, this, m_roomsData[_roomIndex]);
+	e->SetLocation(t);
+	t->SetContents(e);
+	m_scene->AddCollidable(e);
+}
+
+void World::CreateEnemyAtIndex(int _tileIndex, int _enemyLevel)
+{
+	Enemy* e = new Enemy();
+	e->Init("img/pics/coin.png", "Enemy", m_scene->GetRenderer());
+	Tile* t = GetTileAtIndex(_tileIndex);
+	e->SetScale(m_tiles[0]->GetScale());
+	e->GenerateEnemy(_enemyLevel, this, m_roomsData[GetIndexOfRoomTileIsIn(_tileIndex)]);
+	e->SetLocation(t);
+	t->SetContents(e);
+	m_scene->AddCollidable(e);
 }
 
 const std::vector<Enemy*>& World::GetEnemiesOnLevel()

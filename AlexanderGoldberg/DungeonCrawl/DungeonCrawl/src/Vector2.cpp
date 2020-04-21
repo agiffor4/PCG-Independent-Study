@@ -72,6 +72,24 @@ Vector2::~Vector2()
 {
 }
 
+void Vector2::Set(float x, float y)
+{
+	X = x;
+	Y = y;
+}
+
+void Vector2::Set(int x, int y)
+{
+	X = x;
+	Y = y;
+}
+
+void Vector2::Set(double x, double y)
+{
+	X = x;
+	Y = y;
+}
+
 Vector2 Vector2::Normalized() {
 	if (X == 0 && Y == 0)
 	{

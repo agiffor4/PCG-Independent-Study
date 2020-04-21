@@ -2,6 +2,8 @@
 #include "Timer.h"
 #include "Vector2.h"
 #include <vector>
+#include "Weapon.h"
+class Tile;
 namespace  EnemyDataStructs 
 {
 	struct MovementStruct {
@@ -176,6 +178,25 @@ namespace  EnemyDataStructs
 		int DetectionRadius = 5;//in tiles
 		int DetectionRadiusLost = 15; //in tiles how far before they deaggro
 		bool Detected = false;
+	};
+
+	struct SummonStruct {
+		Timer SummonIntervals = Timer(0.5f); //how frequently a summon attempt occurs
+		Vector2 SummonIntervalsRange = Vector2(3, 3);
+		Timer SummonTime = Timer(0.5f); //how long it takes to summon
+		Vector2 SummonTimeRange = Vector2(0.1f, 0.1f);
+		int SummonRange = 1;
+		int SummonChance = 100; // chance for summon attempt to succeeed
+		Tile* SpawnTarget = nullptr;
+	
+	};
+	struct MeleeStruct{
+		int Range = 1;
+		int Damage = 2;
+		Timer AttackFrequency = Timer(1.0f);
+	};
+	struct RangedStruct{
+		Weapon* Weapon = nullptr;
 	};
 };
 
