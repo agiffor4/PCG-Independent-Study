@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Blockade.cpp" />
     <ClCompile Include="src\Enemy.cpp" />
     <ClCompile Include="src\EnemyCombat.cpp" />
     <ClCompile Include="src\MouseAim.cpp" />
@@ -208,6 +209,7 @@
     <ClCompile Include="src\StatusEffect.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Blockade.h" />
     <ClInclude Include="src\Enemy.h" />
     <ClInclude Include="src\EnemyCombat.h" />
     <ClInclude Include="src\EnemyDataStructs.h" />

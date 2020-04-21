@@ -4,6 +4,7 @@
 DoorA::DoorA() 
 {
 	m_blocksPassage = true;
+	m_solid = true;
 }
 DoorA::~DoorA() {}
 

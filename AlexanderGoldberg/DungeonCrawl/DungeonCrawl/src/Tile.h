@@ -12,6 +12,7 @@ class Tile :
 private:
 	Thing* m_contents = nullptr;
 	std::vector<Interactable*> m_items;
+	std::vector<Interactable*> m_toDelete;
 	std::vector<Shadow*> m_shadows;
 	Vector2 m_posInGrid = Vector2();
 	int m_posInVector = -1;
@@ -138,7 +139,7 @@ private:
 
 	};
 	bool m_clickAble = false;
-	
+	void deleteFlaggedItems(); 
 public:
 
 
@@ -160,6 +161,7 @@ public:
 	void AddItem(Interactable* _newItem);
 	void AddShadow(Shadow* _newShadow);
 	Interactable* RemoveItem(Interactable* _toRemove, bool _deleteOnRemoval);
+	
 	const Vector2& GetPositionInGrid();
 	void AddRoomNumber(int _roomTileIsIn, bool _renderNumbers, SDL_Renderer* _renderer);
 	void InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y) override;

@@ -802,11 +802,16 @@ void World::generateFoes()
 	int deepest = roomTree.GetDeepestDepth();
 	for (size_t i = 0; i < m_roomsData.size(); i++)
 	{
-		int enemiesToSpawn = roomTree.GetRoomDepth(i) / 2;
-		for (size_t j = 0; j < roomTree.GetRoomDepth(i) && j < 4; j++)
+		if (roomTree.GetRoomDepth(i) > 2)
 		{
-			CreateEnemy(i);
+			int enemiesToSpawn = roomTree.GetRoomDepth(i) / 2;
+			for (size_t j = 0; j < enemiesToSpawn && j < 4; j++)
+			{
+				CreateEnemy(i);
+			}
+
 		}
+		
 	}
 
 }

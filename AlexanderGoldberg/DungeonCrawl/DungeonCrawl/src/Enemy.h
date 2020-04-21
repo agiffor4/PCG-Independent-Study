@@ -79,6 +79,8 @@ protected:
 	void shield(float _dt);
 	void loadShieldImage();
 	void mineLaying(float _dt);
+	void blockLaying(float _dt);
+	void spawnBlock();
 	void spawnMine();
 	void die() override;
 	void generatePatrolPath(std::vector<int> _corners);

@@ -6,6 +6,7 @@
 #include "AStarSearch.h"
 #include "InputManager.h"
 #include <stack>
+#include "Blockade.h"
 Enemy::Enemy()
 {
 	m_solid = true;
@@ -315,6 +316,65 @@ void Enemy::mineLaying(float _dt)
 	}
 }
 
+void Enemy::blockLaying(float _dt)
+{
+	if (propertyInProfile(EnemyProperty::defenseLeaveBarricades))
+	{
+		if (!m_barrierData.TimeToDropBlock.GetShouldCountDown() && m_barrierData.PlaceBlockInterval.CountDown(_dt))
+		{
+			m_barrierData.PlaceBlockInterval.SetTimer(getRandominRange(m_barrierData.PlaceBlockTimeRange.X, m_barrierData.PlaceBlockTimeRange.Y));
+			if (getChance(m_barrierData.BlockDropChance))
+			{
+				m_movementData.CanMove = false;
+				m_barrierData.TimeToDropBlock.SetShouldCountDown(true);
+			}
+
+		}
+		if (m_barrierData.TimeToDropBlock.CountDownAutoCheckBool(_dt))
+		{
+			spawnBlock();
+			m_movementData.CanMove = true;
+		}
+	}
+}
+
+void Enemy::spawnBlock()
+{
+	std::vector<Tile*> neighbors = m_world->GetNeighbors(m_location);
+	bool checked[8] = { false, false, false, false, false, false, false, false };
+	auto allTrue = [](bool _array[])
+	{
+		int size = sizeof(_array) / sizeof(_array[0]);
+		for (size_t i = 0; i < size; i++)
+		{
+			if (_array[i] == false)
+			{
+				return false;
+			}
+		}
+		return true;
+	};
+	int index = 0;
+	bool valid = false;
+	do
+	{
+		index = rand() % neighbors.size();
+		if (neighbors[index]->IsPassable())
+			valid = true;
+
+	} while (!valid && !allTrue(checked));
+	
+	if (valid)
+	{
+		Blockade* blockade = new Blockade();
+		blockade->Init("img/blank_tile_orig.bmp", "Blockage", m_rendererRef);
+		blockade->Initialize();
+		blockade->SetLifeTime(m_barrierData.BarrierLifeTimeRange.X, m_barrierData.BarrierLifeTimeRange.Y);
+		neighbors[index]->AddItem(blockade);
+
+	}
+}
+
 void Enemy::spawnMine()
 {
 	Trap* t = dynamic_cast<Trap*>(m_mineLayerData.GetMine());
@@ -407,6 +467,8 @@ void Enemy::Update(float _dt)
 
 	shield(_dt);
 	mineLaying(_dt);
+	blockLaying(_dt);
+
 }
 
 void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawnedIn)
@@ -414,7 +476,7 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 	m_world = _world;
 	m_roomSpawnedIn = _roomSpawnedIn;
 	SetHealthMax(_difficulty * getRandomInRange(10, 30));
-	bool generateCustom = false;
+	bool generateCustom = true;
 	if (generateCustom)
 	{
 		addPropertyToProfile(EnemyProperty::movemetMoves);
@@ -427,6 +489,14 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 		corners.push_back(m_roomSpawnedIn.sm_containsTiles[0]);
 		corners.push_back(m_roomSpawnedIn.sm_containsTiles[m_roomSpawnedIn.sm_containsTiles.size() - 1]);
 		generatePatrolPath(corners);
+		addPropertyToProfile(EnemyProperty::defenseLeaveBarricades);
+		m_barrierData.BarrierLifeTimeRange.X = 2;
+		m_barrierData.BarrierLifeTimeRange.Y = 5;
+		m_barrierData.PlaceBlockTimeRange.X = 1;
+		m_barrierData.PlaceBlockTimeRange.Y = 1;
+		m_barrierData.PlaceBlockInterval.SetTimer(getRandominRange(m_barrierData.PlaceBlockTimeRange.X, m_barrierData.PlaceBlockTimeRange.Y));
+		m_barrierData.TimeToDropBlock.SetTimer(getRandominRange(m_barrierData.BarrierLifeTimeRange.X, m_barrierData.BarrierLifeTimeRange.Y));
+
 	}
 	else
 	{
@@ -548,6 +618,13 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 		if (getChance(15 + _difficulty * 2))
 		{
 			addPropertyToProfile(EnemyProperty::defenseLeaveBarricades);
+			m_barrierData.BarrierLifeTimeRange.X = 2;
+			m_barrierData.BarrierLifeTimeRange.Y = 5;
+			m_barrierData.PlaceBlockTimeRange.X = 1;
+			m_barrierData.PlaceBlockTimeRange.Y = 1;
+			m_barrierData.PlaceBlockInterval.SetTimer(getRandominRange(m_barrierData.PlaceBlockTimeRange.X, m_barrierData.PlaceBlockTimeRange.Y));
+			m_barrierData.TimeToDropBlock.SetTimer(getRandominRange(m_barrierData.BarrierLifeTimeRange.X, m_barrierData.BarrierLifeTimeRange.Y));
+			
 		}
 		if (propertyInProfile(EnemyProperty::movemetMoves))
 		{
@@ -626,7 +703,7 @@ int Enemy::getRandomInRange(int _min, int _max)
 float Enemy::getRandominRange(float _min, float _max)
 {
 	
-	return ((getRandomInRange(_min * 1000, (_max) * 1000) - _min) / 1000) + _min;
+	return ((float)rand() / (float)RAND_MAX) * (_max - _min) + _min;
 }
 
 

@@ -9,7 +9,10 @@ namespace  EnemyDataStructs
 		bool RoomBound = false;
 		bool CanMove = true;
 		Timer MoveTimerSec = Timer(1.0f);
-		
+		void Print() 
+		{
+			printf("MovementData: Moved %s, RoomBound %s, CanMove %s, MoveRate (TPS) %f\n", (Moved ? "true": "false"), (RoomBound ? "true": "false"), (CanMove ? "true": "false"), MoveTimerSec.GetResetTime());
+		}
 		
 
 	};
@@ -29,7 +32,10 @@ namespace  EnemyDataStructs
 		bool StunnedOnImpact = false; // is the enemy stunned when it runs into something
 		int ChargeDamage = 5; //how much damage does it do to the player if they are adjacent when it stops charging
 		int DirectionOfCharge = -1; //the direction the enemy is charging in, set when charge begins
-		
+		void Print()
+		{
+			printf("ChargetData: DoesDamage %s, Charging %s, StopAtTarget %s, ChargeDamage %d, ChargeMovementIntervals (TPS) %f, Wind up %f, Charge Chance %d, Charge Frequency %f, Minimum distance (tiles) %d\n", (DoesDamage ? "true": "false"), (Charging ? "true": "false"), (StopAtTarget ? "true": "false"), ChargeDamage, ChargeMovementIntervals.GetResetTime(), ChargeWindUpSec.GetResetTime(), ChanceToCarge, ShouldChargeCheckIntervals.GetResetTime(), MinDistance);
+		}
 	};
 	struct ShieldStruct 
 	{
@@ -71,7 +77,16 @@ namespace  EnemyDataStructs
 		Timer TimeVisible = Timer(1.0f);
 		Timer TimeFlickering = Timer(1.0f);
 		Timer FlickerRate = Timer(0.05f); //flicker rate while flickering
-		
+		void Print()
+		{
+			/*
+			printf("Connst Times %s, Invisible Time %f, min max invisible %s, visible Time %f, min max Visible %s, flicker Time %f, min max Flicker %s, Flicker Rate"
+				, (ConstTimes ? "true" : "false"),
+				TimeInvisible.GetResetTime(), MinMaxInvisibleTime.toString().c_str(),
+				TimeVisible.GetResetTime(), MinMaxVisibleTime.toString().c_str(),
+				TimeFlickering.GetResetTime(), MinMaxFlickerTime.toString().c_str()),
+				FlickerRate.GetResetTime());*/
+		}
 
 	};
 
@@ -148,7 +163,12 @@ namespace  EnemyDataStructs
 
 	struct BarrierStruct
 	{
-
+		bool Dies = true;
+		Vector2 BarrierLifeTimeRange = Vector2();
+		Timer PlaceBlockInterval = Timer(1.5f);
+		Timer TimeToDropBlock = Timer(0.5f);
+		Vector2 PlaceBlockTimeRange = Vector2();
+		int BlockDropChance = 100;
 	};
 
 	struct DetectionStruct

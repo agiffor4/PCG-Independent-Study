@@ -7,6 +7,15 @@
 #include "World.h"
 #include "Shadow.h"
 #include "InputManager.h"
+void Tile::deleteFlaggedItems()
+{
+	for (size_t i = 0; i < m_toDelete.size(); i++)
+	{
+		delete(m_toDelete[i]);
+	}
+
+	m_toDelete.clear();
+}
 Tile::Tile() {
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::MOUSEUP);
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::UP);
@@ -140,6 +149,10 @@ void Tile::AddItem(Interactable* _newItem)
 		_newItem->SetScale(GetScale());
 		_newItem->SetLocation(this);
 		m_items.push_back(_newItem);
+		if (_newItem->IsSolid())
+		{
+			m_solid = true;
+		}
 	}
 }
 
@@ -162,12 +175,25 @@ Interactable* Tile::RemoveItem(Interactable* _toRemove, bool _deleteOnRemoval)
 		{
 			m_items.erase(itt);
 			if (_deleteOnRemoval)
-				delete(_toRemove);
+				m_toDelete.push_back(_toRemove);
 			else
 				toReturn = _toRemove;
 			break;
 		}
 		itt++;
+	}
+
+	if (_toRemove->IsSolid())
+	{
+		m_solid = false;
+		for (size_t i = 0; i < m_items.size(); i++)
+		{
+			if (m_items[i]->IsSolid())
+			{
+				m_solid = true;
+				break;
+			}
+		}
 	}
 	return toReturn;
 }
@@ -442,6 +468,7 @@ void Tile::Update(float _dt)
 		}
 
 	}
+	deleteFlaggedItems();
 }
 
 void Tile::DetermineTileType(World* _world)
