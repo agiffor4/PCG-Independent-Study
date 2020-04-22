@@ -40,10 +40,15 @@ void Player::Update(float _dt)
 		move(m_direction);
 		m_moveRate.SetShouldCountDown(true);
 	}
-	if (m_equipedWeapon != nullptr && m_equipedWeapon->ShouldSetLOS())
+	if (m_equipedWeapon != nullptr)
 	{
-		SetLineOfSight(true);
+		m_equipedWeapon->Update(_dt);
+		if (m_equipedWeapon->ShouldSetLOS())
+		{
+			SetLineOfSight(true);
+		}
 	}
+	
 	if (m_fireButtonDown)
 	{
 		if (m_equipedWeapon != nullptr)

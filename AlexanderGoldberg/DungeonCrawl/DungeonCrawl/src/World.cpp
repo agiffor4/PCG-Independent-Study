@@ -1068,11 +1068,13 @@ void World::PlacePlayer(std::vector<std::vector<int>>* _rooms)
 #if UseCamera == 1
 	centerCameraOnPlayer(t);
 #endif
+
 	Weapon* w = new Weapon();
 	w->Init("img/pics/Weapon01.png", "Basic Weapon", m_scene->GetRenderer());
 	w->InitializeWeapon(m_scene, this);
+	
 	w->GenerateWeapon(1);
-	t = GetAdjacentTile(m_playerStart, World::TileDirection::UP);
+	t = GetTileAtIndex(m_playerStart);
 	t->AddItem(w);
 
 }

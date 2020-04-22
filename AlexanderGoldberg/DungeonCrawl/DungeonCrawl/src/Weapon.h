@@ -80,7 +80,9 @@ protected:
 	void setProjectileHomeTargetsToNearest(float _maxDistance);
 
 	//UTILITY
-	int getRandomInRange(int _min, int _max);
+	inline int getRandomInRange(int _min, int _max);
+	inline float getRandomInRange(float _min, float _max);
+	inline float getRandomInRange(double _min, double _max);
 	bool propertyInProfile(weaponProperties _property);
 	void addPropertyToProfile(weaponProperties _property);
 	void removePropertyFromProfile(weaponProperties _property);

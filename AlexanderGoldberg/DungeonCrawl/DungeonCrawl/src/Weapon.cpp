@@ -233,6 +233,17 @@ int Weapon::getRandomInRange(int _min, int _max)
 	return (rand() % (_max + 1 - _min)) + _min;
 }
 
+float Weapon::getRandomInRange(float _min, float _max)
+{
+
+	return ((float)rand() / (float)RAND_MAX) * (_max - _min) + _min;
+}
+
+float Weapon::getRandomInRange(double _min, double _max)
+{
+
+	return ((float)rand() / (float)RAND_MAX) * (_max - _min) + _min;
+}
 bool Weapon::propertyInProfile(weaponProperties _property)
 {
 	return (m_weaponProfile & (Uint32)_property);
