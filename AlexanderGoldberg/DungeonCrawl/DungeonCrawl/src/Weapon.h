@@ -111,10 +111,7 @@ protected:
 	void generateAutoMachinegun();
 	void generateMinigun();
 	void generateMissileLauncher();
-	void generateAutoHexShot();
-	void generateAutoTriShot();
 	//tier 5
-	void generateAutoMinigun();
 	void generateAutoMissileLauncher();
 	void generateAutoSniperRifle();
 	Enums::DamageType m_damageType = Enums::DamageType::Piercing;

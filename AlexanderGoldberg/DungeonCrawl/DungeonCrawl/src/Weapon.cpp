@@ -457,7 +457,8 @@ void Weapon::GenerateWeapon(int _weaponLevel)
 	m_weaponLevel = _weaponLevel;
 	if (!m_randomWeapon)
 	{
-		generateSniperRifle();
+		generateMinigun();
+		m_ammo = m_ammoMax;
 	}
 	else
 	{
@@ -575,48 +576,129 @@ void Weapon::generateSniperRifle()
 
 void Weapon::generateTriShot()
 {
+	m_triggerData.fireRate = 0.75f;
+	m_triggerData.shotsFiredperTriggerPull = 3;
+	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
+	m_projectileData.projectileSpeedMultiplier = 1;
+	m_projectileData.DamageAmount = 1;
+	m_SpreadData.constSpreadInDegreesPerProjectile.push_back(-15);
+	m_SpreadData.constSpreadInDegreesPerProjectile.push_back(0);
+	m_SpreadData.constSpreadInDegreesPerProjectile.push_back(15);
+	addPropertyToProfile(weaponProperties::spreadConstant);
+
+
 }
 
 void Weapon::generateHexShot()
 {
+	m_triggerData.fireRate = 0.75f;
+	m_triggerData.shotsFiredperTriggerPull = 6;
+	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
+	m_projectileData.projectileSpeedMultiplier = 1;
+	m_projectileData.DamageAmount = 1;
+	m_SpreadData.constSpreadInDegreesPerProjectile.push_back(0);
+	m_SpreadData.constSpreadInDegreesPerProjectile.push_back(60);
+	m_SpreadData.constSpreadInDegreesPerProjectile.push_back(120);
+	m_SpreadData.constSpreadInDegreesPerProjectile.push_back(180);
+	m_SpreadData.constSpreadInDegreesPerProjectile.push_back(240);
+	m_SpreadData.constSpreadInDegreesPerProjectile.push_back(300);
+	addPropertyToProfile(weaponProperties::spreadConstant);
 }
 
 void Weapon::generateAutoPistol()
 {
+	m_triggerData.fireRate = getRandomInRange(1.0f, 1.5f);
+	m_triggerData.shotsFiredperTriggerPull = 1;
+	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
+	m_projectileData.projectileSpeedMultiplier = 1;
+	m_projectileData.DamageAmount = 1;
+	addPropertyToProfile(weaponProperties::spreadRandom);
+	m_SpreadData.spreadRangeDeg.Set(-5, 5);
+	addPropertyToProfile(weaponProperties::burstConstant);
+	m_burstData.burstShotsVariable.Set(4, 5);
+	m_burstData.burstTotalTime = m_triggerData.fireRate;
+	addPropertyToProfile(weaponProperties::everyShotCosts);
 }
 
 void Weapon::generateAutoShotgun()
 {
+	m_triggerData.fireRate = getRandomInRange(1.0f, 1.5f);
+	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
+	m_triggerData.shotsFiredperTriggerPull = 3;
+	m_projectileData.projectileSpeedMultiplier = 1;
+	m_projectileData.DamageAmount = 1;
+	addPropertyToProfile(weaponProperties::spreadRandom);
+	m_SpreadData.spreadRangeDeg.Set(-15, 15);
+	addPropertyToProfile(weaponProperties::burstVariable);
+	m_burstData.burstShotsVariable.Set(4, 6);
+	addPropertyToProfile(weaponProperties::everyShotCosts);
+	m_burstData.burstTotalTime = 0.2f;
 }
 
 void Weapon::generateAutoMachinegun()
 {
+	m_triggerData.fireRate = getRandomInRange(0.75f, 1.0f);
+	m_triggerData.shotsFiredperTriggerPull = 1;
+	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
+	m_projectileData.projectileSpeedMultiplier = 1;
+	m_projectileData.DamageAmount = 1;
+	addPropertyToProfile(weaponProperties::spreadRandom);
+	m_SpreadData.spreadRangeDeg.Set(-5, 5);
+	addPropertyToProfile(weaponProperties::burstVariable);
+	m_burstData.burstShotsVariable.Set(3, 5);
+	m_burstData.burstTotalTime = m_triggerData.fireRate;
 }
 
 void Weapon::generateMinigun()
 {
+	m_triggerData.fireRate = getRandomInRange(0.5f, 0.5f);
+	m_triggerData.shotsFiredperTriggerPull = 1;
+	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
+	m_projectileData.projectileSpeedMultiplier = 1.5f;
+	m_projectileData.DamageAmount = 3;
+	addPropertyToProfile(weaponProperties::spreadRandom);
+	m_SpreadData.spreadRangeDeg.Set(-5, 5);
+	addPropertyToProfile(weaponProperties::burstVariable);
+	m_burstData.burstShotsVariable.Set(3, 5);
+	m_burstData.burstTotalTime = m_triggerData.fireRate;
+	addPropertyToProfile(weaponProperties::everyShotCosts);
+	m_ammoMax = 200;
+	
 }
 
 void Weapon::generateMissileLauncher()
 {
+	m_triggerData.fireRate = 3.0f;
+	m_triggerData.shotsFiredperTriggerPull = 1;
+	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
+	m_projectileData.projectileSpeedMultiplier = 2;
+	m_projectileData.DamageAmount = 10;
+	addPropertyToProfile(weaponProperties::areaOfEffectDamage);
+	m_AOEData.AoePercentageFallOffPerUnitDistance = 0.75f;
+	m_AOEData.AoeRadiusInTiles = 2;
+
 }
 
-void Weapon::generateAutoHexShot()
-{
-}
 
-void Weapon::generateAutoTriShot()
-{
-}
-
-void Weapon::generateAutoMinigun()
-{
-}
 
 void Weapon::generateAutoMissileLauncher()
 {
+	m_triggerData.fireRate = 1.0f;
+	m_triggerData.shotsFiredperTriggerPull = 1;
+	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
+	m_projectileData.projectileSpeedMultiplier = 2;
+	m_projectileData.DamageAmount = 10;
+	addPropertyToProfile(weaponProperties::areaOfEffectDamage);
+	m_AOEData.AoePercentageFallOffPerUnitDistance = 0.75f;
+	m_AOEData.AoeRadiusInTiles = 2;
 }
 
 void Weapon::generateAutoSniperRifle()
 {
+	m_triggerData.fireRate = 1.0f;
+	m_triggerData.shotsFiredperTriggerPull = 1;
+	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
+	m_projectileData.projectileSpeedMultiplier = 2;
+	m_projectileData.DamageAmount = 10;
+
 }
