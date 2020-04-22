@@ -457,8 +457,83 @@ void Weapon::GenerateWeapon(int _weaponLevel)
 	m_weaponLevel = _weaponLevel;
 	if (!m_randomWeapon)
 	{
-		generateMinigun();
+		switch (m_weaponLevel)
+		{
+		case 1:
+			generatePistol();
+			break;
+		case 2:
+			if(getChance(50))
+				generateShotgun();
+			else
+				generateMachinegun();
+			break;
+		case 3:
+			if (getChance(50))
+			{
+				if (getChance(50))
+					generateTriShot();
+				else
+					generateHexShot();
+			}
+			else
+			{
+				if (getChance(50))
+					generateSniperRifle();
+				else
+					generateAutoPistol();
+			}
+			break;
+		case 4:
+			if (getChance(50))
+			{
+				if (getChance(50))
+					generateMinigun();
+				else
+					generateMissileLauncher();
+			}
+			else
+			{
+				if (getChance(50))
+					generateAutoShotgun();
+				else
+					generateAutoMachinegun();
+			}
+			break;
+		case 5:
+			if (getChance(50))
+				generateAutoMissileLauncher();
+			else
+				generateAutoSniperRifle();
+			break;
+		default:
+			break;
+		}
 		m_ammo = m_ammoMax;
+		
+
+		if (getChance(30))
+		{
+			addPropertyToProfile(weaponProperties::illuminated);
+			m_LightData.lightRadius = getRandomInRange(1, 3);
+			m_LightData.lightIntensity = m_projectileData.DamageAmount * 1.5f;
+		}
+		if (m_weaponLevel > 3)
+		{
+			m_projectileData.piercingCount = getChance(75) ? 1 : getRandomInRange(1, (m_weaponLevel / 2) + 1);
+			if (m_projectileData.piercingCount > 1)
+				addPropertyToProfile(weaponProperties::piercing);
+		}
+
+		if (m_weaponLevel > 5)
+		{
+			generateHomingData();
+			if (propertyInProfile(weaponProperties::areaOfEffectDamage))
+			{
+				generateAOEData();
+			}
+		}
+		
 	}
 	else
 	{
