@@ -410,8 +410,6 @@ bool Weapon::getChance(int _percentChance)
 	return (rand() % 100) < _percentChance;
 }
 
-
-
 bool Weapon::Interaction(Thing* _thingInitatingInteraction)
 {
 	/*Player* p = dynamic_cast<Player*>(_thingInitatingInteraction);
@@ -457,23 +455,30 @@ bool Weapon::ShouldSetLOS()
 void Weapon::GenerateWeapon(int _weaponLevel)
 {
 	m_weaponLevel = _weaponLevel;
-	if (getChance(m_weaponLevel * 3))
+	if (!m_randomWeapon)
 	{
-		addPropertyToProfile(weaponProperties::everyShotCosts);
+		generateShotgun();
 	}
-	if (getChance(30))
+	else
 	{
-		addPropertyToProfile(weaponProperties::illuminated);
-		m_LightData.lightRadius = getRandomInRange(1, 3);
-		m_LightData.lightIntensity = m_projectileData.DamageAmount * 1.5f;
+		if (getChance(m_weaponLevel * 3))
+		{
+			addPropertyToProfile(weaponProperties::everyShotCosts);
+		}
+		if (getChance(30))
+		{
+			addPropertyToProfile(weaponProperties::illuminated);
+			m_LightData.lightRadius = getRandomInRange(1, 3);
+			m_LightData.lightIntensity = m_projectileData.DamageAmount * 1.5f;
+		}
+		generateTriggerPullData();
+		generateBurstData();
+		generateProjectileData();
+		generateSpreadData();
+		generateHomingData();
+		generateAOEData();
+		/*generateBounceData();*/
 	}
-	generateTriggerPullData();
-	generateBurstData();
-	generateProjectileData();
-	generateSpreadData();
-	generateHomingData();
-	generateAOEData();
-	/*generateBounceData();*/
 	
 
 
@@ -509,4 +514,95 @@ void Weapon::PrintWeaponInfo()
 	{
 		m_bounceData.PrintData();
 	}
+}
+
+
+
+
+void Weapon::generatePistol()
+{
+
+	//higher level weapons will tend towards faster fire rates
+	
+	m_triggerData.fireRate = getRandomInRange(0.75f, 1.0f);
+	m_triggerData.shotsFiredperTriggerPull = 1;
+
+	m_projectileData.projectileSpeedMultiplier = 1;
+	m_projectileData.DamageAmount = 1;
+	addPropertyToProfile(weaponProperties::spreadRandom);
+	m_SpreadData.spreadRangeDeg.Set(-5, 5);
+
+
+}
+
+void Weapon::generateShotgun()
+{
+
+	m_triggerData.fireRate = getRandomInRange(1.0f, 1.5f);
+	m_triggerData.shotsFiredperTriggerPull = 2;
+	m_projectileData.projectileSpeedMultiplier = 1;
+	m_projectileData.DamageAmount = 1;
+	addPropertyToProfile(weaponProperties::spreadRandom);
+	m_SpreadData.spreadRangeDeg.Set(-15, 15);
+	addPropertyToProfile(weaponProperties::burstConstant);
+	m_burstData.burstShotsVariable.X = 3;
+	addPropertyToProfile(weaponProperties::everyShotCosts);
+	m_burstData.burstTotalTime = 0.1f;
+
+}
+
+void Weapon::generateMachinegun()
+{
+}
+
+void Weapon::generateSniperRifle()
+{
+}
+
+void Weapon::generateTriShot()
+{
+}
+
+void Weapon::generateHexShot()
+{
+}
+
+void Weapon::generateAutoPistol()
+{
+}
+
+void Weapon::generateAutoShotgun()
+{
+}
+
+void Weapon::generateAutoMachinegun()
+{
+}
+
+void Weapon::generateMinigun()
+{
+}
+
+void Weapon::generateMissileLauncher()
+{
+}
+
+void Weapon::generateAutoHexShot()
+{
+}
+
+void Weapon::generateAutoTriShot()
+{
+}
+
+void Weapon::generateAutoMinigun()
+{
+}
+
+void Weapon::generateAutoMissileLauncher()
+{
+}
+
+void Weapon::generateAutoSniperRifle()
+{
 }

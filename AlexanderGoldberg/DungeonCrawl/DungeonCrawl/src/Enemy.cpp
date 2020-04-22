@@ -463,7 +463,7 @@ void Enemy::melee(float _dt)
 	{
 		if (Vector2::GetDistanceLessThan(GetPositionInGrid(), m_player->GetPositionInGrid(), m_meleeData.Range))
 		{
-			m_player->TakeDamage(m_meleeData.Damage);
+			m_player->TakeDamage(m_meleeData.Damage, Enums::DamageType::Piercing);
 		}
 	}
 

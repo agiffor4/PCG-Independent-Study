@@ -4,6 +4,7 @@
 #include <map>
 #include "Timer.h"
 #include "WeaponStructs.h"
+#include "Enums.h"
 class Player;
 class Projectile;
 class Scene;
@@ -69,7 +70,7 @@ protected:
 	WeaponStructs::AOEStruct m_AOEData = WeaponStructs::AOEStruct();
 	
 	int m_weaponLevel = 1;
-
+	bool m_randomWeapon = false;
 	Projectile* getProjectile();
 	std::vector<Projectile*> m_projectiles;
 	void fire(Vector2 _direction, bool _costAmmo = true, bool _ignoreCooldown = false);
@@ -95,14 +96,30 @@ protected:
 	void generateBounceData();
 	bool getChance(int _percentChance);
 
-
+	//tier 1
+	void generatePistol();
+	//tier 2
+	
+	void generateShotgun();
+	void generateMachinegun();
+	//tier 3
+	void generateSniperRifle();
+	void generateTriShot();
+	void generateHexShot();
+	void generateAutoPistol();
+	//tier 4
+	void generateAutoShotgun();
+	void generateAutoMachinegun();
+	void generateMinigun();
+	void generateMissileLauncher();
+	void generateAutoHexShot();
+	void generateAutoTriShot();
+	//tier 5
+	void generateAutoMinigun();
+	void generateAutoMissileLauncher();
+	void generateAutoSniperRifle();
+	Enums::DamageType m_damageType = Enums::DamageType::Piercing;
 public:
-	enum class damageType {
-
-		Piercing,
-		Fire,
-		Ice
-	};
 	Weapon();
 	~Weapon();
 	void InitializeWeapon(Scene* _scene, World* _world);
