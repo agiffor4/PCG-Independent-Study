@@ -534,7 +534,15 @@ void World::Generate()
 	if (m_digPathsOneAtATime)
 		GenerateLevelP1();
 	else
-		GenerateLevel();
+	{
+		do
+		{
+			m_regenLevel = false;
+			GenerateLevel();
+			if (m_regenLevel)
+				printf("\n\nForcing regeneration of stage due to failure to fulfill requirements\n\n");
+		} while (m_regenLevel);
+	}
 }
 void World::GenerateLevel()
 {
@@ -754,14 +762,25 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 			int roomToLock = 0;
 			if (m_roomsData.size() > 2)
 			{
+				int roomReturnedToLockIsPlayer = 0;
 				do
 				{
 					roomToLock = roomTree.GetRandomParentWithinRange((m_lastKeyDepth > 4 ? 2 : m_lastKeyDepth > 3 ? 1 : 0), m_lastKeyRoom);
+					if (roomToLock == playerStartRoomIndex)
+						roomReturnedToLockIsPlayer++;
+					if (roomReturnedToLockIsPlayer > 25)
+					{
+						m_regenLevel = true;
+						break;
+					}
 				} while (roomToLock == exitRoomIndex || roomToLock == playerStartRoomIndex);
 			}
-			doorPath = "img/" + (i < 3 ? numToColor[i] : numToColor[0]) + "Door.bmp";
-			keyPath = "img/" + (i < 3 ? numToColor[i] : numToColor[0]) + "KeyCard.bmp";
-			GenerateKeyDoorPair(roomToLock, roomTree, doorPath, keyPath, _bspToUse);
+			if (!m_regenLevel)
+			{
+				doorPath = "img/" + (i < 3 ? numToColor[i] : numToColor[0]) + "Door.bmp";
+				keyPath = "img/" + (i < 3 ? numToColor[i] : numToColor[0]) + "KeyCard.bmp";
+				GenerateKeyDoorPair(roomToLock, roomTree, doorPath, keyPath, _bspToUse);
+			}
 		}
 		break;
 	
@@ -791,16 +810,19 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 }
 void World::GenerateItems(int _exitLocation, BSP* _bspToUse) {
 	
-//	generateTreasure();
-	
-	generateChests();
+	if (!m_regenLevel)
+	{
+		//	generateTreasure();
+		generateChests();
 
-	int randomTile = m_roomsData[rand() % m_roomsData.size()].GetRandomTile();
-	Light* l = new Light();
-	l->Init("img/Torch.png", "Light", m_scene->GetRenderer(), this);
-	m_tiles[randomTile]->AddItem(l);
-	generateWeapon();
-	generateFoes();
+		int randomTile = m_roomsData[rand() % m_roomsData.size()].GetRandomTile();
+		Light* l = new Light();
+		l->Init("img/Torch.png", "Light", m_scene->GetRenderer(), this);
+		m_tiles[randomTile]->AddItem(l);
+		generateWeapon();
+		//generateFoes();
+	}
+	
 	
 }
 
@@ -819,6 +841,7 @@ void World::generateTreasure() {
 
 void World::generateWeapon()
 {
+	m_weaponsSpawnedOnLevel = 1;
 	for (size_t i = 0; i < m_roomsData.size(); i++)
 	{
 		if (m_roomsData[i].sm_connectedness < 4)
@@ -1025,12 +1048,12 @@ Player* World::CreatePlayer()
 
 Weapon* World::CreateWeapon()
 {
+	m_weaponsSpawnedOnLevel++;
 	Weapon* w = nullptr;
 	w = new Weapon();	
-	w->Init("img/pics/Weapon03.png", "Triplicate", m_scene->GetRenderer());
+	w->Init("img/pics/Weapon03.png", "Weapon " + std::to_string(m_weaponsSpawnedOnLevel), m_scene->GetRenderer());
 	w->InitializeWeapon(m_scene, this);
-	w->GenerateWeapon(1);
-	m_scene->AddRenderable(w);
+	w->GenerateWeapon(m_generationNumber + (rand() % 2));
 	return w;
 
 }
@@ -1049,7 +1072,6 @@ void World::PlacePlayer(std::vector<std::vector<int>>* _rooms)
 	w->Init("img/pics/Weapon01.png", "Basic Weapon", m_scene->GetRenderer());
 	w->InitializeWeapon(m_scene, this);
 	w->GenerateWeapon(1);
-	m_scene->AddRenderable(w);
 	t = GetAdjacentTile(m_playerStart, World::TileDirection::UP);
 	t->AddItem(w);
 

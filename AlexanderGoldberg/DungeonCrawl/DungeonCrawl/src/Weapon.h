@@ -115,6 +115,8 @@ protected:
 	void generateAutoMissileLauncher();
 	void generateAutoSniperRifle();
 	Enums::DamageType m_damageType = Enums::DamageType::Piercing;
+	void generateWeaponOfType(int _weapon);
+	void generateWeaponOfType(const std::vector<int>& _weapon);
 public:
 	Weapon();
 	~Weapon();
@@ -129,6 +131,7 @@ public:
 	float GetAmmoAsPercent();
 	bool ShouldSetLOS();
 	void GenerateWeapon(int _weaponLevel);
+	
 	void PrintWeaponInfo();
 };
 

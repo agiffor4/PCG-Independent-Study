@@ -61,6 +61,8 @@ protected:
 	std::vector<Enemy*> m_EnemiesOnLevel;
 	float m_scale = 32.0f / 64.0f;
 	void tileRenderingSetUp();
+	int m_weaponsSpawnedOnLevel = 0;
+	bool m_regenLevel = false;
 public:
 	
 	enum class TileDirection

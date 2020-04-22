@@ -4,6 +4,7 @@
 #include "Scene.h"
 #include  "World.h"
 #include "Enemy.h"
+#include <functional>
 Projectile* Weapon::getProjectile()
 {
 	
@@ -58,6 +59,8 @@ Weapon::Weapon()
 
 Weapon::~Weapon()
 {
+	m_scene->RemoveRenderable(this);
+
 }
 
 void Weapon::InitializeWeapon(Scene* _scene, World* _world)
@@ -460,51 +463,51 @@ void Weapon::GenerateWeapon(int _weaponLevel)
 		switch (m_weaponLevel)
 		{
 		case 1:
-			generatePistol();
+			generateWeaponOfType(1);
 			break;
 		case 2:
 			if(getChance(50))
-				generateShotgun();
+				generateWeaponOfType({ 2, 2, 1,1, 2, 2, 2 ,2, 2, 2, 1, 1 });
 			else
-				generateMachinegun();
+				generateWeaponOfType({ 3, 3, 3,3, 3, 3, 3 ,2, 2, 3, 2, 2 });
 			break;
 		case 3:
 			if (getChance(50))
 			{
 				if (getChance(50))
-					generateTriShot();
+					generateWeaponOfType({ 1, 3, 4, 2, 2, 4, 4 ,3, 3, 4, 4, 4 });
 				else
-					generateHexShot();
+					generateWeaponOfType({ 4, 2, 3, 2, 4, 4, 4 ,5, 5, 5, 5, 5 });
 			}
 			else
 			{
 				if (getChance(50))
-					generateSniperRifle();
+					generateWeaponOfType({ 6, 3, 4, 3, 4, 5, 5 ,5, 6, 6, 6, 6 });
 				else
-					generateAutoPistol();
+					generateWeaponOfType({ 6, 3, 4, 3, 4, 5, 6 ,7, 7, 7, 7, 7 });
 			}
 			break;
 		case 4:
 			if (getChance(50))
 			{
 				if (getChance(50))
-					generateMinigun();
+					generateWeaponOfType({8, 3, 4, 3, 4, 5, 6 ,7, 8, 8, 8, 8 });
 				else
-					generateMissileLauncher();
+					generateWeaponOfType({ 9, 3, 4, 3, 4, 5, 6 ,7, 8, 9, 9, 9, 9 });
 			}
 			else
 			{
 				if (getChance(50))
-					generateAutoShotgun();
+					generateWeaponOfType({ 10, 3, 4, 3, 4, 5, 6 ,7, 8, 9, 10, 10, 10, 10});
 				else
-					generateAutoMachinegun();
+					generateWeaponOfType({ 11, 3, 4, 3, 4, 5, 6 ,7, 8, 9, 11, 11, 11, 11, 11, 11 });
 			}
 			break;
 		case 5:
 			if (getChance(50))
-				generateAutoMissileLauncher();
+				generateWeaponOfType({ 12, 3, 4, 3, 4, 5,6 ,7, 8, 9, 12, 12, 12, 12, 12 });
 			else
-				generateAutoSniperRifle();
+				generateWeaponOfType({13, 3, 4, 3, 4, 5, 6 ,7, 8, 9, 12, 12, 13, 13, 13, 13});
 			break;
 		default:
 			break;
@@ -604,23 +607,23 @@ void Weapon::generatePistol()
 	m_triggerData.shotsFiredperTriggerPull = 1;
 	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
 	m_projectileData.projectileSpeedMultiplier = 1;
-	m_projectileData.DamageAmount = 1;
+	m_projectileData.DamageAmount = 1 * m_weaponLevel;
 	addPropertyToProfile(weaponProperties::spreadRandom);
-	m_SpreadData.spreadRangeDeg.Set(-5, 5);
+	m_SpreadData.spreadRangeDeg.Set(-5 + (m_weaponLevel / 2 > 5 ? 5 : m_weaponLevel / 2), 5 - (m_weaponLevel / 2 > 5 ? 5 : m_weaponLevel / 2));
 
 
 }
 
 void Weapon::generateShotgun()
 {
-
-	m_triggerData.fireRate = getRandomInRange(1.0f, 1.5f);
+	int spreadEffector = (m_weaponLevel / 2 > 5 ? 5 : m_weaponLevel / 2);
+	m_triggerData.fireRate = getRandomInRange(1.0f, 1.5f) - (m_weaponLevel / 10);
 	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
 	m_triggerData.shotsFiredperTriggerPull = 2;
 	m_projectileData.projectileSpeedMultiplier = 1;
-	m_projectileData.DamageAmount = 1;
+	m_projectileData.DamageAmount = 1 * m_weaponLevel;
 	addPropertyToProfile(weaponProperties::spreadRandom);
-	m_SpreadData.spreadRangeDeg.Set(-15, 15);
+	m_SpreadData.spreadRangeDeg.Set(-15 + spreadEffector, 15 - spreadEffector);
 	addPropertyToProfile(weaponProperties::burstConstant);
 	m_burstData.burstShotsVariable.X = 3;
 	addPropertyToProfile(weaponProperties::everyShotCosts);
@@ -630,23 +633,24 @@ void Weapon::generateShotgun()
 
 void Weapon::generateMachinegun()
 {
-
+	int spreadEffector = (m_weaponLevel / 2 > 10 ? 10 : m_weaponLevel / 2);
 	m_triggerData.fireRate = 0.1f;
 	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
 	m_triggerData.shotsFiredperTriggerPull = 1;
 	m_projectileData.projectileSpeedMultiplier = 1;
-	m_projectileData.DamageAmount = 1;
+	m_projectileData.DamageAmount = 1 * m_weaponLevel;
 	addPropertyToProfile(weaponProperties::spreadRandom);
-	m_SpreadData.spreadRangeDeg.Set(-10, 10);
+	m_SpreadData.spreadRangeDeg.Set(-10 + spreadEffector * 0.5f, 10 - spreadEffector *0.5f);
 }
 
 void Weapon::generateSniperRifle()
 {
+	
 	m_triggerData.fireRate = 5.0f;
 	m_triggerData.shotsFiredperTriggerPull = 1;
 	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
 	m_projectileData.projectileSpeedMultiplier = 2;
-	m_projectileData.DamageAmount = 10;
+	m_projectileData.DamageAmount = 2.5f * m_weaponLevel;
 }
 
 void Weapon::generateTriShot()
@@ -655,7 +659,7 @@ void Weapon::generateTriShot()
 	m_triggerData.shotsFiredperTriggerPull = 3;
 	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
 	m_projectileData.projectileSpeedMultiplier = 1;
-	m_projectileData.DamageAmount = 1;
+	m_projectileData.DamageAmount = 1 * m_weaponLevel;
 	m_SpreadData.constSpreadInDegreesPerProjectile.push_back(-15);
 	m_SpreadData.constSpreadInDegreesPerProjectile.push_back(0);
 	m_SpreadData.constSpreadInDegreesPerProjectile.push_back(15);
@@ -670,7 +674,7 @@ void Weapon::generateHexShot()
 	m_triggerData.shotsFiredperTriggerPull = 6;
 	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
 	m_projectileData.projectileSpeedMultiplier = 1;
-	m_projectileData.DamageAmount = 1;
+	m_projectileData.DamageAmount = 1* m_weaponLevel;
 	m_SpreadData.constSpreadInDegreesPerProjectile.push_back(0);
 	m_SpreadData.constSpreadInDegreesPerProjectile.push_back(60);
 	m_SpreadData.constSpreadInDegreesPerProjectile.push_back(120);
@@ -682,13 +686,14 @@ void Weapon::generateHexShot()
 
 void Weapon::generateAutoPistol()
 {
+	int spreadEffector = (m_weaponLevel / 2 > 5 ? 5 : m_weaponLevel / 2);
 	m_triggerData.fireRate = getRandomInRange(1.0f, 1.5f);
 	m_triggerData.shotsFiredperTriggerPull = 1;
 	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
 	m_projectileData.projectileSpeedMultiplier = 1;
 	m_projectileData.DamageAmount = 1;
 	addPropertyToProfile(weaponProperties::spreadRandom);
-	m_SpreadData.spreadRangeDeg.Set(-5, 5);
+	m_SpreadData.spreadRangeDeg.Set(-8 + spreadEffector, 8 - spreadEffector);
 	addPropertyToProfile(weaponProperties::burstConstant);
 	m_burstData.burstShotsVariable.Set(4, 5);
 	m_burstData.burstTotalTime = m_triggerData.fireRate;
@@ -697,13 +702,14 @@ void Weapon::generateAutoPistol()
 
 void Weapon::generateAutoShotgun()
 {
+	int spreadEffector = (m_weaponLevel / 2 > 5 ? 5 : m_weaponLevel / 2);
 	m_triggerData.fireRate = getRandomInRange(1.0f, 1.5f);
 	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
 	m_triggerData.shotsFiredperTriggerPull = 3;
 	m_projectileData.projectileSpeedMultiplier = 1;
-	m_projectileData.DamageAmount = 1;
+	m_projectileData.DamageAmount = 1 * m_weaponLevel;
 	addPropertyToProfile(weaponProperties::spreadRandom);
-	m_SpreadData.spreadRangeDeg.Set(-15, 15);
+	m_SpreadData.spreadRangeDeg.Set(-15 + spreadEffector, 15 - spreadEffector);
 	addPropertyToProfile(weaponProperties::burstVariable);
 	m_burstData.burstShotsVariable.Set(4, 6);
 	addPropertyToProfile(weaponProperties::everyShotCosts);
@@ -712,13 +718,14 @@ void Weapon::generateAutoShotgun()
 
 void Weapon::generateAutoMachinegun()
 {
+	int spreadEffector = (m_weaponLevel / 2 > 5 ? 5 : m_weaponLevel / 2);
 	m_triggerData.fireRate = getRandomInRange(0.75f, 1.0f);
 	m_triggerData.shotsFiredperTriggerPull = 1;
 	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
 	m_projectileData.projectileSpeedMultiplier = 1;
-	m_projectileData.DamageAmount = 1;
+	m_projectileData.DamageAmount = 1 * m_weaponLevel;
 	addPropertyToProfile(weaponProperties::spreadRandom);
-	m_SpreadData.spreadRangeDeg.Set(-5, 5);
+	m_SpreadData.spreadRangeDeg.Set(-5 + spreadEffector, 5 - spreadEffector);
 	addPropertyToProfile(weaponProperties::burstVariable);
 	m_burstData.burstShotsVariable.Set(3, 5);
 	m_burstData.burstTotalTime = m_triggerData.fireRate;
@@ -726,11 +733,12 @@ void Weapon::generateAutoMachinegun()
 
 void Weapon::generateMinigun()
 {
+
 	m_triggerData.fireRate = getRandomInRange(0.5f, 0.5f);
 	m_triggerData.shotsFiredperTriggerPull = 1;
 	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
 	m_projectileData.projectileSpeedMultiplier = 1.5f;
-	m_projectileData.DamageAmount = 3;
+	m_projectileData.DamageAmount = 3 * m_weaponLevel;
 	addPropertyToProfile(weaponProperties::spreadRandom);
 	m_SpreadData.spreadRangeDeg.Set(-5, 5);
 	addPropertyToProfile(weaponProperties::burstVariable);
@@ -747,14 +755,12 @@ void Weapon::generateMissileLauncher()
 	m_triggerData.shotsFiredperTriggerPull = 1;
 	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
 	m_projectileData.projectileSpeedMultiplier = 2;
-	m_projectileData.DamageAmount = 10;
+	m_projectileData.DamageAmount = 10 * m_weaponLevel;
 	addPropertyToProfile(weaponProperties::areaOfEffectDamage);
-	m_AOEData.AoePercentageFallOffPerUnitDistance = 0.75f;
+	m_AOEData.AoePercentageFallOffPerUnitDistance = 0.80f - m_weaponLevel * 0.05f;
 	m_AOEData.AoeRadiusInTiles = 2;
 
 }
-
-
 
 void Weapon::generateAutoMissileLauncher()
 {
@@ -762,9 +768,9 @@ void Weapon::generateAutoMissileLauncher()
 	m_triggerData.shotsFiredperTriggerPull = 1;
 	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
 	m_projectileData.projectileSpeedMultiplier = 2;
-	m_projectileData.DamageAmount = 10;
+	m_projectileData.DamageAmount = 10 * m_weaponLevel;
 	addPropertyToProfile(weaponProperties::areaOfEffectDamage);
-	m_AOEData.AoePercentageFallOffPerUnitDistance = 0.75f;
+	m_AOEData.AoePercentageFallOffPerUnitDistance = 0.75f - m_weaponLevel * 0.07f;
 	m_AOEData.AoeRadiusInTiles = 2;
 }
 
@@ -774,6 +780,58 @@ void Weapon::generateAutoSniperRifle()
 	m_triggerData.shotsFiredperTriggerPull = 1;
 	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
 	m_projectileData.projectileSpeedMultiplier = 2;
-	m_projectileData.DamageAmount = 10;
+	m_projectileData.DamageAmount = 2.5f * m_weaponLevel;
 
+}
+
+void Weapon::generateWeaponOfType(int _weapon)
+{
+	switch (_weapon)
+	{
+	case 1:
+		generatePistol();
+		break;
+	case 2:
+		generateShotgun();
+		break;
+	case 3:
+		generateMachinegun();
+		break;
+	case 4:
+		generateSniperRifle();
+		break;
+	case 5:
+		generateTriShot();
+		break;
+	case 6:
+		generateHexShot();
+		break;
+	case 7:
+		generateAutoPistol();
+		break;
+	case 8:
+		generateAutoShotgun();
+		break;
+	case 9:generateAutoMachinegun();
+		break;
+	case 10:
+		generateMinigun();
+		break;
+	case 11:
+		generateMissileLauncher();
+		break;
+	case 12:
+		generateAutoMissileLauncher();
+		break;
+	case 13:
+		generateAutoSniperRifle();
+		break;
+	default:
+		break;
+	}
+}
+
+void Weapon::generateWeaponOfType(const std::vector<int>& _weapon)
+{
+	generateWeaponOfType(_weapon[rand() % _weapon.size()]);
 }
