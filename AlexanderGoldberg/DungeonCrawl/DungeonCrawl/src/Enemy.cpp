@@ -777,7 +777,7 @@ bool Enemy::TakeDamage(int _amount, DamageType _type)
 			return Damagable::TakeDamage(_amount, _type);
 		return false;
 	}
-
+	return Damagable::TakeDamage(_amount, _type);
 }
 
 void Enemy::Render(SDL_Renderer* _renderer)
