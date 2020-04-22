@@ -60,6 +60,14 @@ namespace  EnemyDataStructs
 			if (ShieldCurrent > ShieldMax)
 				ShieldCurrent = ShieldMax;
 		}
+		void PrintBreakable()
+		{
+			printf("Shield Breakable: Regens %s, RechargeAmount %d, ShieldMax %d, ShieldCurrent %d\n", (Regens ? "true" : "false"), RechargeAmount, ShieldMax, ShieldCurrent);
+		}
+		void PrintTimer()
+		{
+			printf("Shield Timer: VariableTimes  %s, MinMaxTimeOff %s, MinMaxTimeOn %s,\n", (VariableTimes ? "true" : "false"), MinMaxTimeOff.toString().c_str(), MinMaxTimeOn.toString().c_str());
+		}
 	};
 	struct VisibilityStruct
 	{
@@ -81,13 +89,11 @@ namespace  EnemyDataStructs
 		Timer FlickerRate = Timer(0.05f); //flicker rate while flickering
 		void Print()
 		{
-			/*
-			printf("Connst Times %s, Invisible Time %f, min max invisible %s, visible Time %f, min max Visible %s, flicker Time %f, min max Flicker %s, Flicker Rate"
-				, (ConstTimes ? "true" : "false"),
+			printf("Connst Times %s, Invisible Time %f, min max invisible %s, visible Time %f, min max Visible %s, flicker Time %f, min max Flicker %s, Flicker Rate %s, Flicker Rate %f\n", (ConstTimes ? "true" : "false"),
 				TimeInvisible.GetResetTime(), MinMaxInvisibleTime.toString().c_str(),
 				TimeVisible.GetResetTime(), MinMaxVisibleTime.toString().c_str(),
-				TimeFlickering.GetResetTime(), MinMaxFlickerTime.toString().c_str()),
-				FlickerRate.GetResetTime());*/
+				TimeFlickering.GetResetTime(), MinMaxFlickerTime.toString().c_str(),
+				FlickerRate.GetResetTime());
 		}
 
 	};
@@ -120,13 +126,39 @@ namespace  EnemyDataStructs
 		//keepdistance variables
 		Vector2 MinMaxDist = Vector2(1,1);
 
-		
+		void PrintSeek() 
+		{
+			printf("Seeking: Use Diagonals %s, Pursue Beyond Room %s\n", (UseDiagonals ? "true" : "false"), (pursueBeyondRoom ? "true" : "false"));
+
+		}
+		void PrintDist() 
+		{
+			printf("Distance: Use Diagonals %s, Pursue Beyond Room %s, min max distance to keep %s\n", (UseDiagonals ? "true" : "false"), (pursueBeyondRoom ? "true" : "false"), MinMaxDist.toString().c_str());
+		}
+		void PrintPatrol() 
+		{
+			printf("Patrol: Use Diagonals %s, Pursue Beyond Room %s indexs in path <", (UseDiagonals ? "true" : "false"), (pursueBeyondRoom ? "true" : "false"));
+			for (size_t i = 0; i < PartolPointsAsIndexes.size(); i++)
+			{
+				printf("%d", PartolPointsAsIndexes[i]);
+				if (i < PartolPointsAsIndexes.size() - 1)
+					printf(", ");
+				else
+					printf("\n");
+
+			}
+
+		}
 	};
 
 
 	struct ContactStruct
 	{
-		bool Aggroded = false;
+		bool Aggroded = false;	
+		void Print() 
+		{
+			printf("Contact: Aggroed %s\n", (Aggroded ? "true" : "false"));
+		}
 	};
 
 
@@ -153,13 +185,19 @@ namespace  EnemyDataStructs
 			}
 			return nullptr;
 		}
-
+		void Print()
+		{
+			printf("Mine Layer: Chance %d, Frequnecy %f, Time To Placee %f, Damage %d, Charges %d \n", MineDropChance, MineDropFrequency.GetResetTime(), TimeToDropMine.GetResetTime(), MineDamage, MineCharges);
+		}
 	};
 
 
 	struct DodgeStruct
 	{
-
+		void Print()
+		{
+			printf("");
+		}
 	};
 
 
@@ -171,6 +209,10 @@ namespace  EnemyDataStructs
 		Timer TimeToDropBlock = Timer(0.5f);
 		Vector2 PlaceBlockTimeRange = Vector2();
 		int BlockDropChance = 100;
+		void Print()
+		{
+			printf("Barrier: Chance %d, Dies %s, Lifetime %s, Time to Place %s\n", BlockDropChance, (Dies ? "true" : "false"), BarrierLifeTimeRange.toString().c_str(), PlaceBlockTimeRange.toString().c_str());
+		}
 	};
 
 	struct DetectionStruct
@@ -178,6 +220,10 @@ namespace  EnemyDataStructs
 		int DetectionRadius = 5;//in tiles
 		int DetectionRadiusLost = 15; //in tiles how far before they deaggro
 		bool Detected = false;
+		void Print()
+		{
+			printf("Dection: Radius %d, Radius los %d, Detected %s\n", DetectionRadius, DetectionRadiusLost, (Detected ? "true" : "false"));
+		}
 	};
 
 	struct SummonStruct {
@@ -188,15 +234,26 @@ namespace  EnemyDataStructs
 		int SummonRange = 1;
 		int SummonChance = 100; // chance for summon attempt to succeeed
 		Tile* SpawnTarget = nullptr;
+		void Print()
+		{
+			printf("Summon: SummonIntervalsRange %s, SummonTimeRange %s, Range %d, Chance %d\n", SummonIntervalsRange.toString().c_str(), SummonTimeRange.toString().c_str(), SummonRange, SummonChance);
+		
+		}
+			
 	
 	};
 	struct MeleeStruct{
 		int Range = 1;
 		int Damage = 2;
 		Timer AttackFrequency = Timer(1.0f);
+		void Print() 
+		{
+			printf("Melee: Damage %d, Range %s\n", Damage, Range);
+		}
 	};
 	struct RangedStruct{
 		Weapon* Weapon = nullptr;
+		void Print() {}
 	};
 };
 

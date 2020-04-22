@@ -149,3 +149,29 @@ void Damagable::Update(float _dt)
 		}
 	}
 }
+
+void Damagable::PrintDamageableInfo()
+{
+
+	printf("Damageable: health %d/%d, regen rate %d, regen amount %d\n", m_health , m_healthMax, m_regenRate, m_regenAmount);
+	printf("Vulnerable to: ");
+	for (size_t i = 0; i < m_vulnarabilites.size(); i++)
+	{
+		printf(PrintDTName(m_vulnarabilites[i]).c_str());
+		if (i < m_vulnarabilites.size() - 1)
+			printf(", ");
+		else
+			printf("\n");
+	}
+
+	printf("Resistant to: ");
+	for (size_t i = 0; i < m_resitances.size(); i++)
+	{
+		printf(PrintDTName(m_resitances[i]).c_str());
+		if (i < m_resitances.size() - 1)
+			printf(", ");
+		else
+			printf("\n");
+	}
+
+}

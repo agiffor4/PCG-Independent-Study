@@ -12,6 +12,7 @@ Player::Player()
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::UP);
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::DOWN);
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::MOUSEUP);
+	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::MOUSEDOWN);
 	m_shouldDelete = false;
 	m_moveRate.SetTimer(0.2f);
 	m_holdables[0] = nullptr;
@@ -42,6 +43,13 @@ void Player::Update(float _dt)
 	if (m_equipedWeapon != nullptr && m_equipedWeapon->ShouldSetLOS())
 	{
 		SetLineOfSight(true);
+	}
+	if (m_fireButtonDown)
+	{
+		if (m_equipedWeapon != nullptr)
+		{
+			m_equipedWeapon->Fire(m_mouseAim.GetDirection());
+		}
 	}
 }
 
@@ -100,10 +108,23 @@ void Player::InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y)
 	switch (_mouse)
 	{
 	case IInputHandler::MouseButton::LEFT:		
-		if (m_equipedWeapon != nullptr)
-		{
-			m_equipedWeapon->Fire(m_mouseAim.GetDirection());
-		}
+		m_fireButtonDown = false;
+		break;
+	case IInputHandler::MouseButton::RIGHT:
+		break;
+	case IInputHandler::MouseButton::MIDDLE:
+		break;
+	default:
+		break;
+	}
+}
+
+void Player::InvokeMouseDown(MouseButton _mouse, Sint32 _x, Sint32 _y)
+{
+	switch (_mouse)
+	{
+	case IInputHandler::MouseButton::LEFT:
+		m_fireButtonDown = true;
 		break;
 	case IInputHandler::MouseButton::RIGHT:
 		break;

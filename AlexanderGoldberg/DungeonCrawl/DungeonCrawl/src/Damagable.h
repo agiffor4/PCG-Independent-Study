@@ -35,5 +35,6 @@ public:
 	float GetOnePercentOfCurrentHealth(float _percent0To1);
 	
 	void Update(float _dt) override;
+	void PrintDamageableInfo();
 };
 

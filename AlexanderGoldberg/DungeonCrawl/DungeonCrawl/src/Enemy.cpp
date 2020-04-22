@@ -10,7 +10,7 @@
 Enemy::Enemy()
 {
 	m_solid = true;
-	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::UP);
+	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::MOUSEUP);
 }
 
 Enemy::~Enemy()
@@ -19,6 +19,51 @@ Enemy::~Enemy()
 	{
 		delete(m_shieldImage);
 	}
+}
+
+
+void Enemy::Print()
+{
+
+	printf("\n\n");
+	if (propertyInProfile(EnemyProperty::combatRanged))
+		m_rangedData.Print();
+	if (propertyInProfile(EnemyProperty::combatMelee))
+		m_meleeData.Print();
+	if (propertyInProfile(EnemyProperty::combatSummon))
+		m_summonData.Print();
+	if (propertyInProfile(EnemyProperty::movemetMoves))
+		m_movementData.Print();
+	if (propertyInProfile(EnemyProperty::defenseShieldTimed))
+		m_shieldData.PrintTimer();
+	if (propertyInProfile(EnemyProperty::defenseShieldBreakable))
+		m_shieldData.PrintBreakable();
+	if (propertyInProfile(EnemyProperty::defenseLeaveBarricades))
+		m_barrierData.Print();
+	if (propertyInProfile(EnemyProperty::healthRegen))
+	{
+		PrintDamageableInfo();
+	}
+	if (propertyInProfile(EnemyProperty::contactPassive))
+		m_contactData.Print();
+	if (propertyInProfile(EnemyProperty::visibilityFlicker) || propertyInProfile(EnemyProperty::visibilityVisible) || propertyInProfile(EnemyProperty::visibilityInvisible))
+		m_visibilityData.Print();
+	if (propertyInProfile(EnemyProperty::mineLayer))
+		m_mineLayerData.Print();
+	if (propertyInProfile(EnemyProperty::behaviorSeekout))
+		m_behaviorData.PrintSeek();
+	if (propertyInProfile(EnemyProperty::behaviorKeepDistance))
+		m_behaviorData.PrintDist();
+	if (propertyInProfile(EnemyProperty::behaviorCharge))
+		m_chargeData.Print();
+	if (propertyInProfile(EnemyProperty::behaviorPatrol))
+		m_behaviorData.PrintPatrol();
+	if (propertyInProfile(EnemyProperty::defenseDodge))
+		m_dodgeData.Print();
+
+	m_detectionData.Print();
+	PrintDamageableInfo();
+	printf("\n\n");
 }
 
 void Enemy::move()
@@ -32,7 +77,8 @@ void Enemy::move()
 		if (propertyInProfile(EnemyProperty::behaviorPatrol))
 		{
 			int targetIndex = m_behaviorData.GetTarget();
-			GetLocation()->MoveContentsTo(m_world->GetTileAtIndex(targetIndex));
+			if(m_world->GetTileAtIndex(targetIndex)->IsPassable())
+				GetLocation()->MoveContentsTo(m_world->GetTileAtIndex(targetIndex));
 			m_behaviorData.IncrementIndex();
 			if (GetPositionInVector() == targetIndex)
 			{
@@ -750,13 +796,25 @@ void Enemy::Render(SDL_Renderer* _renderer)
 	}
 }
 
-void Enemy::InvokeKeyUp(SDL_Keycode _key)
-{ 
-	if (_key == SDLK_8)
+void Enemy::InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y)
+{
+	switch (_mouse)
 	{
-		GetLocation()->PrintTileData();
+	case IInputHandler::MouseButton::LEFT:
+		break;
+	case IInputHandler::MouseButton::RIGHT:
+		if (m_location->inBounds(_x, _y))
+		{
+			Print();
+		}
+		break;
+	case IInputHandler::MouseButton::MIDDLE:
+		break;
+	default:
+		break;
 	}
 }
+
 
 
 

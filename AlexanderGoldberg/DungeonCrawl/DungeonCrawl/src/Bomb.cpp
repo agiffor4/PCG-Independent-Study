@@ -2,7 +2,6 @@
 #include "Tile.h"
 #include "World.h"
 #include "Damagable.h"
-#include "Enums.h"
 Bomb::Bomb(World* _world)
 {
 	m_world = _world;

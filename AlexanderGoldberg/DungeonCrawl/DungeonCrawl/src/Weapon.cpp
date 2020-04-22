@@ -457,7 +457,7 @@ void Weapon::GenerateWeapon(int _weaponLevel)
 	m_weaponLevel = _weaponLevel;
 	if (!m_randomWeapon)
 	{
-		generateShotgun();
+		generateSniperRifle();
 	}
 	else
 	{
@@ -526,7 +526,7 @@ void Weapon::generatePistol()
 	
 	m_triggerData.fireRate = getRandomInRange(0.75f, 1.0f);
 	m_triggerData.shotsFiredperTriggerPull = 1;
-
+	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
 	m_projectileData.projectileSpeedMultiplier = 1;
 	m_projectileData.DamageAmount = 1;
 	addPropertyToProfile(weaponProperties::spreadRandom);
@@ -539,6 +539,7 @@ void Weapon::generateShotgun()
 {
 
 	m_triggerData.fireRate = getRandomInRange(1.0f, 1.5f);
+	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
 	m_triggerData.shotsFiredperTriggerPull = 2;
 	m_projectileData.projectileSpeedMultiplier = 1;
 	m_projectileData.DamageAmount = 1;
@@ -553,10 +554,23 @@ void Weapon::generateShotgun()
 
 void Weapon::generateMachinegun()
 {
+
+	m_triggerData.fireRate = 0.1f;
+	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
+	m_triggerData.shotsFiredperTriggerPull = 1;
+	m_projectileData.projectileSpeedMultiplier = 1;
+	m_projectileData.DamageAmount = 1;
+	addPropertyToProfile(weaponProperties::spreadRandom);
+	m_SpreadData.spreadRangeDeg.Set(-10, 10);
 }
 
 void Weapon::generateSniperRifle()
 {
+	m_triggerData.fireRate = 5.0f;
+	m_triggerData.shotsFiredperTriggerPull = 1;
+	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
+	m_projectileData.projectileSpeedMultiplier = 2;
+	m_projectileData.DamageAmount = 10;
 }
 
 void Weapon::generateTriShot()

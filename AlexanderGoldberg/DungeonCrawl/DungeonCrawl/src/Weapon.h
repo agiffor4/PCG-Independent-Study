@@ -4,7 +4,6 @@
 #include <map>
 #include "Timer.h"
 #include "WeaponStructs.h"
-#include "Enums.h"
 class Player;
 class Projectile;
 class Scene;

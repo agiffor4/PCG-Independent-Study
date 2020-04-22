@@ -96,11 +96,11 @@ protected:
 public:
 	Enemy();
 	~Enemy();
-	
+	void Print();
 	void Update(float _dt) override;
 	void GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawnedIn);
 	bool TakeDamage(int _amount, DamageType _type) override;
 	void Render(SDL_Renderer* _renderer) override;
-	void InvokeKeyUp(SDL_Keycode _key) override;
+	void InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y) override;
 };
 
