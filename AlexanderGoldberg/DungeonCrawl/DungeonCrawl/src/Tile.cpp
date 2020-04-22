@@ -7,6 +7,7 @@
 #include "World.h"
 #include "Shadow.h"
 #include "InputManager.h"
+#include "Scene.h"
 void Tile::deleteFlaggedItems()
 {
 	for (size_t i = 0; i < m_toDelete.size(); i++)
@@ -331,14 +332,19 @@ void Tile::PrintTileData()
 	printf("In light source strength %d\n", m_illuminationStrength);
 }
 
-void Tile::ClearTileContents() {
+void Tile::ClearTileContents(Scene* _scene) {
 
 	if (m_contents != nullptr)
 	{
 		if (m_contents->ShouldDelete())
+		{
+			_scene->RemoveRenderable(m_contents);
 			delete(m_contents);
+		}
 		else
+		{
 			m_contents->SetLocation(nullptr);
+		}
 	}
 	
 	SetContents(nullptr);

@@ -6,6 +6,7 @@ class Interactable;
 class World;
 class TextA;
 class Shadow;
+class Scene;
 class Tile :
 	public Thing, IInputHandler
 {
@@ -167,7 +168,7 @@ public:
 	void InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y) override;
 	void InvokeKeyUp(SDL_Keycode _key) override;
 	void PrintTileData();
-	void ClearTileContents();
+	void ClearTileContents(Scene* _scene);
 	void Render(SDL_Renderer* _renderer) override;
 	void Update(float _dt) override;
 	void DetermineTileType(World* _world);

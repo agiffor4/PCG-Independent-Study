@@ -523,7 +523,7 @@ void World::GenerateTiles(int _screenWidth, int _screenHeight) {
 void World::clearPreviousLevel() {
 	for (size_t i = 0; i < m_tiles.size(); i++)
 	{
-		m_tiles[i]->ClearTileContents();
+		m_tiles[i]->ClearTileContents(m_scene);
 		m_tiles[i]->SetCorridor(false);
 	}
 	m_roomsData.erase(m_roomsData.begin(), m_roomsData.end());
@@ -820,7 +820,7 @@ void World::GenerateItems(int _exitLocation, BSP* _bspToUse) {
 		l->Init("img/Torch.png", "Light", m_scene->GetRenderer(), this);
 		m_tiles[randomTile]->AddItem(l);
 		generateWeapon();
-		//generateFoes();
+		generateFoes();
 	}
 	
 	
