@@ -61,6 +61,13 @@ protected:
 	std::vector<Enemy*> m_EnemiesOnLevel;
 	float m_scale = 32.0f / 64.0f;
 	void tileRenderingSetUp();
+	//UTILITY
+	int getRandomInRange(int _min, int _max);
+	float getRandomInRange(float _min, float _max);
+	float getRandomInRange(double _min, double _max);
+	bool getChance(int _percentChance);
+
+
 	int m_weaponsSpawnedOnLevel = 0;
 	bool m_regenLevel = false;
 public:
@@ -124,7 +131,7 @@ public:
 	Vector2 CheckIfCameraShouldMove(Vector2 _cameraMoveDirection);
 	
 	//ENEMIES
-	void CreateEnemy(int _roomIndex, int _enemyLevel);
+	void CreateEnemy(int _roomIndex, int _enemyLevel, void* _chances);
 	void CreateEnemyAtIndex(int _tileIndex, int _enemyLevel);
 	const std::vector<Enemy*>& GetEnemiesOnLevel();
 	Enemy* GetNearestEnemy(Vector2 _referencePoint, float _maximumRange = -1);

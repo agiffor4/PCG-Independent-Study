@@ -861,14 +861,45 @@ void World::generateFoes()
 	/*int roomIndex = roomTree.GetFirstChildOfRoomWithTreePosition(roomTree.GetRootIndexInTree());
 	CreateEne(roomIndex);*/
 	int deepest = roomTree.GetDeepestDepth();
+	Enemy::PropertyChances chances = Enemy::PropertyChances();
+	
 	for (size_t i = 0; i < m_roomsData.size(); i++)
 	{
 		if (roomTree.GetRoomDepth(i) > 2)
 		{
+			chances.Movement = getChance(90);
+			chances.Patrol = getChance(30);
+			chances.Seek = chances.Patrol ? false : getChance(50);
+
+			chances.Charge = getChance(15);
+		
+			chances.HealthRegen = getChance(30 + m_generationNumber * 5);
+
+			if (getChance(15))
+			{
+				chances.Invisible = getChance(5);
+				chances.Flicker = chances.Invisible ? false : getChance(50);
+			}
+			
+		
+			chances.Shield = getChance(15 + m_generationNumber * 5);
+			chances.ShieldTimed = getChance(50);
+			chances.Contact = false;
+			chances.MineLayer = getChance(20 + (chances.Patrol ? 40 : 0);
+			chances.Barrier = getChance(15 + m_generationNumber * 2);
+			
+			chances.Summon = m_generationNumber > 5 ? getChance(20) : false;
+			chances.Melee = getChance(25);
+			chances.Ranged = !chances.Melee;
+
+			chances.PursueBeyondRoom = getChance((m_generationNumber * 7));
+			chances.Passive = chances.Movement ? false : getChance(10);
+			chances.DodgeChance = false;
+			
 			int enemiesToSpawn = roomTree.GetRoomDepth(i) / 2;
 			for (size_t j = 0; j < enemiesToSpawn && j < 4; j++)
 			{
-				CreateEnemy(i, 1);
+				CreateEnemy(i, m_generationNumber, &chances);
 			}
 
 		}
@@ -924,6 +955,46 @@ void World::tileRenderingSetUp()
 	Camera::SetCenter(center);*/
 #endif
 }
+bool World::getChance(int _percentChance)
+{
+	return (rand() % 100) < _percentChance;
+}
+
+int World::getRandomInRange(int _min, int _max)
+{
+	if (_max < _min)
+	{
+		printf("_min out of bounds! Swapping values.\n");
+		_max = _min + _max;
+		_max = _max - _min;
+		_min = _max - _min;
+	}
+	return (rand() % (_max + 1 - _min)) + _min;
+}
+
+float World::getRandomInRange(float _min, float _max)
+{
+	if (_max < _min)
+	{
+		printf("_min out of bounds! Swapping values.\n");
+		_max = _min + _max;
+		_max = _max - _min;
+		_min = _max - _min;
+	}
+	return ((float)rand() / (float)RAND_MAX) * (_max - _min) + _min;
+}
+float World::getRandomInRange(double _min, double _max)
+{
+	if (_max < _min)
+	{
+		printf("_min out of bounds! Swapping values.\n");
+		_max = _min + _max;
+		_max = _max - _min;
+		_min = _max - _min;
+	}
+	return ((float)rand() / (float)RAND_MAX) * (_max - _min) + _min;
+}
+
 
 void World::AddRooms(std::vector<std::vector<int>>& const _rooms) {
 	m_roomsData.erase(m_roomsData.begin(), m_roomsData.end());
@@ -1072,7 +1143,6 @@ void World::PlacePlayer(std::vector<std::vector<int>>* _rooms)
 	Weapon* w = new Weapon();
 	w->Init("img/pics/Weapon01.png", "Basic Weapon", m_scene->GetRenderer());
 	w->InitializeWeapon(m_scene, this);
-	
 	w->GenerateWeapon(1);
 	t = GetTileAtIndex(m_playerStart);
 	t->AddItem(w);
@@ -1243,13 +1313,13 @@ Vector2 World::CheckIfCameraShouldMove(Vector2 _cameraMoveDirection)
 	return _cameraMoveDirection;
 }
 
-void World::CreateEnemy(int _roomIndex, int _enemyLevel)
+void World::CreateEnemy(int _roomIndex, int _enemyLevel, void* _chances)
 {
 	Enemy* e = new Enemy();
 	e->Init("img/pics/coin.png", "Enemy", m_scene->GetRenderer());
 	Tile* t = GetTileAtIndex(m_roomsData[_roomIndex].GetRandomTile());
 	e->SetScale(m_tiles[0]->GetScale());
-	e->GenerateEnemy(_enemyLevel, this, m_roomsData[_roomIndex]);
+	e->GenerateEnemy(_enemyLevel, this, m_roomsData[_roomIndex], (Enemy::PropertyChances*)_chances);
 	e->SetLocation(t);
 	t->SetContents(e);
 	m_scene->AddCollidable(e);

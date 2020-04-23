@@ -93,12 +93,34 @@ protected:
 	void melee(float _dt);
 	void ranged(float _dt);
 	Tile* getFreeTileInRaidus(int _radius);
+	void randomEnemy(int _difficulty);
 public:
+	struct PropertyChances {
+			bool Movement = false;
+			bool Charge = false;
+			bool Shield = false;
+			bool ShieldTimed = false;
+			bool HealthRegen = false;
+			bool Invisible = false;
+			bool Flicker = false;
+			bool Seek = false;
+			bool Patrol = false;
+			bool Contact = false;
+			bool MineLayer = false;
+			bool DodgeChance = false;
+			bool Barrier = false;
+			bool Detection = false;
+			bool Summon = false;
+			bool Melee = false;
+			bool Ranged = false;
+			bool PursueBeyondRoom = false;
+			bool Passive = false;
+	};
 	Enemy();
 	~Enemy();
 	void Print();
 	void Update(float _dt) override;
-	void GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawnedIn);
+	void GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawnedIn, PropertyChances* _chances = nullptr);
 	bool TakeDamage(int _amount, DamageType _type) override;
 	void Render(SDL_Renderer* _renderer) override;
 	void InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y) override;
