@@ -14,3 +14,15 @@ int RoomData::GetRandomTile()
 {
 	return sm_containsTiles[rand() % sm_containsTiles.size()];
 }
+
+std::vector<int> RoomData::GetCorners()
+{
+	std::vector<int> corners;
+	corners.push_back(sm_containsTiles[sm_containsTiles.size() - 1] - sm_width);
+	corners.push_back(sm_containsTiles[0]);
+	corners.push_back(sm_containsTiles[0] + sm_width);
+	corners.push_back(sm_containsTiles[sm_containsTiles.size()-1]);
+
+	return corners;
+}
+

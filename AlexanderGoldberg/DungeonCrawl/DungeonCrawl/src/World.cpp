@@ -816,11 +816,25 @@ void World::GenerateItems(int _exitLocation, BSP* _bspToUse) {
 		generateChests();
 
 		int randomTile = m_roomsData[rand() % m_roomsData.size()].GetRandomTile();
-		Light* l = new Light();
+		Light* l = nullptr;
+		/* l = new Light();
 		l->Init("img/Torch.png", "Light", m_scene->GetRenderer(), this);
-		m_tiles[randomTile]->AddItem(l);
+		m_tiles[randomTile]->AddItem(l);*/
+		for (size_t i = 0; i < m_roomsData.size(); i++)
+		{
+			std::vector<int> corners = m_roomsData[i].GetCorners();
+			for (size_t i = 0; i < corners.size(); i++)
+			{
+				l = new Light();
+				l->Init("img/Torch.png", "Light", m_scene->GetRenderer(), this);
+				m_tiles[corners[i]]->AddItem(l);
+			}
+
+		}
 		generateWeapon();
+		
 		generateFoes();
+		
 	}
 	
 	
@@ -885,7 +899,7 @@ void World::generateFoes()
 			chances.Shield = getChance(15 + m_generationNumber * 5);
 			chances.ShieldTimed = getChance(50);
 			chances.Contact = false;
-			chances.MineLayer = getChance(20 + (chances.Patrol ? 40 : 0);
+			chances.MineLayer = getChance(20 + (chances.Patrol ? 40 : 0));
 			chances.Barrier = getChance(15 + m_generationNumber * 2);
 			
 			chances.Summon = m_generationNumber > 5 ? getChance(20) : false;
@@ -1010,7 +1024,8 @@ void World::AddRooms(std::vector<std::vector<int>>& const _rooms) {
 			m_roomsData[i].sm_containsTiles.push_back(_rooms[i][j]);
 			m_roomsData[i].sm_region = i;
 		}
-
+		m_roomsData[i].sm_width = GetTileAtIndex(m_roomsData[i].sm_containsTiles[m_roomsData[i].sm_containsTiles.size() - 1])->GetPositionInGrid().X - GetTileAtIndex(m_roomsData[i].sm_containsTiles[0])->GetPositionInGrid().X;
+		m_roomsData[i].sm_height = GetTileAtIndex(m_roomsData[i].sm_containsTiles[m_roomsData[i].sm_containsTiles.size() - 1])->GetPositionInGrid().Y - GetTileAtIndex(m_roomsData[i].sm_containsTiles[0])->GetPositionInGrid().Y;
 	}
 
 }

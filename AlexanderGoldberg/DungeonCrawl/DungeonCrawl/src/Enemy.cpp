@@ -18,6 +18,12 @@ Enemy::~Enemy()
 	if (m_shieldImage != nullptr)
 	{
 		delete(m_shieldImage);
+		m_shieldImage = nullptr;
+	}
+	if (m_rangedData.Weapon != nullptr)
+	{
+		delete(m_rangedData.Weapon);
+		m_rangedData.Weapon = nullptr;
 	}
 }
 
@@ -517,6 +523,12 @@ void Enemy::melee(float _dt)
 
 void Enemy::ranged(float _dt)
 {
+	if (m_detectionData.Detected)
+	{
+		if (m_rangedData.Weapon != nullptr)
+			m_rangedData.Weapon->Fire(Vector2::GetDirection(GetPositionInGrid(), m_player->GetPositionInGrid()));
+
+	}
 }
 
 Tile* Enemy::getFreeTileInRaidus(int _radius)
@@ -767,6 +779,10 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 			else
 			{
 				addPropertyToProfile(EnemyProperty::behaviorPatrol);
+				std::vector<int> pathCorners;
+				pathCorners = m_roomSpawnedIn.GetCorners();
+				generatePatrolPath(pathCorners);
+				
 			}
 
 			if (_chances->MineLayer)
@@ -873,6 +889,20 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 		{
 			addPropertyToProfile(EnemyProperty::contactPassive);
 		}
+
+		if (_chances->Melee)
+		{
+			addPropertyToProfile(EnemyProperty::combatMelee);
+			m_meleeData.AttackFrequency = getRandomInRange(0.5f, 0.75f);
+			m_meleeData.Damage = (1 * _difficulty);
+			m_meleeData.Range = _difficulty > 5 ? 2 : 1;
+		}
+		else
+		{
+			addPropertyToProfile(EnemyProperty::combatRanged);
+			m_rangedData.Weapon = new Weapon();
+			m_rangedData.Weapon->GenerateWeapon((rand() % _difficulty) + 1);
+		}
 		/*if (propertyInProfile(EnemyProperty::movemetMoves))
 		{
 			if (getChance(20 + 2 * _difficulty))
@@ -881,7 +911,6 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 			}
 		}*/
 
-		
 	}
 	else
 	{

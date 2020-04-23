@@ -89,7 +89,7 @@ namespace  EnemyDataStructs
 		Timer FlickerRate = Timer(0.05f); //flicker rate while flickering
 		void Print()
 		{
-			printf("Connst Times %s, Invisible Time %f, min max invisible %s, visible Time %f, min max Visible %s, flicker Time %f, min max Flicker %s, Flicker Rate %s, Flicker Rate %f\n", (ConstTimes ? "true" : "false"),
+			printf("Connst Times %s, Invisible Time %f, min max invisible %s, visible Time %f, min max Visible %s, flicker Time %f, min max Flicker %s, Flicker Rate %f\n", (ConstTimes ? "true" : "false"),
 				TimeInvisible.GetResetTime(), MinMaxInvisibleTime.toString().c_str(),
 				TimeVisible.GetResetTime(), MinMaxVisibleTime.toString().c_str(),
 				TimeFlickering.GetResetTime(), MinMaxFlickerTime.toString().c_str(),
@@ -248,12 +248,20 @@ namespace  EnemyDataStructs
 		Timer AttackFrequency = Timer(1.0f);
 		void Print() 
 		{
-			printf("Melee: Damage %d, Range %s\n", Damage, Range);
+			printf("Melee: Damage %d, Range %d\n", Damage, Range);
 		}
 	};
 	struct RangedStruct{
 		Weapon* Weapon = nullptr;
-		void Print() {}
+		void Print() {
+			if (Weapon != nullptr)
+			{
+				printf("Weapon:\n");
+				Weapon->PrintWeaponInfo();
+				printf("\n\n");
+			}
+			
+		}
 	};
 };
 
