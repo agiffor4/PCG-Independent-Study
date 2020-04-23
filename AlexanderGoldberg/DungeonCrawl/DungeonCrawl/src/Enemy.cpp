@@ -740,7 +740,7 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 			if (!_chances->Patrol)
 			{
 				m_behaviorData.pursueBeyondRoom = _chances->PursueBeyondRoom;
-				if (_chances->Seek)
+				if (_chances->Seek || _chances->Melee)
 				{
 					addPropertyToProfile(EnemyProperty::behaviorSeekout);
 				}
@@ -757,7 +757,7 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 					m_chargeData.MinDistance = getRandomInRange(3, 5);
 					m_chargeData.ChanceToCarge = 10 * _difficulty;
 					m_chargeData.ShouldChargeCheckIntervals.SetTimer(getRandomInRange(0.25f, 1.5f));
-					m_chargeData.ChargeWindUpSec.SetTimer(2.0f / _difficulty);
+					m_chargeData.ChargeWindUpSec.SetTimer(3.0f / _difficulty);
 					m_chargeData.StunnedOnImpact = getChance(100 - (_difficulty - 1) * 5);
 					m_chargeData.ChargeMovementIntervals = m_movementData.MoveTimerSec.GetResetTime() * 0.1f;
 					m_chargeData.DoesDamage = true;
@@ -772,7 +772,7 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 			if (_chances->MineLayer)
 			{
 				addPropertyToProfile(EnemyProperty::mineLayer);
-				m_mineLayerData.MineCharges = getChance(50) ? 1 : getRandomInRange(3, 5);
+				m_mineLayerData.MineCharges = getChance(30 + (_difficulty * 2)) ? getRandomInRange(3, 5) : 1;
 				m_mineLayerData.MineDamage = _difficulty * 2;
 				m_mineLayerData.TimeToDropMine.SetTimer(3 / _difficulty);
 				m_mineLayerData.MineDropFrequency.SetTimer(m_movementData.MoveTimerSec.GetResetTime());
@@ -785,8 +785,10 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 		if (_chances->HealthRegen)
 		{
 			addPropertyToProfile(EnemyProperty::healthRegen);
-			m_regenAmount = 1;
-			m_regenRate = getRandomInRange((5.0f - _difficulty < 1 ? 1 : 5.0f - _difficulty), 15.0f - _difficulty);
+			m_regenAmount = m_health * 0.1f;
+			if (m_regenAmount < 1)
+				m_regenAmount = 1;
+			m_regenRate = getRandomInRange((15.0f - _difficulty < 1 ? 1 : 15.0f - _difficulty), 45.0f - _difficulty);
 			m_regenTimer.SetTimer(m_regenRate);
 		}
 
