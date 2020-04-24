@@ -21,7 +21,8 @@ public:
 	std::string GetFontPath();
 	virtual void ResetAfterResize();
 	void SetText(std::string _text);
-	
+	SDL_Color GetColor();
+	void SetColor(SDL_Color _newColor);
 	void CleanUp() override;
 	void Render(SDL_Renderer* _renderer) override;
 	int getTextWidth(const std::string* _textToUse = nullptr);

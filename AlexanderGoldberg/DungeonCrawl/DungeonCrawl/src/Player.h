@@ -1,15 +1,16 @@
 #pragma once
-#include "StatusEffectable.h"
+#include "WeaponHolder.h"
 #include "IInputHandler.h"
 #include "World.h"
 #include "Timer.h"
 #include "MouseAim.h"
+class PlayerHUD;
 class Weapon;
 class Scene;
 class Interactable;
 class Holdable;
 class Player :
-	public StatusEffectable, public IInputHandler
+	public WeaponHolder, public IInputHandler
 {
 	
 public:	
@@ -27,9 +28,10 @@ public:
 	void EquipWeapon(Weapon* _weapon);
 	int GetAmmo();
 	float GetAmmoAsPercent();
-	Vector2 GetAimDirection();
+	
 protected:
 	bool m_fireButtonDown = false;
+	PlayerHUD* m_hud = nullptr;
 	//MOVEMENT VARIABLES
 	enum class MovementDirection {
 		LEFT = 1,

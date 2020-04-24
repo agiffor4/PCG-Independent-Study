@@ -1334,7 +1334,7 @@ void World::CreateEnemy(int _roomIndex, int _enemyLevel, void* _chances)
 	e->Init("img/pics/coin.png", "Enemy", m_scene->GetRenderer());
 	Tile* t = GetTileAtIndex(m_roomsData[_roomIndex].GetRandomTile());
 	e->SetScale(m_tiles[0]->GetScale());
-	e->GenerateEnemy(_enemyLevel, this, m_roomsData[_roomIndex], (Enemy::PropertyChances*)_chances);
+	e->GenerateEnemy(_enemyLevel, m_scene, this, m_roomsData[_roomIndex], (Enemy::PropertyChances*)_chances);
 	e->SetLocation(t);
 	t->SetContents(e);
 	m_scene->AddCollidable(e);
@@ -1346,7 +1346,7 @@ void World::CreateEnemyAtIndex(int _tileIndex, int _enemyLevel)
 	e->Init("img/pics/coin.png", "Enemy", m_scene->GetRenderer());
 	Tile* t = GetTileAtIndex(_tileIndex);
 	e->SetScale(m_tiles[0]->GetScale());
-	e->GenerateEnemy(_enemyLevel, this, m_roomsData[GetIndexOfRoomTileIsIn(_tileIndex)]);
+	e->GenerateEnemy(_enemyLevel, m_scene, this, m_roomsData[GetIndexOfRoomTileIsIn(_tileIndex)]);
 	e->SetLocation(t);
 	t->SetContents(e);
 	m_scene->AddCollidable(e);

@@ -6,7 +6,7 @@
 #include "Camera.h"
 #include "Holdable.h"
 #include "Weapon.h"
-
+#include "PlayerHUD.h"
 Player::Player()
 {
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::UP);
@@ -18,6 +18,7 @@ Player::Player()
 	m_holdables[0] = nullptr;
 	m_holdables[1] = nullptr;
 	SetHealthMax(100);
+	
 }
 
 
@@ -25,14 +26,14 @@ Player::Player()
 Player::~Player()
 {
 	
-	
+	if (m_hud != nullptr)
+		delete(m_hud);
 }
 
 void Player::Update(float _dt)
 {
 
 	
-
 	m_moveRate.CountDownAutoCheckBool(_dt);
 	if (!m_moveRate.GetShouldCountDown())
 	{
@@ -53,9 +54,11 @@ void Player::Update(float _dt)
 	{
 		if (m_equipedWeapon != nullptr)
 		{
-			m_equipedWeapon->Fire(m_mouseAim.GetDirection());
+			setAimDirection(m_mouseAim.GetDirection());
+			m_equipedWeapon->Fire(GetAimDirection());
 		}
 	}
+	m_hud->Update(_dt);
 }
 
 void Player::InvokeKeyDown(SDL_Keycode _key)
@@ -146,6 +149,7 @@ void Player::Initalize(World& _world, const std::string _path, const std::string
 	m_world = &_world;	
 	SetRenderLayer(15);
 	SetName("Player");
+	m_hud = new PlayerHUD(this, _renderer);
 	
 }
 
@@ -372,6 +376,7 @@ void Player::Render(SDL_Renderer* _renderer)
 	Vector2 v = GetCameraAdjustPosition(true);
 	m_mouseAim.SetOrigin(v);
 	m_mouseAim.Render(_renderer);
+	m_hud->Render(_renderer);
 }
 
 void Player::EquipWeapon(Weapon* _weapon)
@@ -395,10 +400,7 @@ float Player::GetAmmoAsPercent()
 	return m_equipedWeapon != nullptr ? m_equipedWeapon->GetAmmoAsPercent() : 0.0f;
 }
 
-Vector2 Player::GetAimDirection()
-{
-	return m_mouseAim.GetDirection();
-}
+
 
 
 std::set<Tile*> Player::getTilesInLineOfSight(Tile* _epicenter)

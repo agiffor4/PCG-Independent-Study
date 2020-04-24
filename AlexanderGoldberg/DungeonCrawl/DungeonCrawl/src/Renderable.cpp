@@ -94,6 +94,10 @@ const std::string& Renderable::GetName()
 {
 	return m_name;
 }
+const SDL_Texture* Renderable::GetTexture()
+{
+	return m_texture;
+}
 void Renderable::SetSize(float _x, float _y) {
 	m_currentSize.X = _x;
 	m_currentSize.Y = _y;

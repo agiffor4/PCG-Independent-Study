@@ -1,13 +1,14 @@
 #pragma once
-#include "StatusEffectable.h"
+#include "WeaponHolder.h"
 #include "EnemyCombat.h"
 #include "EnemyDataStructs.h"
 #include "RoomData.h"
 #include "IInputHandler.h"
+class Scene;
 class World;
 class Player;
 class Enemy :
-	public StatusEffectable, public IInputHandler
+	public WeaponHolder, public IInputHandler
 {
 public:
 	enum class EnemyProperty
@@ -120,7 +121,7 @@ public:
 	~Enemy();
 	void Print();
 	void Update(float _dt) override;
-	void GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawnedIn, PropertyChances* _chances = nullptr);
+	void GenerateEnemy(int _difficulty, Scene* _scene, World* _world, RoomData& _roomSpawnedIn, PropertyChances* _chances = nullptr);
 	bool TakeDamage(int _amount, DamageType _type) override;
 	void Render(SDL_Renderer* _renderer) override;
 	void InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y) override;

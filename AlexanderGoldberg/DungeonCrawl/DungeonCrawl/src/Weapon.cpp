@@ -60,7 +60,6 @@ Weapon::Weapon()
 Weapon::~Weapon()
 {
 	m_scene->RemoveRenderable(this);
-
 }
 
 void Weapon::InitializeWeapon(Scene* _scene, World* _world)
@@ -81,7 +80,7 @@ bool Weapon::AddAmmo(int _amount)
 	return true;
 }
 
-void Weapon::SetHolder(Player* _holder)
+void Weapon::SetHolder(WeaponHolder* _holder)
 {
 	m_holder = _holder;
 }
@@ -212,9 +211,9 @@ void Weapon::fire(Vector2 _direction, bool _costAmmo, bool _ignoreCooldown)
 		{
 			m_triggerData.fireTimer.SetShouldCountDown(true);
 			Projectile* p = getProjectile();
-			p->OnSpawn(m_holder->GetPosition(), _direction, 3, m_projectileData.DamageAmount, m_weaponProfile, (Thing*)m_holder);
+			p->OnSpawn(m_holder->GetPosition(), _direction, 3, m_projectileData.DamageAmount, m_weaponProfile, m_holder);
 			p->SetStructData(m_world, m_projectileData, m_AOEData, m_LightData, m_bounceData);
-			if (_costAmmo)
+			if (_costAmmo && m_useAmmo)
 				m_ammo--;
 		}
 
@@ -572,6 +571,11 @@ void Weapon::GenerateWeapon(int _weaponLevel)
 	
 
 
+}
+
+void Weapon::SetUseAmmo(bool _val)
+{
+	m_useAmmo = _val;
 }
 
 void Weapon::PrintWeaponInfo()

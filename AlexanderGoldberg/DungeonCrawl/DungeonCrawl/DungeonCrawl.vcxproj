@@ -152,6 +152,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Healthbar.cpp" />
+    <ClCompile Include="src\PlayerHUD.cpp" />
     <ClCompile Include="src\Blockade.cpp" />
     <ClCompile Include="src\Enemy.cpp" />
     <ClCompile Include="src\EnemyCombat.cpp" />
@@ -207,8 +209,11 @@
     <ClCompile Include="src\WeaponTriplicate.cpp" />
     <ClCompile Include="src\StatusEffectable.cpp" />
     <ClCompile Include="src\StatusEffect.cpp" />
+    <ClCompile Include="src\WeaponHolder.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Healthbar.h" />
+    <ClInclude Include="src\PlayerHUD.h" />
     <ClInclude Include="src\Blockade.h" />
     <ClInclude Include="src\Enemy.h" />
     <ClInclude Include="src\EnemyCombat.h" />
@@ -348,6 +353,7 @@
     <ClInclude Include="src\WeaponTriplicate.h" />
     <ClInclude Include="src\StatusEffectable.h" />
     <ClInclude Include="src\StatusEffect.h" />
+    <ClInclude Include="src\WeaponHolder.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL\lib\x64\SDL2.dll" />

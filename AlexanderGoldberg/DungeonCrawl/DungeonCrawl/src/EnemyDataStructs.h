@@ -89,7 +89,7 @@ namespace  EnemyDataStructs
 		Timer FlickerRate = Timer(0.05f); //flicker rate while flickering
 		void Print()
 		{
-			printf("Connst Times %s, Invisible Time %f, min max invisible %s, visible Time %f, min max Visible %s, flicker Time %f, min max Flicker %s, Flicker Rate %f\n", (ConstTimes ? "true" : "false"),
+			printf("Visiablity: Connst Times %s, Invisible Time %f, min max invisible %s, \nVisiablity: visible Time %f, min max Visible %s, \nVisiablity: flicker Time %f, min max Flicker %s, Flicker Rate %f\n", (ConstTimes ? "true" : "false"),
 				TimeInvisible.GetResetTime(), MinMaxInvisibleTime.toString().c_str(),
 				TimeVisible.GetResetTime(), MinMaxVisibleTime.toString().c_str(),
 				TimeFlickering.GetResetTime(), MinMaxFlickerTime.toString().c_str(),
@@ -144,7 +144,7 @@ namespace  EnemyDataStructs
 				if (i < PartolPointsAsIndexes.size() - 1)
 					printf(", ");
 				else
-					printf("\n");
+					printf(">\n");
 
 			}
 

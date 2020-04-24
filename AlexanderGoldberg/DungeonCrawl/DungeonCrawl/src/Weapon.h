@@ -8,7 +8,7 @@ class Player;
 class Projectile;
 class Scene;
 class World;
-
+class WeaponHolder;
 class Weapon :
 	public Interactable
 {
@@ -39,9 +39,9 @@ public:
 	};
 	std::map<int, std::string> enumLookup;
 protected:
+	bool m_useAmmo = true;
 
-
-	Player* m_holder;
+	WeaponHolder* m_holder;
 	
 	//spread variables
 	WeaponStructs::SpreadStruct m_SpreadData = WeaponStructs::SpreadStruct();
@@ -124,7 +124,7 @@ public:
 	~Weapon();
 	void InitializeWeapon(Scene* _scene, World* _world);
 	bool AddAmmo(int _amount);
-	void SetHolder(Player* _holder);
+	void SetHolder(WeaponHolder* _holder);
 	virtual void Fire(Vector2 _direction);
 	bool Interaction(Thing* _thingInitatingInteraction) override;
 	void InteractionOnEnteringTile(Thing* _thingInitatingInteraction) override;
@@ -133,7 +133,7 @@ public:
 	float GetAmmoAsPercent();
 	bool ShouldSetLOS();
 	void GenerateWeapon(int _weaponLevel);
-	
+	void SetUseAmmo(bool _val);
 	void PrintWeaponInfo();
 };
 

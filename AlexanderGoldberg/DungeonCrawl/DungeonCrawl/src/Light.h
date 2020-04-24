@@ -4,12 +4,14 @@
 #include <set>
 class Tile;
 class World;
+class Timer;
 class Light :
 	public Holdable
 {
 protected:
 	int m_lightRadiusInTiles = 1;
 	World* m_world = nullptr;
+	Timer* m_checkLightsOn = nullptr;
 public:
 	void SetLightRadius(int _lightRadiusInTiles);
 	void SetWorld(World* _world);
@@ -18,6 +20,7 @@ public:
 	void Init(const std::string _path, const std::string _name, SDL_Renderer* _renderer, World* _world, Uint32 _transparentColor = -999);
 	std::set<Tile*> GetEffectedTiles(Tile* _epicenter);
 	bool Interaction(Thing* _thingInitatingInteraction) override;
+	void Update(float _dt) override;
 	Light();
 	~Light();
 };

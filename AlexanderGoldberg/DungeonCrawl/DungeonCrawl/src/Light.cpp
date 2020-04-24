@@ -5,8 +5,12 @@
 #include <set>
 Light::Light()
 {
+	m_checkLightsOn = new Timer(0.25f);
 }
-Light::~Light() {}
+Light::~Light() 
+{
+	delete(m_checkLightsOn);
+}
 void Light::SetLightRadius(int _lightRadiusInTiles)
 {
 	m_lightRadiusInTiles = _lightRadiusInTiles;
@@ -97,6 +101,14 @@ std::set<Tile*> Light::GetEffectedTiles(Tile* _epicenter)
 bool Light::Interaction(Thing* _thingInitatingInteraction)
 {
 	return true;
+}
+
+void Light::Update(float _dt)
+{
+	if (m_checkLightsOn->CountDown(_dt))
+	{
+		Illuminate(true);
+	}
 }
 
 

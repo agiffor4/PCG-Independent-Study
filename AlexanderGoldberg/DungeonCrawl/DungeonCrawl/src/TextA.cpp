@@ -1,7 +1,6 @@
 #include "TextA.h"
 #include "SDL_FontCache.h"
 #include <string>
-
 TextA::TextA() {}
 
 TextA::~TextA()
@@ -10,8 +9,8 @@ TextA::~TextA()
 }
 void TextA::InitializeFont(std::string _fontFilePath, int _pointsize, SDL_Renderer* _renderer, SDL_Color _color)
 {
-	//{ 255, 255, 255, 255 }
-	m_color = _color;
+	
+	SetColor(_color);
 	m_fontPath = _fontFilePath;
 	m_font = FC_CreateFont();
 	m_fontSize = _pointsize;
@@ -30,6 +29,7 @@ std::string TextA::GetFontPath()
 
 void TextA::ResetAfterResize()
 {
+	
 	if (m_font != nullptr)
 	{
 		FC_FreeFont(m_font);
@@ -37,6 +37,7 @@ void TextA::ResetAfterResize()
 	}
 	
 	FC_LoadFont(m_font, m_RenderRef, m_fontPath.c_str(), m_fontSize, m_color, TTF_STYLE_NORMAL);
+	
 	//FC_ResetFontFromRendererReset(m_font, m_RenderRef, SDL_RENDER_DEVICE_RESET);
 }
 
@@ -44,8 +45,19 @@ void TextA::SetText(std::string _text) {
 	m_text = _text;
 }
 
+SDL_Color TextA::GetColor()
+{
+	return m_color;
+}
+
+void TextA::SetColor(SDL_Color _newColor)
+{
+	m_color = _newColor;	
+}
+
 void TextA::Render(SDL_Renderer* _renderer)
 {
+	
 	if (m_fontInitalized){		
 		FC_DrawColor(m_font, _renderer, GetPosition().X, GetPosition().Y, m_color, m_text.c_str());
 	}

@@ -34,14 +34,14 @@
     <Filter Include="Source Files\Tree">
       <UniqueIdentifier>{a820dd1a-753e-48c0-a06d-e7f52b7fe996}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Interactables\Weapons">
-      <UniqueIdentifier>{8b166514-78bc-4b40-83ef-50270ce44f81}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Interactables\Pickups">
       <UniqueIdentifier>{9b1397d0-5369-4cb4-9f11-ad8c38a6acc4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Things\Enemy">
       <UniqueIdentifier>{08d875ee-4c21-48ad-bb54-5cf940f9d8b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Weapon">
+      <UniqueIdentifier>{70199289-2109-4d02-a007-804e1c4c9fbb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -162,12 +162,6 @@
     <ClCompile Include="src\TrapDisarmer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Projectile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MouseAim.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\HealthPickUp.cpp">
       <Filter>Source Files\Interactables\Pickups</Filter>
     </ClCompile>
@@ -177,37 +171,52 @@
     <ClCompile Include="src\Ammo.cpp">
       <Filter>Source Files\Interactables\Pickups</Filter>
     </ClCompile>
-    <ClCompile Include="src\Weapon.cpp">
-      <Filter>Source Files\Interactables\Weapons</Filter>
-    </ClCompile>
-    <ClCompile Include="src\StatusEffectable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\EnemyCombat.cpp">
       <Filter>Source Files\Things\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="src\Enemy.cpp">
       <Filter>Source Files\Things\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="src\WeaponTriplicate.cpp">
-      <Filter>Source Files\Interactables\Weapons</Filter>
+    <ClCompile Include="src\Projectile.cpp">
+      <Filter>Source Files\Weapon</Filter>
     </ClCompile>
-    <ClCompile Include="src\WeaponBasic.cpp">
-      <Filter>Source Files\Interactables\Weapons</Filter>
+    <ClCompile Include="src\MouseAim.cpp">
+      <Filter>Source Files\Weapon</Filter>
     </ClCompile>
-    <ClCompile Include="src\WeaponHexShot.cpp">
-      <Filter>Source Files\Interactables\Weapons</Filter>
-    </ClCompile>
-    <ClCompile Include="src\WeaponShotgun.cpp">
-      <Filter>Source Files\Interactables\Weapons</Filter>
-    </ClCompile>
-    <ClCompile Include="src\WeaponStructs.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\StatusEffectable.cpp">
+      <Filter>Source Files\Things</Filter>
     </ClCompile>
     <ClCompile Include="src\StatusEffect.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Things</Filter>
     </ClCompile>
     <ClCompile Include="src\Blockade.cpp">
+      <Filter>Source Files\Things\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WeaponStructs.cpp">
+      <Filter>Source Files\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Weapon.cpp">
+      <Filter>Source Files\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WeaponBasic.cpp">
+      <Filter>Source Files\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WeaponHexShot.cpp">
+      <Filter>Source Files\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WeaponShotgun.cpp">
+      <Filter>Source Files\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WeaponTriplicate.cpp">
+      <Filter>Source Files\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Healthbar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlayerHUD.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WeaponHolder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -627,6 +636,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Blockade.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Healthbar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PlayerHUD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WeaponHolder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

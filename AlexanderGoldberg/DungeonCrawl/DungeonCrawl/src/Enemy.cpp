@@ -46,10 +46,6 @@ void Enemy::Print()
 		m_shieldData.PrintBreakable();
 	if (propertyInProfile(EnemyProperty::defenseLeaveBarricades))
 		m_barrierData.Print();
-	if (propertyInProfile(EnemyProperty::healthRegen))
-	{
-		PrintDamageableInfo();
-	}
 	if (propertyInProfile(EnemyProperty::contactPassive))
 		m_contactData.Print();
 	if (propertyInProfile(EnemyProperty::visibilityFlicker) || propertyInProfile(EnemyProperty::visibilityVisible) || propertyInProfile(EnemyProperty::visibilityInvisible))
@@ -86,12 +82,6 @@ void Enemy::move()
 			if(m_world->GetTileAtIndex(targetIndex)->IsPassable())
 				GetLocation()->MoveContentsTo(m_world->GetTileAtIndex(targetIndex));
 			m_behaviorData.IncrementIndex();
-			if (GetPositionInVector() == targetIndex)
-			{
-				targetIndex = m_behaviorData.GetTarget();
-				GetLocation()->MoveContentsTo(m_world->GetTileAtIndex(targetIndex));
-				m_behaviorData.IncrementIndex();
-			}
 		}
 		if ((propertyInProfile(EnemyProperty::behaviorSeekout) || propertyInProfile(EnemyProperty::behaviorKeepDistance)))
 		{
@@ -526,7 +516,11 @@ void Enemy::ranged(float _dt)
 	if (m_detectionData.Detected)
 	{
 		if (m_rangedData.Weapon != nullptr)
-			m_rangedData.Weapon->Fire(Vector2::GetDirection(GetPositionInGrid(), m_player->GetPositionInGrid()));
+		{
+			setAimDirection(Vector2::GetDirection(m_player->GetPositionInGrid(), GetPositionInGrid()));
+			m_rangedData.Weapon->Fire(GetAimDirection());
+			m_rangedData.Weapon->Update(_dt);
+		}
 
 	}
 }
@@ -661,7 +655,7 @@ void Enemy::randomEnemy(int _difficulty)
 		{
 			addPropertyToProfile(EnemyProperty::defenseShieldTimed);
 			bool VariableTimes = getChance(50);
-
+			
 			m_shieldData.MinMaxTimeOff.X = getRandomInRange(1, 3);
 			m_shieldData.MinMaxTimeOn.X = getRandomInRange(1, 3);
 			m_shieldData.MinMaxTimeOff.Y = getRandomInRange(m_shieldData.MinMaxTimeOff.X, m_shieldData.MinMaxTimeOff.X * 2);
@@ -681,6 +675,7 @@ void Enemy::randomEnemy(int _difficulty)
 			m_shieldData.ShieldCurrent = m_shieldData.ShieldMax;
 
 		}
+		loadShieldImage();
 	}
 	if (getChance(15 + _difficulty * 2))
 	{
@@ -706,7 +701,11 @@ void Enemy::randomEnemy(int _difficulty)
 
 void Enemy::Update(float _dt)
 {
-	
+	if (m_health < 1)
+	{
+		return;
+	}
+
 	if (propertyInProfile(EnemyProperty::contactPassive) && !m_contactData.Aggroded)
 	{
 		return;
@@ -733,10 +732,11 @@ void Enemy::Update(float _dt)
 	shield(_dt);
 	mineLaying(_dt);
 	blockLaying(_dt);
+	attack(_dt);
 
 }
 
-void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawnedIn, PropertyChances* _chances)
+void Enemy::GenerateEnemy(int _difficulty, Scene* _scene, World* _world, RoomData& _roomSpawnedIn, PropertyChances* _chances)
 {
 	m_world = _world;
 	m_roomSpawnedIn = _roomSpawnedIn;
@@ -849,6 +849,7 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 				m_shieldData.MinMaxTimeOn.Y = getRandomInRange(m_shieldData.MinMaxTimeOn.X, m_shieldData.MinMaxTimeOn.X * 1.5f);
 				m_shieldData.TimeOff.SetTimer(m_shieldData.MinMaxTimeOff.X);
 				m_shieldData.TimeOn.SetTimer(m_shieldData.MinMaxTimeOn.X);
+				m_shieldData.TimeOff.SetShouldCountDown(true);
 			}
 			else
 			{
@@ -862,6 +863,7 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 				m_shieldData.ShieldCurrent = m_shieldData.ShieldMax;
 
 			}
+			loadShieldImage();
 		}
 		if (_chances->Barrier)
 		{
@@ -901,7 +903,10 @@ void Enemy::GenerateEnemy(int _difficulty, World* _world, RoomData& _roomSpawned
 		{
 			addPropertyToProfile(EnemyProperty::combatRanged);
 			m_rangedData.Weapon = new Weapon();
+			m_rangedData.Weapon->InitializeWeapon(_scene, m_world);
 			m_rangedData.Weapon->GenerateWeapon((rand() % _difficulty) + 1);
+			m_rangedData.Weapon->SetHolder(this);
+			m_rangedData.Weapon->SetUseAmmo(false);
 		}
 		/*if (propertyInProfile(EnemyProperty::movemetMoves))
 		{
@@ -945,7 +950,7 @@ bool Enemy::TakeDamage(int _amount, DamageType _type)
 void Enemy::Render(SDL_Renderer* _renderer)
 {
 	Renderable::Render(_renderer);
-	if (m_shouldRender)
+	if (m_shouldRender && m_health > 0)
 	{
 		if ((propertyInProfile(EnemyProperty::defenseShieldBreakable) || propertyInProfile(EnemyProperty::defenseShieldTimed)) && m_shieldData.ShieldCurrent > 0)
 		{

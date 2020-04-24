@@ -62,6 +62,7 @@ public:
 	void SetRenderableOffset(Vector2 _renderOffset);
 	const Vector2& GetRenderableOffSet();
 	const std::string& GetName();
+	const SDL_Texture* GetTexture();
 	virtual void CleanUp();
 
 };
