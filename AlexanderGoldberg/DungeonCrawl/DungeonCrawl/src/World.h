@@ -146,7 +146,7 @@ public:
 	int GetLevel();
 
 
-
+	void RemovePlayer();
 
 	//DEBUGGINg
 	

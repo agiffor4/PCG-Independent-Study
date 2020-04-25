@@ -149,6 +149,7 @@ void Player::Initalize(World& _world, const std::string _path, const std::string
 	m_world = &_world;	
 	SetRenderLayer(15);
 	SetName("Player");
+	m_solid = true;
 	m_hud = new PlayerHUD(this, _renderer);
 	
 }
@@ -439,4 +440,5 @@ std::set<Tile*> Player::getTilesInLineOfSight(Tile* _epicenter)
 	return toIlluminate;
 }
 void Player::die() {
+	m_world->RemovePlayer();
 }

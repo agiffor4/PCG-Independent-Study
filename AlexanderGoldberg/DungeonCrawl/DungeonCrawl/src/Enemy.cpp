@@ -503,10 +503,14 @@ void Enemy::melee(float _dt)
 {
 	if (m_meleeData.AttackFrequency.CountDown(_dt))
 	{
-		if (Vector2::GetDistanceLessThan(GetPositionInGrid(), m_player->GetPositionInGrid(), m_meleeData.Range))
+		if (m_location != nullptr)
 		{
-			m_player->TakeDamage(m_meleeData.Damage, Enums::DamageType::Piercing);
+			if (Vector2::GetDistanceLessThan(GetPositionInGrid(), m_player->GetPositionInGrid(), m_meleeData.Range))
+			{
+				m_player->TakeDamage(m_meleeData.Damage, Enums::DamageType::Piercing);
+			}
 		}
+		
 	}
 
 }

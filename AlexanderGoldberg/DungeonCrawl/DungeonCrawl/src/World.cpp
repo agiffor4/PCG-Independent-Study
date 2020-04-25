@@ -1128,6 +1128,7 @@ Player* World::CreatePlayer()
 	Player* p = new Player();
 	p->Initalize((*this), "img/Player.bmp", "Player", m_scene->GetRenderer());
 	p->SetScale(m_scale);
+	m_scene->AddCollidable(p);
 	return p;
 
 }
@@ -1422,6 +1423,12 @@ Tile* World::GetNeighborNearestPoint(Vector2 _referancePoint, int _tile, bool _i
 int World::GetLevel()
 {
 	return m_generationNumber;
+}
+
+void World::RemovePlayer()
+{
+	m_scene->RemoveRenderable(m_player);
+
 }
 
 Enemy* World::GetNearestEnemy(Vector2 _referencePoint, float _maximumRange)
