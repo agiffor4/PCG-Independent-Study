@@ -1162,7 +1162,7 @@ void World::PlacePlayer(std::vector<std::vector<int>>* _rooms)
 	Weapon* w = new Weapon();
 	w->Init("img/pics/Weapon01.png", "Basic Weapon", m_scene->GetRenderer());
 	w->InitializeWeapon(m_scene, this);
-	w->GenerateWeapon(3);
+	w->GenerateWeapon(1);
 	std::vector<Tile*> neighbors = GetNeighbors(m_playerStart);
 	int index = m_playerStart;
 	for (size_t i = 0; i < neighbors.size(); i++)

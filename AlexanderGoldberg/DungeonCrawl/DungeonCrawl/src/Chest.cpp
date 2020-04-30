@@ -30,13 +30,13 @@ bool Chest::Interaction(Thing* _thingInitatingInteraction)
 		Player* p = dynamic_cast<Player*>(_thingInitatingInteraction);
 		if (p != nullptr)
 		{		
-			if (p->GetHealthAsPercent() < p->GetAmmoAsPercent())
+			if (p->GetHealthAsPercent() > p->GetAmmoAsPercent())
 			{
 				Ammo* a = new Ammo((rand() % 10) + 5);
 				a->Init("img/pics/clip.png", "AmmoClip", m_rendererRef);
 				t->AddItem(a);
 			}
-			else if (p->GetHealthAsPercent() >  p->GetAmmoAsPercent())
+			else if (p->GetHealthAsPercent() < p->GetAmmoAsPercent())
 			{
 				HealthPickUp* a = new HealthPickUp((rand() % 10) + 5);
 				a->Init("img/pics/health_small.png", "Health Pick up", m_rendererRef);
