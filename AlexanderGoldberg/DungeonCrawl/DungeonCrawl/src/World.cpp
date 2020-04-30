@@ -590,9 +590,11 @@ void World::GenerateLevel()
 	int exitIndex = CreateExit(&bsp);
 	int doorPairsToGenerate = rooms.size() / 4;
 	GenerateDoors(exitIndex, doorPairsToGenerate, doorPairsToGenerate > 0 ? true : false, &bsp);
-	GenerateItems(exitIndex, &bsp);
+	if (!m_regenLevel)
+		GenerateItems(exitIndex, &bsp);
 	Vector2 CameraOffset = Camera::Offset();
-	tileRenderingSetUp();
+	if(!m_regenLevel)
+		tileRenderingSetUp();
 }
 void World::GenerateLevelP1() {
 
@@ -688,8 +690,11 @@ void World::GenerateKeyDoorPair(int _roomToGenerateDoorsIn, RoomTree& _roomTree,
 	{
 	case BSP::TunnelingType::Hub:
 	case BSP::TunnelingType::Base:
+		int timesRound;
+		timesRound = 0;
 		do
 		{
+			timesRound++;
 			int randomRoom = rand() % m_roomsData.size();
 			if (randomRoom != _roomToGenerateDoorsIn)
 			{
@@ -704,6 +709,11 @@ void World::GenerateKeyDoorPair(int _roomToGenerateDoorsIn, RoomTree& _roomTree,
 					validKeyLocation = true;
 					m_lastKeyRoom = randomRoom;
 				}
+			}
+			if (timesRound > 50)
+			{
+				m_regenLevel = true;
+				validKeyLocation = true;
 			}
 		} while (!validKeyLocation);
 		break;
@@ -749,8 +759,12 @@ void World::GenerateDoors(int _exitLocation, int _keyDoorPairCountToGenerate, bo
 	std::string keyPath = "img/Keycard.bmp";	
 	if (_ensureDoorToExit)
 		GenerateKeyDoorPair(exitRoomIndex, roomTree, doorPath, keyPath, _bspToUse);
+	if (m_regenLevel)
+		return;
 	m_lastKeyDepth = roomTree.GetDeepestDepth();
 	roomTree.GenerateRoomTree(m_roomsData, _bspToUse->RoomIndexTileIsIn(m_playerStart));
+	if (m_regenLevel)
+		return;
 	roomTree.PrintTree();
 	switch ((BSP::TunnelingType)m_keyDoorGenerationType)
 	{

@@ -7,6 +7,6 @@ Exit::Exit(World* _world)
 Exit::~Exit() {}
 
 bool Exit::Interaction(Thing* _thingInitatingInteraction) {
-	m_world->GenerateLevel();
+	m_world->Generate();
 	return false;
 }
