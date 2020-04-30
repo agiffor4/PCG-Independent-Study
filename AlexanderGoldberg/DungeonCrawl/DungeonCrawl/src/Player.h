@@ -29,7 +29,7 @@ public:
 	void EquipWeapon(Weapon* _weapon);
 	int GetAmmo();
 	float GetAmmoAsPercent();
-	
+	int GetLevelGenCount();
 protected:
 
 	WeaponNameRenderer* m_nameRenderer = nullptr;

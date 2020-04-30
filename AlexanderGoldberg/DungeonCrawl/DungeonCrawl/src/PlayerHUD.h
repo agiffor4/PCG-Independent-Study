@@ -9,6 +9,7 @@ class PlayerHUD
 protected:
 	Player* m_player = nullptr;
 	TextA* m_ammoCount = nullptr;
+	TextA* m_levelCount = nullptr;
 	Healthbar* m_healthBar = nullptr;
 public:
 	void Initialize(Player* _player, SDL_Renderer* _renderer, Scene* _scene);

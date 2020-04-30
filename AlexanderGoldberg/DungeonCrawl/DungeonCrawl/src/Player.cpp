@@ -415,6 +415,11 @@ float Player::GetAmmoAsPercent()
 	return m_equipedWeapon != nullptr ? m_equipedWeapon->GetAmmoAsPercent() : 0.0f;
 }
 
+int Player::GetLevelGenCount()
+{
+	return m_world->GetLevel();
+}
+
 
 
 
