@@ -38,6 +38,33 @@ public:
 	}
 
 
+	template <typename T> void UnsubscribeToInput(T* _func) {
+		IInputHandler* ih = (IInputHandler*)(_func);
+		if (ih != nullptr)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				int ind = 0;
+				for (auto itt = m_subscribers[i].begin(); itt != m_subscribers[i].end(); itt++)
+				{
+					ind++;
+					if (ind > 2515)
+					{
+						int foo = 0;
+					}
+					if (ih == (*itt))
+					{
+						m_subscribers[i].erase(itt);
+						break;
+					}
+				}
+			}
+		}
+		else
+		{
+			printf("Unable to cast pointer to IInputHandler.  Not subscribing to InputManager.");
+		}
+	}
 
 	static InputManager* GetInputManager() {
 		static InputManager singleton;

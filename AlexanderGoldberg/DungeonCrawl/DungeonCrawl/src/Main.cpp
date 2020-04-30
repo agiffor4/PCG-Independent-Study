@@ -13,11 +13,13 @@
 
 #include"Player.h"
 #include "Camera.h"
+#include "MarkovChain.h"
 
 #include <vector>
 #include <stack>
 #include<memory>
 #include <iostream>
+
 #define UseHigherGrid 0
 void CleanUpSDL(SDL_Window* _window, SDL_Renderer* _renderer);
 
@@ -95,9 +97,23 @@ void mainLoop()
 
 int main(int argc, char* argv[]) 
 {
-	
-
-	
+	MarkovChain mc = MarkovChain();
+	/*mc.Generate(2);
+	printf("%s\n", mc.GetName(8).c_str());
+	printf("%s\n", mc.GetName(10).c_str());
+	printf("%s\n", mc.GetName(16).c_str());
+	printf("%s\n", mc.GetName(4).c_str());
+	printf("%s\n", mc.GetName().c_str());
+	printf("%s\n", mc.GetName().c_str());
+	printf("%s\n", mc.GetName(10).c_str());
+	printf("%s\n", mc.GetName(16).c_str());
+	printf("%s\n", mc.GetName(10).c_str());
+	printf("%s\n", mc.GetName().c_str());
+	printf("%s\n", mc.GetName().c_str());
+	printf("%s\n", mc.GetName().c_str());
+	printf("%s\n", mc.GetName().c_str());
+	printf("%s\n", mc.GetName().c_str());
+	printf("%s\n", mc.GetName().c_str());*/
 	SDL_Init(SDL_INIT_EVERYTHING);
 	mainLoop();
 

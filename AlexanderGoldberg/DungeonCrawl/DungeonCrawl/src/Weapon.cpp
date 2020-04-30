@@ -4,6 +4,7 @@
 #include "Scene.h"
 #include  "World.h"
 #include "Enemy.h"
+#include "WeaponNameRenderer.h"
 #include <functional>
 Projectile* Weapon::getProjectile()
 {
@@ -83,6 +84,7 @@ bool Weapon::AddAmmo(int _amount)
 void Weapon::SetHolder(WeaponHolder* _holder)
 {
 	m_holder = _holder;
+	
 }
 void Weapon::Fire(Vector2 _direction) {
 	
@@ -530,12 +532,18 @@ void Weapon::GenerateWeapon(int _weaponLevel)
 			addPropertyToProfile(weaponProperties::illuminated);
 			m_LightData.lightRadius = getRandomInRange(1, 3);
 			m_LightData.lightIntensity = m_projectileData.DamageAmount * 1.5f;
+			m_name = "Illuminated " + m_name;
 		}
 		if (m_weaponLevel > 3)
 		{
 			m_projectileData.piercingCount = getChance(75) ? 1 : getRandomInRange(1, (m_weaponLevel / 2) + 1);
 			if (m_projectileData.piercingCount > 1)
+			{
 				addPropertyToProfile(weaponProperties::piercing);
+				m_name = "Piercing " + m_name;
+			}
+				
+
 		}
 
 		if (m_weaponLevel > 5)
@@ -610,9 +618,6 @@ void Weapon::PrintWeaponInfo()
 	}
 }
 
-
-
-
 void Weapon::generatePistol()
 {
 
@@ -626,7 +631,9 @@ void Weapon::generatePistol()
 	addPropertyToProfile(weaponProperties::spreadRandom);
 	m_SpreadData.spreadRangeDeg.Set(-5 + (m_weaponLevel / 2 > 5 ? 5 : m_weaponLevel / 2), 5 - (m_weaponLevel / 2 > 5 ? 5 : m_weaponLevel / 2));
 
-
+	m_name = "Pistol";
+	if (m_SpreadData.spreadRangeDeg.X < 1)
+		m_name = "High accuracy pistol";
 }
 
 void Weapon::generateShotgun()
@@ -643,6 +650,9 @@ void Weapon::generateShotgun()
 	m_burstData.burstShotsVariable.X = 3;
 	addPropertyToProfile(weaponProperties::everyShotCosts);
 	m_burstData.burstTotalTime = 0.1f;
+	m_name = "Shotgun";
+	if (m_SpreadData.spreadRangeDeg.X < 1)
+		m_name = "Clumpshot Shotgun";
 
 }
 
@@ -656,6 +666,10 @@ void Weapon::generateMachinegun()
 	m_projectileData.DamageAmount = 1 * m_weaponLevel;
 	addPropertyToProfile(weaponProperties::spreadRandom);
 	m_SpreadData.spreadRangeDeg.Set(-10 + spreadEffector * 0.5f, 10 - spreadEffector *0.5f);
+	m_name = "Machine gun";
+	if (m_SpreadData.spreadRangeDeg.X < 1)
+		m_name = "High accuracy" + m_name;
+
 }
 
 void Weapon::generateSniperRifle()
@@ -666,6 +680,7 @@ void Weapon::generateSniperRifle()
 	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
 	m_projectileData.projectileSpeedMultiplier = 2;
 	m_projectileData.DamageAmount = 2.5f * m_weaponLevel;
+	m_name = "Sniper rifle";
 }
 
 void Weapon::generateTriShot()
@@ -679,7 +694,7 @@ void Weapon::generateTriShot()
 	m_SpreadData.constSpreadInDegreesPerProjectile.push_back(0);
 	m_SpreadData.constSpreadInDegreesPerProjectile.push_back(15);
 	addPropertyToProfile(weaponProperties::spreadConstant);
-
+	m_name = "Tri-shot";
 
 }
 
@@ -697,6 +712,7 @@ void Weapon::generateHexShot()
 	m_SpreadData.constSpreadInDegreesPerProjectile.push_back(240);
 	m_SpreadData.constSpreadInDegreesPerProjectile.push_back(300);
 	addPropertyToProfile(weaponProperties::spreadConstant);
+	m_name = "Hex-shot";
 }
 
 void Weapon::generateAutoPistol()
@@ -713,6 +729,9 @@ void Weapon::generateAutoPistol()
 	m_burstData.burstShotsVariable.Set(4, 5);
 	m_burstData.burstTotalTime = m_triggerData.fireRate;
 	addPropertyToProfile(weaponProperties::everyShotCosts);
+	m_name = "Automatic pistol";
+	if (m_SpreadData.spreadRangeDeg.X < 1)
+		m_name = "High accuracy" + m_name;
 }
 
 void Weapon::generateAutoShotgun()
@@ -729,6 +748,9 @@ void Weapon::generateAutoShotgun()
 	m_burstData.burstShotsVariable.Set(4, 6);
 	addPropertyToProfile(weaponProperties::everyShotCosts);
 	m_burstData.burstTotalTime = 0.2f;
+	m_name = "Shotgun";
+	if (m_SpreadData.spreadRangeDeg.X < 1)
+		m_name = "Clump " + m_name;
 }
 
 void Weapon::generateAutoMachinegun()
@@ -744,6 +766,9 @@ void Weapon::generateAutoMachinegun()
 	addPropertyToProfile(weaponProperties::burstVariable);
 	m_burstData.burstShotsVariable.Set(3, 5);
 	m_burstData.burstTotalTime = m_triggerData.fireRate;
+	m_name = "Auto machine gun";
+	if (m_SpreadData.spreadRangeDeg.X < 1)
+		m_name = "High accuracy" + m_name;
 }
 
 void Weapon::generateMinigun()
@@ -761,7 +786,7 @@ void Weapon::generateMinigun()
 	m_burstData.burstTotalTime = m_triggerData.fireRate;
 	addPropertyToProfile(weaponProperties::everyShotCosts);
 	m_ammoMax = 200;
-	
+	m_name = "Minigun";
 }
 
 void Weapon::generateMissileLauncher()
@@ -774,7 +799,7 @@ void Weapon::generateMissileLauncher()
 	addPropertyToProfile(weaponProperties::areaOfEffectDamage);
 	m_AOEData.AoePercentageFallOffPerUnitDistance = 0.80f - m_weaponLevel * 0.05f;
 	m_AOEData.AoeRadiusInTiles = 2;
-
+	m_name = "Missile Launcher";
 }
 
 void Weapon::generateAutoMissileLauncher()
@@ -787,6 +812,8 @@ void Weapon::generateAutoMissileLauncher()
 	addPropertyToProfile(weaponProperties::areaOfEffectDamage);
 	m_AOEData.AoePercentageFallOffPerUnitDistance = 0.75f - m_weaponLevel * 0.07f;
 	m_AOEData.AoeRadiusInTiles = 2;
+	m_name = "Automatic Missile Launcher";
+	
 }
 
 void Weapon::generateAutoSniperRifle()
@@ -796,6 +823,7 @@ void Weapon::generateAutoSniperRifle()
 	m_triggerData.fireTimer.SetTimer(m_triggerData.fireRate);
 	m_projectileData.projectileSpeedMultiplier = 2;
 	m_projectileData.DamageAmount = 2.5f * m_weaponLevel;
+	m_name = "Auto sniper rifle";
 
 }
 

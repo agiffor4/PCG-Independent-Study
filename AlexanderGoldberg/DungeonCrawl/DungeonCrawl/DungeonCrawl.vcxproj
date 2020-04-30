@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\MarkovChain.cpp" />
     <ClCompile Include="src\Healthbar.cpp" />
     <ClCompile Include="src\PlayerHUD.cpp" />
     <ClCompile Include="src\Blockade.cpp" />
@@ -210,8 +211,10 @@
     <ClCompile Include="src\StatusEffectable.cpp" />
     <ClCompile Include="src\StatusEffect.cpp" />
     <ClCompile Include="src\WeaponHolder.cpp" />
+    <ClCompile Include="src\WeaponNameRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\MarkovChain.h" />
     <ClInclude Include="src\Healthbar.h" />
     <ClInclude Include="src\PlayerHUD.h" />
     <ClInclude Include="src\Blockade.h" />
@@ -354,6 +357,7 @@
     <ClInclude Include="src\StatusEffectable.h" />
     <ClInclude Include="src\StatusEffect.h" />
     <ClInclude Include="src\WeaponHolder.h" />
+    <ClInclude Include="src\WeaponNameRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SDL\lib\x64\SDL2.dll" />

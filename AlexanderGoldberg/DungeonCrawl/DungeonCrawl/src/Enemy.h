@@ -4,6 +4,7 @@
 #include "EnemyDataStructs.h"
 #include "RoomData.h"
 #include "IInputHandler.h"
+class TextA;
 class Scene;
 class World;
 class Player;
@@ -13,9 +14,9 @@ class Enemy :
 public:
 	enum class EnemyProperty
 	{
-/*+01+*/		combatRanged = 1, //ranged combat exclusive with melee combat
-/*+02+*/		combatMelee = 2, //melee combat exclusive with ranged combat
-/*+03+*/		combatSummon = 4, //summons other enemies, not exclusive with other combat properties
+				combatRanged = 1, //ranged combat exclusive with melee combat
+				combatMelee = 2, //melee combat exclusive with ranged combat
+				combatSummon = 4, //summons other enemies, not exclusive with other combat properties
 				movemetMoves = 8, //if true allows movement, if false stationary
 				defenseShieldTimed = 16,
 				defenseShieldBreakable = 32,
@@ -42,11 +43,14 @@ protected:
 		NONE = -1,
 		UP, DOWN, LEFT, RIGHT, UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT
 	};
+	TextA* m_nameDisplayer = nullptr;
+	TextA* m_HealthDisplayer = nullptr;
 	EnemyCombat m_combat = EnemyCombat();
 	float m_moveRate = 1.0f; //in seconds per tile
 	float m_attackRate = 1.0f;// in seconds
 	Uint32 m_EnemyProfile = 0;
 	World* m_world = nullptr;
+	std::string m_EnemyName;
 	Player* m_player = nullptr;
 	Renderable* m_shieldImage = nullptr;
 	RoomData m_roomSpawnedIn = RoomData();
@@ -95,6 +99,7 @@ protected:
 	void ranged(float _dt);
 	Tile* getFreeTileInRaidus(int _radius);
 	void randomEnemy(int _difficulty);
+	
 public:
 	struct PropertyChances {
 			bool Movement = false;
@@ -125,5 +130,6 @@ public:
 	bool TakeDamage(int _amount, DamageType _type) override;
 	void Render(SDL_Renderer* _renderer) override;
 	void InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y) override;
+	void GenerateName(Scene* _scene);
 };
 

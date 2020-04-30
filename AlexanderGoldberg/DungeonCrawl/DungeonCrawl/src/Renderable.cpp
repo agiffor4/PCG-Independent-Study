@@ -1,7 +1,7 @@
 #include "Renderable.h"
 #include "Camera.h"
 #include "SDL_image.h"
-
+#include "Scene.h"
 Renderable::Renderable()
 {
 
@@ -147,6 +147,10 @@ float Renderable::vectorToAngle(Vector2 _direction)
 	}
 	return angle;
 }
+void Renderable::SetScene(Scene* _scene)
+{
+	m_sceneIn = _scene;
+}
 bool& Renderable::renderOrderChanged(){
 	static bool s_renderOrderChanged;
 	return s_renderOrderChanged;
@@ -213,6 +217,11 @@ void Renderable::Update(float _dt)
 void Renderable::CleanUp(){
 	SDL_DestroyTexture(m_texture);
 	//printf("Clean up called for renderable %s\n", m_name.c_str());
+}
+
+void Renderable::SetShouldRender(bool _val)
+{
+	m_shouldRender = _val;
 }
 
 

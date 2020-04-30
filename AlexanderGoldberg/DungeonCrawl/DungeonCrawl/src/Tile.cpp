@@ -453,6 +453,7 @@ void Tile::Render(SDL_Renderer* _renderer)
 
 void Tile::Update(float _dt)
 {
+	
 	for (size_t i = 0; i < m_items.size(); i++)
 	{
 		if (m_items[i] != nullptr)
@@ -475,6 +476,13 @@ void Tile::Update(float _dt)
 
 	}
 	deleteFlaggedItems();
+	if (m_deleteContents)
+	{
+		m_deleteContents = false;
+		m_sceneIn->RemoveRenderable(m_contents);
+		delete(m_contents);
+		m_contents = nullptr;
+	}
 }
 
 void Tile::DetermineTileType(World* _world)
@@ -731,6 +739,16 @@ SDL_Color Tile::GetIllumination()
 		}
 	}
 	return { 255, 255, 255, 255 };
+}
+
+bool Tile::IsVisible()
+{
+	return m_shouldRender && (!m_inFogOfWar || !m_renderFogOfWar);
+}
+
+void Tile::DeleteContents()
+{
+	m_deleteContents = true;
 }
 
 

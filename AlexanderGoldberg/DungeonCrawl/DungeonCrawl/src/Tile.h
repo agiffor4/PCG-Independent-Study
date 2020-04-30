@@ -141,6 +141,7 @@ private:
 	};
 	bool m_clickAble = false;
 	void deleteFlaggedItems(); 
+	bool m_deleteContents = false;
 public:
 
 
@@ -176,5 +177,7 @@ public:
 	void SetFogOfWar(bool _inFogOfWar, int _distanceFromSource);
 	const std::vector<Interactable*>& GetItems();
 	SDL_Color GetIllumination();
+	bool IsVisible();
+	void DeleteContents();
 };
 

@@ -58,7 +58,7 @@ void TextA::SetColor(SDL_Color _newColor)
 void TextA::Render(SDL_Renderer* _renderer)
 {
 	
-	if (m_fontInitalized){		
+	if (m_fontInitalized && m_shouldRender){		
 		FC_DrawColor(m_font, _renderer, GetPosition().X, GetPosition().Y, m_color, m_text.c_str());
 	}
 

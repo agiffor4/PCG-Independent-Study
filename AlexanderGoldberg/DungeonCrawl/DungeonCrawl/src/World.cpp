@@ -19,7 +19,7 @@
 #include "Ammo.h"
 #include "Weapon.h"
 #include "Chest.h"
-
+#include "MarkovChain.h"
 #include "Enemy.h"
 #include "Thing.h"
 /*
@@ -876,7 +876,8 @@ void World::generateFoes()
 	CreateEne(roomIndex);*/
 	int deepest = roomTree.GetDeepestDepth();
 	Enemy::PropertyChances chances = Enemy::PropertyChances();
-	
+	MarkovChain mc = MarkovChain();
+	mc.Generate(2);
 	for (size_t i = 0; i < m_roomsData.size(); i++)
 	{
 		if (roomTree.GetRoomDepth(i) > 2)
@@ -913,7 +914,7 @@ void World::generateFoes()
 			int enemiesToSpawn = roomTree.GetRoomDepth(i) / 2;
 			for (size_t j = 0; j < enemiesToSpawn && j < 4; j++)
 			{
-				CreateEnemy(i, m_generationNumber, &chances);
+				CreateEnemy(i, m_generationNumber, &chances, &mc);
 			}
 
 		}
@@ -1126,8 +1127,9 @@ Player* World::CreatePlayer()
 {
 	m_playerCreated = true;
 	Player* p = new Player();
-	p->Initalize((*this), "img/Player.bmp", "Player", m_scene->GetRenderer());
+	p->Initalize((*this), "img/Player.bmp", "Player", m_scene, m_scene->GetRenderer());
 	p->SetScale(m_scale);
+	p->SetScene(m_scene);
 	m_scene->AddCollidable(p);
 	return p;
 
@@ -1141,6 +1143,7 @@ Weapon* World::CreateWeapon()
 	w->Init("img/pics/Weapon03.png", "Weapon " + std::to_string(m_weaponsSpawnedOnLevel), m_scene->GetRenderer());
 	w->InitializeWeapon(m_scene, this);
 	w->GenerateWeapon(m_generationNumber + (rand() % 2));
+	w->SetScene(m_scene);
 	return w;
 
 }
@@ -1159,8 +1162,19 @@ void World::PlacePlayer(std::vector<std::vector<int>>* _rooms)
 	Weapon* w = new Weapon();
 	w->Init("img/pics/Weapon01.png", "Basic Weapon", m_scene->GetRenderer());
 	w->InitializeWeapon(m_scene, this);
-	w->GenerateWeapon(1);
-	t = GetTileAtIndex(m_playerStart);
+	w->GenerateWeapon(3);
+	std::vector<Tile*> neighbors = GetNeighbors(m_playerStart);
+	int index = m_playerStart;
+	for (size_t i = 0; i < neighbors.size(); i++)
+	{
+		if (neighbors[i]->IsPassable())
+		{
+			index = neighbors[i]->GetPositionInVector();
+			break;
+		}
+	}
+	w->SetScene(m_scene);
+	t = GetTileAtIndex(index);
 	t->AddItem(w);
 
 }
@@ -1329,28 +1343,43 @@ Vector2 World::CheckIfCameraShouldMove(Vector2 _cameraMoveDirection)
 	return _cameraMoveDirection;
 }
 
-void World::CreateEnemy(int _roomIndex, int _enemyLevel, void* _chances)
+void World::CreateEnemy(int _roomIndex, int _enemyLevel, void* _chances, MarkovChain* _mc)
 {
 	Enemy* e = new Enemy();
-	e->Init("img/pics/coin.png", "Enemy", m_scene->GetRenderer());
+	e->Init("img/pics/coin.png", _mc->GetName(), m_scene->GetRenderer());
 	Tile* t = GetTileAtIndex(m_roomsData[_roomIndex].GetRandomTile());
 	e->SetScale(m_tiles[0]->GetScale());
 	e->GenerateEnemy(_enemyLevel, m_scene, this, m_roomsData[_roomIndex], (Enemy::PropertyChances*)_chances);
 	e->SetLocation(t);
 	t->SetContents(e);
 	m_scene->AddCollidable(e);
+	e->GenerateName(m_scene);
+	e->SetScene(m_scene);
 }
 
-void World::CreateEnemyAtIndex(int _tileIndex, int _enemyLevel)
+void World::CreateEnemyAtIndex(int _tileIndex, int _enemyLevel, MarkovChain* _mc)
 {
+	bool m_delete = false;
+	if (_mc == nullptr)
+	{
+		m_delete = true;
+		_mc = new MarkovChain();
+		_mc->Generate(2);
+	}
 	Enemy* e = new Enemy();
-	e->Init("img/pics/coin.png", "Enemy", m_scene->GetRenderer());
+	e->Init("img/pics/coin.png", _mc->GetName(), m_scene->GetRenderer());
 	Tile* t = GetTileAtIndex(_tileIndex);
 	e->SetScale(m_tiles[0]->GetScale());
 	e->GenerateEnemy(_enemyLevel, m_scene, this, m_roomsData[GetIndexOfRoomTileIsIn(_tileIndex)]);
 	e->SetLocation(t);
 	t->SetContents(e);
 	m_scene->AddCollidable(e);
+	e->GenerateName(m_scene);
+	e->SetScene(m_scene);
+	if (m_delete)
+	{
+		delete(_mc);
+	}
 }
 
 const std::vector<Enemy*>& World::GetEnemiesOnLevel()

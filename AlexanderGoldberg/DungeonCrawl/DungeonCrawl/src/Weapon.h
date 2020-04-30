@@ -40,7 +40,6 @@ public:
 	std::map<int, std::string> enumLookup;
 protected:
 	bool m_useAmmo = true;
-
 	WeaponHolder* m_holder;
 	
 	//spread variables

@@ -2,7 +2,7 @@
 #include "Vector2.h"
 #include "SDL.h"
 #include <memory>
-
+class Scene;
 class Renderable
 {
 private:
@@ -37,7 +37,9 @@ protected:
 	const Vector2 getCenterOfTexture();
 	void setAngle(float _angle);
 	float vectorToAngle(Vector2 _direction);
+	Scene* m_sceneIn = nullptr;
 public:
+	void SetScene(Scene* _scene);
 	static bool& renderOrderChanged();
 	void changeImage(std::string _imagePath, Uint32 _transparentColor = -999);
 	void SetRenderLayer(int _renderLayer);
@@ -64,6 +66,6 @@ public:
 	const std::string& GetName();
 	const SDL_Texture* GetTexture();
 	virtual void CleanUp();
-
+	virtual void SetShouldRender(bool _val);
 };
 

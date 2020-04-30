@@ -1,19 +1,20 @@
 #pragma once
-#include "TextA.h"
-#include "Healthbar.h"
+class TextA;
+class Healthbar;
 class Player;
+class Scene;
+struct SDL_Renderer;
 class PlayerHUD
 {
 protected:
 	Player* m_player = nullptr;
-	TextA m_ammoCount = TextA();
-	Healthbar m_healthBar = Healthbar();
+	TextA* m_ammoCount = nullptr;
+	Healthbar* m_healthBar = nullptr;
 public:
-
-	PlayerHUD(Player* _player, SDL_Renderer* _renderer);
+	void Initialize(Player* _player, SDL_Renderer* _renderer, Scene* _scene);
+	PlayerHUD();
 	~PlayerHUD();
 	void Update(float _dt);
-	void Render(SDL_Renderer* _renderer);
 	
 
 };

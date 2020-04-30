@@ -7,6 +7,8 @@
 #include "Holdable.h"
 #include "Weapon.h"
 #include "PlayerHUD.h"
+#include "WeaponNameRenderer.h"
+#include "Scene.h"
 Player::Player()
 {
 	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::UP);
@@ -32,8 +34,14 @@ Player::~Player()
 
 void Player::Update(float _dt)
 {
+	if (m_equipedWeapon != nullptr)
+		m_equipedWeapon->Update(_dt);
 
-	
+	if (m_nameRenderer != nullptr)
+	{
+		if (m_nameRenderer->UpdateB(_dt))
+			m_nameRenderer->SetShouldRender(false);
+	}
 	m_moveRate.CountDownAutoCheckBool(_dt);
 	if (!m_moveRate.GetShouldCountDown())
 	{
@@ -41,14 +49,7 @@ void Player::Update(float _dt)
 		move(m_direction);
 		m_moveRate.SetShouldCountDown(true);
 	}
-	if (m_equipedWeapon != nullptr)
-	{
-		m_equipedWeapon->Update(_dt);
-		if (m_equipedWeapon->ShouldSetLOS())
-		{
-			SetLineOfSight(true);
-		}
-	}
+	SetLineOfSight(true);
 	
 	if (m_fireButtonDown)
 	{
@@ -143,14 +144,15 @@ void Player::InvokeMouseDown(MouseButton _mouse, Sint32 _x, Sint32 _y)
 	}
 }
 
-void Player::Initalize(World& _world, const std::string _path, const std::string _name, SDL_Renderer* _renderer, Uint32 _transparentColor)
+void Player::Initalize(World& _world, const std::string _path, const std::string _name, Scene* _scene, SDL_Renderer* _renderer, Uint32 _transparentColor)
 {
 	Renderable::Init(_path, _name, _renderer, _transparentColor);
 	m_world = &_world;	
 	SetRenderLayer(15);
 	SetName("Player");
 	m_solid = true;
-	m_hud = new PlayerHUD(this, _renderer);
+	m_hud = new PlayerHUD();
+	m_hud->Initialize(this, _renderer, _scene);
 	
 }
 
@@ -377,7 +379,6 @@ void Player::Render(SDL_Renderer* _renderer)
 	Vector2 v = GetCameraAdjustPosition(true);
 	m_mouseAim.SetOrigin(v);
 	m_mouseAim.Render(_renderer);
-	m_hud->Render(_renderer);
 }
 
 void Player::EquipWeapon(Weapon* _weapon)
@@ -385,6 +386,19 @@ void Player::EquipWeapon(Weapon* _weapon)
 	m_equipedWeapon = _weapon;
 	if (m_equipedWeapon != nullptr)
 	{
+
+		if (m_nameRenderer == nullptr)
+		{
+			m_nameRenderer = new WeaponNameRenderer();
+			m_nameRenderer->InitializeFont("fonts/FreeSans.ttf", 12, m_rendererRef, { 3, 252, 244, 255 });
+			m_sceneIn->AddUI(m_nameRenderer);
+		}
+		m_nameRenderer->SetText(m_equipedWeapon->GetName());
+		Vector2 v = GetCameraAdjustPosition() + Vector2(m_nameRenderer->getTextWidth() * -0.5f, 0.0f);
+		m_nameRenderer->SetPosition(v);
+		m_nameRenderer->SetShouldRender(true);
+
+
 		printf("\n\n\n");
 		m_equipedWeapon->PrintWeaponInfo();
 		printf("\n\n\n");

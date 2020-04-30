@@ -7,10 +7,12 @@
 #include "InputManager.h"
 #include <stack>
 #include "Blockade.h"
+#include "TextA.h"
+#include "Scene.h"
 Enemy::Enemy()
 {
 	m_solid = true;
-	InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::MOUSEUP);
+	//InputManager::GetInputManager()->SubscribeToInput(this, InputManager::KeyPressType::MOUSEUP);
 }
 
 Enemy::~Enemy()
@@ -25,6 +27,7 @@ Enemy::~Enemy()
 		delete(m_rangedData.Weapon);
 		m_rangedData.Weapon = nullptr;
 	}
+	
 }
 
 
@@ -281,17 +284,20 @@ void Enemy::visible(float _dt)
 		if (m_visibilityData.FlickerRate.CountDown(_dt))
 		{
 			m_shouldRender = !m_shouldRender;
+			
 		}
 		if (m_visibilityData.TimeFlickering.CountDown(_dt))
 		{
 			if (m_visibilityData.LastStatus == EnemyDataStructs::VisibilityStruct::VisibleStatus::Invisible)
 			{
 				m_shouldRender = true;
+				
 				m_visibilityData.Status = EnemyDataStructs::VisibilityStruct::VisibleStatus::Visible;
 			}
 			else
 			{
 				m_shouldRender = false;
+				
 				m_visibilityData.Status = EnemyDataStructs::VisibilityStruct::VisibleStatus::Invisible;
 			}
 			m_visibilityData.LastStatus = EnemyDataStructs::VisibilityStruct::VisibleStatus::Flickering;
@@ -430,6 +436,7 @@ void Enemy::die()
 {
 	m_shouldRender = false;
 	m_solid = false;
+	m_location->DeleteContents();
 }
 
 void Enemy::generatePatrolPath(std::vector<int> _corners)
@@ -527,6 +534,7 @@ void Enemy::ranged(float _dt)
 		}
 
 	}
+	
 }
 
 Tile* Enemy::getFreeTileInRaidus(int _radius)
@@ -631,6 +639,7 @@ void Enemy::randomEnemy(int _difficulty)
 		{
 			addPropertyToProfile(EnemyProperty::visibilityInvisible);
 			m_shouldRender = false;
+			
 		}
 		else
 		{
@@ -701,13 +710,93 @@ void Enemy::randomEnemy(int _difficulty)
 	}
 }
 
+void Enemy::GenerateName(Scene* _scene)
+{
+	
+		if (propertyInProfile(EnemyProperty::healthRegen))
+			m_EnemyName += "Regenerating ";
+		if (propertyInProfile(EnemyProperty::defenseShieldTimed) || propertyInProfile(EnemyProperty::defenseShieldBreakable))
+			m_EnemyName += "shielded ";
+		if (propertyInProfile(EnemyProperty::defenseLeaveBarricades))
+			m_EnemyName += "blockader ";
+		if (!propertyInProfile(EnemyProperty::movemetMoves))
+			m_EnemyName += "stationary ";
+		if (propertyInProfile(EnemyProperty::combatRanged))
+		{
+				m_EnemyName += "sharpshooting ";
+		}
+		if (propertyInProfile(EnemyProperty::combatMelee))
+		{
+				m_EnemyName += "swordfighting ";
+		}
+		if (propertyInProfile(EnemyProperty::combatSummon))
+		{
+				m_EnemyName += "summoning ";
+		}
+		if (propertyInProfile(EnemyProperty::behaviorSeekout) || propertyInProfile(EnemyProperty::behaviorCharge))
+		{
+			m_EnemyName += "close range ";
+		}
+		if (propertyInProfile(EnemyProperty::behaviorKeepDistance))
+			m_EnemyName += "careful ";
+		if (propertyInProfile(EnemyProperty::visibilityInvisible) || propertyInProfile(EnemyProperty::visibilityFlicker))
+			m_EnemyName += "invisible ";
+		if(propertyInProfile(EnemyProperty::mineLayer))
+			m_EnemyName += "mine layer ";
+		m_EnemyName += "\"" + m_name + "\"";
+		printf("%s\n", m_EnemyName.c_str());
+		
+		
+
+		if (m_nameDisplayer == nullptr)
+		{
+			m_nameDisplayer = new TextA();
+			m_nameDisplayer->InitializeFont("fonts/FreeSans.ttf", 16, m_rendererRef, { 0, 255, 0, 255 });
+			_scene->AddUI(m_nameDisplayer);
+		}
+		
+		m_nameDisplayer->SetText(m_EnemyName);
+		
+}
+
 
 
 void Enemy::Update(float _dt)
 {
 	if (m_health < 1)
 	{
+		if (m_nameDisplayer != nullptr)
+		{
+			m_nameDisplayer->SetPosition(GetLocation()->GetCameraAdjustPosition() - Vector2(m_nameDisplayer->getTextWidth() * 0.5f, (float)m_nameDisplayer->getTextHeight()));
+			m_nameDisplayer->SetShouldRender(false);
+			//m_nameDisplayer->SetText("");
+		}
+		if (m_HealthDisplayer != nullptr)
+		{
+
+			m_HealthDisplayer->SetPosition(GetLocation()->GetCameraAdjustPosition() - Vector2(m_HealthDisplayer->getTextWidth() * 0.5f, (float)((m_nameDisplayer != nullptr ? m_nameDisplayer->getTextHeight() : 0) + m_HealthDisplayer->getTextHeight())));
+			m_HealthDisplayer->SetShouldRender(false);
+			//m_HealthDisplayer->SetText("");
+			m_HealthDisplayer->SetText("0/" + std::to_string(m_healthMax));
+		}
 		return;
+	}
+
+	if (m_shouldRender && m_health > 0)
+	{
+
+		if (m_nameDisplayer != nullptr)
+		{
+			m_nameDisplayer->SetPosition(GetLocation()->GetCameraAdjustPosition() - Vector2(m_nameDisplayer->getTextWidth()*0.5f, (float)m_nameDisplayer->getTextHeight()));
+			m_nameDisplayer->SetShouldRender(m_location->IsVisible() ? m_shouldRender : false);
+		}
+		if (m_HealthDisplayer != nullptr)
+		{
+			
+			m_HealthDisplayer->SetPosition(GetLocation()->GetCameraAdjustPosition() - Vector2(m_HealthDisplayer->getTextWidth() * 0.5f, (float)((m_nameDisplayer != nullptr ? m_nameDisplayer->getTextHeight() : 0) + m_HealthDisplayer->getTextHeight())));
+			m_HealthDisplayer->SetShouldRender(m_location->IsVisible() ? m_shouldRender : false);
+			m_HealthDisplayer->SetText(std::to_string(m_health) + "/" + std::to_string(m_healthMax));
+		}
 	}
 
 	if (propertyInProfile(EnemyProperty::contactPassive) && !m_contactData.Aggroded)
@@ -818,6 +907,7 @@ void Enemy::GenerateEnemy(int _difficulty, Scene* _scene, World* _world, RoomDat
 		{
 			addPropertyToProfile(EnemyProperty::visibilityInvisible);
 			m_shouldRender = false;
+			
 		}
 		else
 		{
@@ -925,7 +1015,16 @@ void Enemy::GenerateEnemy(int _difficulty, Scene* _scene, World* _world, RoomDat
 	{
 		randomEnemy(_difficulty);
 	}
+
+	if (m_HealthDisplayer == nullptr)
+	{
+		m_HealthDisplayer = new TextA();
+		m_HealthDisplayer->InitializeFont("fonts/FreeSans.ttf", 16, m_rendererRef, { 255, 0, 0, 255 });
+		_scene->AddUI(m_HealthDisplayer);
 		
+	}
+
+	
 }
 
 bool Enemy::TakeDamage(int _amount, DamageType _type)

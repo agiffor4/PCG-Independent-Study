@@ -9,6 +9,7 @@ class Weapon;
 class Scene;
 class Interactable;
 class Holdable;
+class WeaponNameRenderer;
 class Player :
 	public WeaponHolder, public IInputHandler
 {
@@ -21,7 +22,7 @@ public:
 	void InvokeKeyUp(SDL_Keycode _key) override;
 	void InvokeMouseUp(MouseButton _mouse, Sint32 _x, Sint32 _y) override;
 	void InvokeMouseDown(MouseButton _mouse, Sint32 _x, Sint32 _y) override;
-	void Initalize(World& _world, const std::string _path, const std::string _name, SDL_Renderer* _renderer, Uint32 _transparentColor = -999);
+	void Initalize(World& _world, const std::string _path, const std::string _name, Scene* _scene, SDL_Renderer* _renderer, Uint32 _transparentColor = -999);
 	void SetLineOfSight(bool _inLineOfSight);
 	bool AddAmmo(int _amount);
 	void Render(SDL_Renderer* _renderer)override;
@@ -30,6 +31,8 @@ public:
 	float GetAmmoAsPercent();
 	
 protected:
+
+	WeaponNameRenderer* m_nameRenderer = nullptr;
 	bool m_fireButtonDown = false;
 	PlayerHUD* m_hud = nullptr;
 	//MOVEMENT VARIABLES
@@ -47,7 +50,7 @@ protected:
 	World* m_world;
 	std::vector<Thing*> m_inventory;
 	int m_inventoryMax = -1;
-	int m_lineOfSightRadius = 2;
+	int m_lineOfSightRadius = 3;
 	Holdable* m_holdables[2];
 	Weapon* m_equipedWeapon = nullptr;
 	

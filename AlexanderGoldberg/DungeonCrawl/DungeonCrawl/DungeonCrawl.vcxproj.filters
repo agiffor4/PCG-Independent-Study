@@ -219,6 +219,12 @@
     <ClCompile Include="src\WeaponHolder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\MarkovChain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WeaponNameRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\DeltaTime.h">
@@ -645,6 +651,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\WeaponHolder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MarkovChain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\WeaponNameRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

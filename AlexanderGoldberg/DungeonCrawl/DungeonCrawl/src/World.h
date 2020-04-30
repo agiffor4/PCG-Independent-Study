@@ -18,6 +18,7 @@ class RoomTree;
 class Weapon;
 class Enemy;
 class Thing;
+class MarkovChain;
 class World : public IInputHandler
 {
 private:
@@ -131,8 +132,8 @@ public:
 	Vector2 CheckIfCameraShouldMove(Vector2 _cameraMoveDirection);
 	
 	//ENEMIES
-	void CreateEnemy(int _roomIndex, int _enemyLevel, void* _chances);
-	void CreateEnemyAtIndex(int _tileIndex, int _enemyLevel);
+	void CreateEnemy(int _roomIndex, int _enemyLevel, void* _chances, MarkovChain* _mc);
+	void CreateEnemyAtIndex(int _tileIndex, int _enemyLevel, MarkovChain* _mc = nullptr);
 	const std::vector<Enemy*>& GetEnemiesOnLevel();
 	Enemy* GetNearestEnemy(Vector2 _referencePoint, float _maximumRange = -1);
 	std::set<Tile*> GetTilesInRadiusFromEpicenter(int _epicenter, int _radius);
