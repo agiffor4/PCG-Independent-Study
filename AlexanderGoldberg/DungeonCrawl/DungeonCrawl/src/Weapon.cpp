@@ -60,6 +60,10 @@ Weapon::Weapon()
 
 Weapon::~Weapon()
 {
+	for (size_t i = 0; i < m_projectiles.size(); i++)
+	{
+		m_scene->RemoveRenderable(m_projectiles[i]);
+	}
 	m_scene->RemoveRenderable(this);
 }
 

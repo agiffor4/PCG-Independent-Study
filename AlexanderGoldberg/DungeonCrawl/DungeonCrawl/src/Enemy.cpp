@@ -26,7 +26,19 @@ Enemy::~Enemy()
 	{
 		delete(m_rangedData.Weapon);
 		m_rangedData.Weapon = nullptr;
+
 	}
+	if (m_HealthDisplayer != nullptr)
+	{
+		m_HealthDisplayer->SetText("");
+		m_sceneIn->RemoveUI(m_HealthDisplayer);
+	}
+	if (m_nameDisplayer != nullptr)
+	{
+		m_nameDisplayer->SetText("");
+		m_sceneIn->RemoveUI(m_nameDisplayer);
+	}
+	
 	
 }
 
@@ -436,6 +448,8 @@ void Enemy::die()
 {
 	m_shouldRender = false;
 	m_solid = false;
+	
+
 	m_location->DeleteContents();
 }
 

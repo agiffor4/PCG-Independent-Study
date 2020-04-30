@@ -25,7 +25,7 @@ void Projectile::move(float _dt)
 			pos = GetPosition() + (m_direction *speed);
 		}
 		SetPosition(pos);
-		if (Vector2::GetDistanceGreaterThan(GetPosition(), m_currentTileIn->GetPosition(), m_currentTileIn->GetDestination().w*0.5f))
+		if (m_currentTileIn != nullptr && Vector2::GetDistanceGreaterThan(GetPosition(), m_currentTileIn->GetPosition(), m_currentTileIn->GetDestination().w*0.5f))
 		{
 			
 			if (hasProperty(Property::illuminated))
